@@ -16,7 +16,7 @@ public class GA {
         this.random = new Random();
     }
 
-    public void run() {
+    public double run() {
         double[][] population = new double[POP_SIZE][4];
 
         // 初始化种群
@@ -26,7 +26,7 @@ public class GA {
             }
         }
 
-        double[] bestIndividual = null;
+        double[] best = null;
         double bestScore = -Double.MAX_VALUE;
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
@@ -43,7 +43,7 @@ public class GA {
                 double score = evaluate(child);
                 if (score > bestScore) {
                     bestScore = score;
-                    bestIndividual = child.clone();
+                    best = child.clone();
         
                 }
              
@@ -53,10 +53,11 @@ public class GA {
             population = newPopulation;
 
         }
-        baseDM.normalizeL2(bestIndividual);
+        baseDM.normalizeL2(best);
         System.out.println("=== GA Finished ===");
-        System.out.printf("Best Score = %.4f\nBest Weights = %s\n", bestScore*100, Arrays.toString(bestIndividual));
+        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
         baseDM.printStats();
+        return bestScore;
     }
 
     // 评估个体（即计算某一组权重下的分数）

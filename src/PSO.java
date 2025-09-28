@@ -19,14 +19,14 @@ public class PSO {
         this.random = new Random();
     }
 
-    public void run() {
+    public double run() {
         double[][] position = new double[POP_SIZE][DIMENSIONS];
         double[][] velocity = new double[POP_SIZE][DIMENSIONS];
         double[][] pBestPosition = new double[POP_SIZE][DIMENSIONS];
         double[] pBestScore = new double[POP_SIZE];
 
-        double[] gBestPosition = new double[DIMENSIONS];
-        double gBestScore = -Double.MAX_VALUE;
+        double[] best = new double[DIMENSIONS];
+        double bestScore = -Double.MAX_VALUE;
 
         // 初始化粒子的位置和速度
         for (int i = 0; i < POP_SIZE; i++) {
@@ -37,9 +37,9 @@ public class PSO {
             pBestPosition[i] = position[i].clone();
             pBestScore[i] = evaluate(position[i]);
 
-            if (pBestScore[i] > gBestScore) {
-                gBestScore = pBestScore[i];
-                gBestPosition = pBestPosition[i].clone();
+            if (pBestScore[i] > bestScore) {
+                bestScore = pBestScore[i];
+                best = pBestPosition[i].clone();
             }
         }
 
@@ -50,7 +50,7 @@ public class PSO {
                     double r2 = random.nextDouble();
                     velocity[i][j] = INERTIA * velocity[i][j]
                             + COGNITIVE * r1 * (pBestPosition[i][j] - position[i][j])
-                            + SOCIAL * r2 * (gBestPosition[j] - position[i][j]);
+                            + SOCIAL * r2 * (best[j] - position[i][j]);
 
                     position[i][j] += velocity[i][j];
 
@@ -65,18 +65,19 @@ public class PSO {
                     pBestPosition[i] = position[i].clone();
                 }
 
-                if (score > gBestScore) {
-                    gBestScore = score;
-                    gBestPosition = position[i].clone();
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = position[i].clone();
                
                 }
             }
 
         }
-        baseDM.normalizeL2(gBestPosition);
+        baseDM.normalizeL2(best);
         System.out.println("=== PSO Finished ===");
-        System.out.printf("Best Score = %.4f\nBest Weights = %s\n", gBestScore*100, Arrays.toString(gBestPosition));
+        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
         baseDM.printStats();
+        return bestScore;
     }
 
     // 评估函数

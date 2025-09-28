@@ -17,7 +17,7 @@ public class SA {
         this.random = new Random();
     }
 
-    public void run() {
+    public double run() {
         double[] current = randomWeights(); // 当前解
         double currentScore = evaluate(current);
 
@@ -46,8 +46,9 @@ public class SA {
         }
         baseDM.normalizeL2(best);
         System.out.println("=== SA Finished ===");
-        System.out.printf("Best Score = %.4f\nBest Weights = %s\n", bestScore*100, Arrays.toString(best));
+        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
         baseDM.printStats();
+        return bestScore;
     }
 
     // 生成初始解（每维随机 0~1）

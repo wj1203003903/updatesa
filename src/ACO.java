@@ -25,9 +25,9 @@ public class ACO {
         }
     }
 
-    public void run() {
+    public double run() {
         double bestScore = -Double.MAX_VALUE;
-        double[] bestWeights = new double[DIMENSIONS];
+        double[] best = new double[DIMENSIONS];
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
             double[][] ants = new double[ANT_COUNT][DIMENSIONS];
@@ -41,7 +41,7 @@ public class ACO {
                 scores[k] = evaluate(ants[k]);
                 if (scores[k] > bestScore) {
                     bestScore = scores[k];
-                    bestWeights = ants[k].clone();
+                    best = ants[k].clone();
 
                 }
             }
@@ -63,10 +63,11 @@ public class ACO {
 
 
         }
-        baseDM.normalizeL2(bestWeights);
+        baseDM.normalizeL2(best);
         System.out.println("=== ACO Finished ===");
-        System.out.printf("Best Score = %.4f\nBest Weights = %s\n", bestScore*100, Arrays.toString(bestWeights));
+        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
         baseDM.printStats();
+        return bestScore;
     }
 
     // 按概率从当前维度选择一个值
