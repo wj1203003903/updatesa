@@ -1,96 +1,112 @@
 import java.util.*;
-// 数据结构
+
 // 存储类，分为不同级别缓存
 class Cathe {
-    int capacity;
+    long capacity; // 容量单位: B (字节)
+    long currentSize = 0;
     Map<String, Map<Integer, List<DataItem>>> dataMap = new HashMap<>();
     protected Cathe lowerLevel = null;
 
-    public Cathe(int capacity) {
+    public Cathe(long capacity) {
         this.capacity = capacity;
     }
 
-    // 绑定下一级缓存
     public void bindLowerLevel(Cathe lower) {
         this.lowerLevel = lower;
     }
 
-    // 获取当前缓存中数据项的总数
-    private int totalSize() {
-        int size = 0;
-        for (Map<Integer, List<DataItem>> map : dataMap.values()) {
-            for (List<DataItem> list : map.values()) {
-                size += list.size();
-            }
-        }
-        return size;
+    public long getCurrentSize() {
+        return currentSize;
     }
 
-    // 获取数据
-    public DataItem get(String type, int priority, int id) {
+    public DataItem get(String type, int priority, int id, long currentTime) {
         Map<Integer, List<DataItem>> typeMap = dataMap.get(type);
         if (typeMap == null) return null;
         List<DataItem> list = typeMap.get(priority);
         if (list == null) return null;
-        int idx = Collections.binarySearch(list, new DataItem(id, 0, type, 0, priority), (a, b) -> a.id - b.id);
+        int idx = Collections.binarySearch(list, new DataItem(id, 0, type, 0, priority, 0, 0, 0), (a, b) -> a.id - b.id);
         if (idx >= 0) {
             DataItem item = list.get(idx);
-            item.updateAccess();
+            item.updateAccess(currentTime);
             return item;
         }
         return null;
     }
 
-    // 插入数据
-    public void put(DataItem item) {
-        if (!dataMap.containsKey(item.type)) {
-            dataMap.put(item.type, new HashMap<>());
-        }
-
-        Map<Integer, List<DataItem>> typeMap = dataMap.get(item.type);
-        if (!typeMap.containsKey(item.Priority)) {
-            typeMap.put(item.Priority, new ArrayList<>());
-        }
-
-        List<DataItem> list = typeMap.get(item.Priority);
-
-        int idx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
-        if (idx >= 0) {
-            list.get(idx).updateAccess();
+    public void put(DataItem item, long currentTime) {
+        if (item.size > this.capacity) {
+            degrade(item, currentTime);
             return;
         }
-        idx = -idx - 1;
-        if (totalSize() >= capacity) {
-            instead(list, item, idx);
-        } else {
-            list.add(idx, item);
+
+        Map<Integer, List<DataItem>> typeMap = dataMap.computeIfAbsent(item.type, k -> new HashMap<>());
+        List<DataItem> list = typeMap.computeIfAbsent(item.Priority, k -> new ArrayList<>());
+
+        // 检查项目是否已存在。如果存在，则更新并返回。
+        int existingIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
+        if (existingIdx >= 0) {
+            list.get(existingIdx).updateAccess(currentTime);
+            return;
         }
-    }
 
-    // 替换数据
-    protected void instead(List<DataItem> list, DataItem newItem, int idx) {
-        int minIndex = -1;
-        double minScore = Double.MAX_VALUE;
-
-        // 查找评分最低的数据项
-        for (int i = 0; i < list.size(); i++) {
-            double score = list.get(i).score();
-            if (score < minScore) {
-                minScore = score;
-                minIndex = i;
+        // --- 核心修正 ---
+        // 步骤 1: 首先执行所有必要的驱逐操作，确保有足够的空间。
+        while (currentSize + item.size > capacity) {
+            if (!evictOne(currentTime)) {
+                // 如果无法腾出空间（例如，因为项目太大或缓存为空），则放弃插入。
+                return;
             }
         }
 
-        if (minIndex != -1 && newItem.score() > minScore) {
-            list.add(idx, newItem);
-            DataItem evicted = list.remove(minIndex);
-            degrade(evicted);
+        // 步骤 2: 在所有可能修改列表大小的操作完成后，再计算插入索引。
+        // 此时的列表状态是最终的，计算出的索引是安全的。
+        int insertionIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
+        // 如果在驱逐期间，同一个 item 被以某种方式添加（不太可能但为了健壮性），则直接返回。
+        if(insertionIdx >= 0) {
+            return;
+        }
+
+        // 将 binarySearch 的负数返回值转换为正确的插入点。
+        insertionIdx = -insertionIdx - 1;
+
+        // 步骤 3: 使用刚刚计算出的、现在肯定有效的索引进行添加。
+        list.add(insertionIdx, item);
+        currentSize += item.size;
+    }
+
+    protected boolean evictOne(long currentTime) {
+        DataItem toEvict = null;
+        double minScore = Double.MAX_VALUE;
+        for (Map<Integer, List<DataItem>> typeMap : dataMap.values()) {
+            for (List<DataItem> list : typeMap.values()) {
+                for (DataItem item : list) {
+                    double score = item.getCacheScore(currentTime);
+                    if (score < minScore) {
+                        minScore = score;
+                        toEvict = item;
+                    }
+                }
+            }
+        }
+        if (toEvict != null) {
+            List<DataItem> list = dataMap.get(toEvict.type).get(toEvict.Priority);
+            if (list.remove(toEvict)) {
+                currentSize -= toEvict.size;
+                degrade(toEvict, currentTime);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void degrade(DataItem item, long currentTime) {
+        if (lowerLevel != null) {
+            lowerLevel.put(item, currentTime);
         }
     }
 
-    protected void degrade(DataItem item) {
-        if (lowerLevel != null) {
-            lowerLevel.put(item);
-        }
+    public void clear() {
+        dataMap.clear();
+        currentSize = 0;
     }
 }

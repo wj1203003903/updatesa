@@ -1,15 +1,15 @@
 import java.util.*;
 
 public class SA {
-    private static final int DIMENSIONS = 4;       // 权重维度
-    private static final double INIT_TEMP = 100.0; // 初始温度
-    private static final double MIN_TEMP = 1e-3;   // 最小温度
-    private static final double COOLING_RATE = 0.6; // 降温系数
+    private static final int DIMENSIONS = 6;       // 权重维度
+    private static final double INIT_TEMP = 1000.0; // 初始温度
+    private static final double MIN_TEMP = 1e-4;   // 最小温度
+    private static final double COOLING_RATE = 0.95; // 降温系数
     private static final int ITERATIONS_PER_TEMP = 50;
 
-    private static DataItem[] testData;
-    private static DataManager baseDM;
-    private static Random random;
+    private DataItem[] testData;
+    private DataManager baseDM;
+    private Random random;
 
     public SA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
@@ -18,40 +18,45 @@ public class SA {
     }
 
     public double run() {
-        double[] current = randomWeights(); // 当前解
-        double currentScore = evaluate(current);
+        double[] currentSolution = randomWeights();
+        baseDM.normalizeL2(currentSolution);
+        double currentScore = evaluate(currentSolution);
 
-        double[] best = current.clone();
+        double[] bestSolution = currentSolution.clone();
         double bestScore = currentScore;
 
         double temperature = INIT_TEMP;
 
         while (temperature > MIN_TEMP) {
             for (int i = 0; i < ITERATIONS_PER_TEMP; i++) {
-                double[] neighbor = generateNeighbor(current);
-                double neighborScore = evaluate(neighbor);
+                double[] neighborSolution = generateNeighbor(currentSolution);
+                baseDM.normalizeL2(neighborSolution);
+                double neighborScore = evaluate(neighborSolution);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
-                    current = neighbor;
+                    currentSolution = neighborSolution;
                     currentScore = neighborScore;
 
                     if (currentScore > bestScore) {
-                        best = current.clone();
+                        bestSolution = currentSolution.clone();
                         bestScore = currentScore;
-                     }
+                        System.out.printf("新最优解: %.4f, 温度: %.4f, 权重: %s\n",
+                                bestScore, temperature, Arrays.toString(bestSolution));
+                    }
                 }
             }
-
             temperature *= COOLING_RATE;
         }
-        baseDM.normalizeL2(best);
-        System.out.println("=== SA Finished ===");
-        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
+
+        System.out.println("\n=== SA 优化完成 ===");
+        System.out.printf("最终最优权重 = %s\n", Arrays.toString(bestSolution));
+        // 使用最优权重最后跑一次，打印最终状态
+        evaluate(bestSolution);
         baseDM.printStats();
+
         return bestScore;
     }
 
-    // 生成初始解（每维随机 0~1）
     private double[] randomWeights() {
         double[] w = new double[DIMENSIONS];
         for (int i = 0; i < DIMENSIONS; i++) {
@@ -60,20 +65,17 @@ public class SA {
         return w;
     }
 
-    // 生成邻居解
     private double[] generateNeighbor(double[] current) {
         double[] neighbor = current.clone();
         int idx = random.nextInt(DIMENSIONS);
-        neighbor[idx] += random.nextGaussian() * 0.1; // 小范围扰动
+        neighbor[idx] += (random.nextDouble() - 0.5) * 0.2; // 小范围扰动
 
-        // 限制在 [0,1] 范围内
         if (neighbor[idx] < 0) neighbor[idx] = 0;
         if (neighbor[idx] > 1) neighbor[idx] = 1;
 
         return neighbor;
     }
 
-    // 接受概率函数
     private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
         if (neighborScore > currentScore) {
             return 1.0;
@@ -81,7 +83,6 @@ public class SA {
         return Math.exp((neighborScore - currentScore) / temperature);
     }
 
-    // 评估函数
     private double evaluate(double[] weights) {
         return DataTest.score(weights, testData, baseDM);
     }

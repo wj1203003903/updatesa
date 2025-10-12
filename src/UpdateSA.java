@@ -196,7 +196,7 @@ public class UpdateSA {
             }
         }
 
-        // 只有当新解比最差的解更好时才替换
+        // 只有当新解比最差解更好时才替换
         if (score > worstScore) {
             eliteArchive.set(worstIdx, solution.clone());
             eliteScores.set(worstIdx, score);

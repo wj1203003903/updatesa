@@ -1,182 +1,140 @@
 import java.util.*;
-// 数据管理类
+
 class DataManager {
+    // ... 其他成员变量不变 ...
     LocalCache local;
     CloudCache cloud;
     RemoteCloud remote;
-
-    private final double LOCAL_BUS_SPEED_BPS = 10 * 1e9; // 本地总线速度 10Gbps
+    private final double LOCAL_BUS_SPEED_BPS = 10 * 1e9;
     private final Channel cloudChannel;
     private final Channel remoteChannel;
-
-    // --- 改动 2: 增加一个 totalDelay 实例变量来累加动态延迟 ---
-    private double totalDelay = 0.0;
-
-    int totalAccessed = 0;
-    int localHits = 0;
-    int cloudHits = 0;
-
-    int localAccesses = 0;
-    int cloudAccesses = 0;
-    int remoteAccesses = 0;
-    
+    private double totalDelaySeconds = 0.0;
+    int totalAccessed = 0, localHits = 0, cloudHits = 0;
+    int localAccesses = 0, cloudAccesses = 0, remoteAccesses = 0;
+    int completedTasks = 0, totalTasks = 0;
     private Map<Integer, DataItem> idToDataItemMap = new HashMap<>();
-    
-    public double getSystemScore() {
-        if (localAccesses == 0 || cloudAccesses == 0) return 0; // 避免除零错误
 
-        double localHitRate = (double) localHits / localAccesses;
-        double cloudHitRate = (double) cloudHits / cloudAccesses;
-
-        // --- 改动 3: 使用累加的 totalDelay 实例变量 ---
-        // 注意：这里的惩罚因子 10000 可能需要根据 totalDelay 的实际数量级进行调整
-        // 比如，如果总访问次数是1000次，平均延迟0.05秒，totalDelay就是50.
-        // (1 + 50/10000) 变化不大。可以考虑用 (1 + totalDelay / totalAccessed) 平均延迟
-        double averageDelay = (totalAccessed > 0) ? totalDelay / totalAccessed : 0;
-        
-        double w1 = 3.0;
-        double w2 = 1.0;
-        // 使用平均延迟作为惩罚项，更具可比性
-        return (w1 * localHitRate + w2 * cloudHitRate) / (1.0 + averageDelay * 10); // 乘以10放大惩罚效果
-    }
-
-    public DataManager(int localCap, int edgeCap) {
+    public DataManager(long localCap, long edgeCap) {
         local = new LocalCache(localCap);
         cloud = new CloudCache(edgeCap);
         remote = new RemoteCloud();
-
         local.bindLowerLevel(cloud);
         cloud.bindLowerLevel(remote);
-
-        // --- 改动 4: 在构造函数中初始化信道对象 ---
-        // 配置 Cloud Channel (CDN)
         this.cloudChannel = new Channel(20 * 1e6, 0.030, 100.0, 40.0);
-        // 配置 Remote Channel (源站)
         this.remoteChannel = new Channel(100 * 1e6, 0.150, 50.0, 30.0);
     }
-    
-    // generateDataItem 方法保持不变
-    public DataItem generateDataItem(int id) {
+
+    public DataItem generateDataItem(int id, long baseTime) {
         if (idToDataItemMap.containsKey(id)) {
             return idToDataItemMap.get(id);
         }
         Random rand = new Random(id);
-        int size = rand.nextInt(50) + 10;
+        int size = (rand.nextInt(50) + 10) * 1024;
         String type = "type" + rand.nextInt(5);
         int frequency = rand.nextInt(10) + 1;
         int priority = rand.nextInt(3) + 1;
-        DataItem item = new DataItem(id, size, type, frequency, priority);
+
+        long arrivalTime = baseTime + rand.nextInt(1000);
+        long processingTime = rand.nextInt(100) + 50;
+
+        // --- 关键参数调整 ---
+        // 给予任务足够的缓冲时间，让模拟有意义
+        long bufferTime = rand.nextInt(500) + 200; // 缓冲时间 200-699ms
+
+        // 计算绝对截止时刻点
+        long absoluteDeadline = arrivalTime + processingTime + bufferTime;
+
+        DataItem item = new DataItem(id, size, type, frequency, priority, arrivalTime, processingTime, absoluteDeadline);
         idToDataItemMap.put(id, item);
         return item;
     }
 
-    // --- 改动 5: 修改 access 方法以计算和累加动态延迟 ---
-    public DataItem access(String type, int priority, int id) {
+    private double access(String type, int priority, int id, long currentTime) {
+        // ... 此方法不变 ...
         totalAccessed++;
-        
-        // 访问本地
+        double delaySeconds;
         localAccesses++;
-        DataItem item = local.get(type, priority, id);
-        if (item != null) {
-            localHits++;
-            // 计算本地延迟并累加
-            this.totalDelay += (item.size * 8.0) / LOCAL_BUS_SPEED_BPS;
-            return item;
-        }
-
-        // 访问云端
+        DataItem item = local.get(type, priority, id, currentTime);
+        if (item != null) { localHits++; delaySeconds = (item.size * 8.0) / LOCAL_BUS_SPEED_BPS; return delaySeconds; }
         cloudAccesses++;
-        item = cloud.get(type, priority, id);
-        if (item != null) {
-            cloudHits++;
-            // 计算云端延迟并累加
-            this.totalDelay += cloudChannel.getTotalDelay(item.size);
-            local.put(item);
-
-            return item;
-        }
-        
-        // 访问远程
+        item = cloud.get(type, priority, id, currentTime);
+        if (item != null) { cloudHits++; delaySeconds = cloudChannel.getTotalDelay(item.size); local.put(item, currentTime); return delaySeconds; }
         remoteAccesses++;
-        item = remote.get(type, priority, id);
-        if (item != null) {
-            // 计算远程延迟并累加
-            this.totalDelay += remoteChannel.getTotalDelay(item.size);
-            local.put(item);
-            cloud.put(item);
-            return item;
+        item = remote.get(type, priority, id, currentTime);
+        if (item != null) { delaySeconds = remoteChannel.getTotalDelay(item.size); cloud.put(item, currentTime); local.put(item, currentTime); return delaySeconds; }
+        return Double.POSITIVE_INFINITY;
+    }
+
+    public long processAndGetDuration(DataItem item, long currentTime) {
+        totalTasks++;
+        double accessDelaySeconds = access(item.type, item.Priority, item.id, currentTime);
+
+        double processingDelaySeconds = item.processingTime / 1000.0;
+        double totalTaskDurationSeconds = accessDelaySeconds + processingDelaySeconds;
+        this.totalDelaySeconds += totalTaskDurationSeconds;
+        long totalTaskDurationMillis = (long)(totalTaskDurationSeconds * 1000);
+
+        // 计算任务完成的绝对时刻点
+        long taskCompletionTime = currentTime + totalTaskDurationMillis;
+
+        // 直接比较两个绝对时刻点
+        if (taskCompletionTime <= item.deadline) {
+            completedTasks++;
         }
 
-        // 生成新数据
-        item = generateDataItem(id);
-        // 新数据从远程获取，计算延迟并累加
-        this.totalDelay += remoteChannel.getTotalDelay(item.size);
-        // 将新数据放入缓存
-        remote.put(item);
-        cloud.put(item);
-        local.put(item);
-        return item;
+        return totalTaskDurationMillis;
     }
 
-    // addDataToRemote 方法保持不变
-    public void addDataToRemote(DataItem item) {
-        remote.put(item);
+    public double getSystemScore() {
+        // ... 此方法不变 ...
+        if (totalAccessed == 0 || totalTasks == 0) return 0;
+        double localHitRate = (double) localHits / Math.max(1, localAccesses);
+        double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
+        double completionRate = (double) completedTasks / totalTasks;
+        double averageDelay = totalDelaySeconds / totalTasks;
+        double w1 = 2.0, w2 = 1.0, w3 = 5.0;
+        return (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (1.0 + averageDelay * 10);
     }
+
+    public void addDataToRemote(DataItem item, long currentTime) {
+        remote.put(item, currentTime);
+    }
+
     public void normalizeL2(double[] vector) {
-        if (vector == null || vector.length != 4) {
-            throw new IllegalArgumentException("向量必须存在且长度为4。");
-        }
-
-        // 1. 计算所有元素平方和的平方根 (L2 范数)
+        // ... 此方法不变 ...
         double sumOfSquares = 0.0;
-        for (double value : vector) {
-            sumOfSquares += value * value;
-        }
-        
-        // 如果所有元素都是0，L2范数为0，这是特殊情况
-        if (sumOfSquares == 0) {
-            // 所有元素都是0，无法正则化，保持原样即可。
-            // 或者可以根据业务需求设置为特定值，但保持为0最常见。
-            return;
-        }
-
+        for (double value : vector) { sumOfSquares += value * value; }
+        if (sumOfSquares == 0) return;
         double l2Norm = Math.sqrt(sumOfSquares);
-
-        // 2. 将每个元素除以 L2 范数
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = vector[i] / l2Norm;
-        }
+        for (int i = 0; i < vector.length; i++) { vector[i] = vector[i] / l2Norm; }
     }
+
     public void reset() {
-        local.dataMap.clear();
-        cloud.dataMap.clear();
-        
-        // 重置所有计数器
-        totalAccessed = 0;
-        localHits = 0;
-        cloudHits = 0;
-        localAccesses = 0;
-        cloudAccesses = 0;
-        remoteAccesses = 0;
-        
-        // --- 改动 6: 重置 totalDelay ---
-        totalDelay = 0.0;
+        // ... 此方法不变 ...
+        local.clear();
+        cloud.clear();
+        totalAccessed = 0; localHits = 0; cloudHits = 0;
+        localAccesses = 0; cloudAccesses = 0; remoteAccesses = 0;
+        completedTasks = 0; totalTasks = 0;
+        totalDelaySeconds = 0.0;
     }
 
     public void printStats() {
-        if (localAccesses == 0 || cloudAccesses == 0) {
-            System.out.println("访问次数不足，无法生成统计数据。");
-            return;
-        }
-        
-        double localHitRate = (double) localHits / localAccesses;
-        double cloudHitRate = (double) cloudHits / cloudAccesses;
-
-        System.out.println("==== 访问统计 ====");
-        System.out.println("总数据访问次数: " + totalAccessed);
-        System.out.printf("本地命中率: %.3f\n", localHitRate);
-        System.out.printf("云端命中率: %.3f\n", cloudHitRate);
-        System.out.printf("总时延: %.3f s\n", totalDelay); // 单位是秒
-        System.out.printf("平均时延: %.3f ms\n", (totalDelay / totalAccessed) * 1000); // 打印更有意义的平均延迟
+        // ... 此方法不变 ...
+        if (totalTasks == 0) { System.out.println("没有任务被处理，无法生成统计数据。"); return; }
+        double localHitRate = (double) localHits / Math.max(1, localAccesses);
+        double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
+        double completionRate = (double) completedTasks / totalTasks;
+        System.out.println("==== 系统性能统计 ====");
+        System.out.println("总处理任务数: " + totalTasks);
+        System.out.printf("任务完成率: %.3f (%d / %d)\n", completionRate, completedTasks, totalTasks);
+        System.out.printf("本地缓存命中率: %.3f\n", localHitRate);
+        System.out.printf("边缘云命中率: %.3f\n", cloudHitRate);
+        System.out.printf("总计延迟: %.3f s\n", totalDelaySeconds);
+        System.out.printf("平均任务延迟: %.3f ms\n", (totalDelaySeconds / totalTasks) * 1000);
     }
 }
+
+class LocalCache extends Cathe { public LocalCache(long c) { super(c); } }
+class CloudCache extends Cathe { public CloudCache(long c) { super(c); } }
+class RemoteCloud extends Cathe { public RemoteCloud() { super(Long.MAX_VALUE); } }
