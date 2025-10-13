@@ -1,30 +1,24 @@
 import java.util.*;
 
-// ´æ´¢Àà£¬·ÖÎª²»Í¬¼¶±ğ»º´æ
 class Cathe {
-    long capacity; // ÈİÁ¿µ¥Î»: B (×Ö½Ú)
+    long capacity;
     long currentSize = 0;
-    Map<String, Map<Integer, List<DataItem>>> dataMap = new HashMap<>();
+    // --- ç¡®è®¤æ•°æ®ç»“æ„ï¼šä¸€ä¸ªç±»å‹å¯¹åº”ä¸€ä¸ªæŒ‰IDæ’åºçš„åˆ—è¡¨ ---
+    Map<String, List<DataItem>> dataMap = new HashMap<>();
     protected Cathe lowerLevel = null;
 
-    public Cathe(long capacity) {
-        this.capacity = capacity;
-    }
+    public Cathe(long capacity) { this.capacity = capacity; }
+    public void bindLowerLevel(Cathe lower) { this.lowerLevel = lower; }
+    public long getCurrentSize() { return currentSize; }
 
-    public void bindLowerLevel(Cathe lower) {
-        this.lowerLevel = lower;
-    }
-
-    public long getCurrentSize() {
-        return currentSize;
-    }
-
+    // --- ä¿®æ­£ get æ–¹æ³• ---
+    // priority å‚æ•°è™½ç„¶è¿˜åœ¨ DataManager.access çš„è°ƒç”¨æ ˆä¸­ï¼Œä½†åœ¨è¿™é‡Œä¸å†ä½¿ç”¨
     public DataItem get(String type, int priority, int id, long currentTime) {
-        Map<Integer, List<DataItem>> typeMap = dataMap.get(type);
-        if (typeMap == null) return null;
-        List<DataItem> list = typeMap.get(priority);
+        List<DataItem> list = dataMap.get(type);
         if (list == null) return null;
-        int idx = Collections.binarySearch(list, new DataItem(id, 0, type, 0, priority, 0, 0, 0), (a, b) -> a.id - b.id);
+
+        // ä½¿ç”¨æ­£ç¡®çš„æ„é€ å‡½æ•° (å·²ç§»é™¤ priority)
+        int idx = Collections.binarySearch(list, new DataItem(id, 0, type, 0, 0, 0, 0), (a, b) -> a.id - b.id);
         if (idx >= 0) {
             DataItem item = list.get(idx);
             item.updateAccess(currentTime);
@@ -39,37 +33,37 @@ class Cathe {
             return;
         }
 
-        Map<Integer, List<DataItem>> typeMap = dataMap.computeIfAbsent(item.type, k -> new HashMap<>());
-        List<DataItem> list = typeMap.computeIfAbsent(item.Priority, k -> new ArrayList<>());
+        // è·å–å¯¹åº”ç±»å‹çš„åˆ—è¡¨
+        List<DataItem> list = dataMap.computeIfAbsent(item.type, k -> new ArrayList<>());
 
-        // ¼ì²éÏîÄ¿ÊÇ·ñÒÑ´æÔÚ¡£Èç¹û´æÔÚ£¬Ôò¸üĞÂ²¢·µ»Ø¡£
         int existingIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
         if (existingIdx >= 0) {
             list.get(existingIdx).updateAccess(currentTime);
             return;
         }
 
-        // --- ºËĞÄĞŞÕı ---
-        // ²½Öè 1: Ê×ÏÈÖ´ĞĞËùÓĞ±ØÒªµÄÇıÖğ²Ù×÷£¬È·±£ÓĞ×ã¹»µÄ¿Õ¼ä¡£
         while (currentSize + item.size > capacity) {
             if (!evictOne(currentTime)) {
-                // Èç¹ûÎŞ·¨ÌÚ³ö¿Õ¼ä£¨ÀıÈç£¬ÒòÎªÏîÄ¿Ì«´ó»ò»º´æÎª¿Õ£©£¬Ôò·ÅÆú²åÈë¡£
                 return;
             }
         }
 
-        // ²½Öè 2: ÔÚËùÓĞ¿ÉÄÜĞŞ¸ÄÁĞ±í´óĞ¡µÄ²Ù×÷Íê³Éºó£¬ÔÙ¼ÆËã²åÈëË÷Òı¡£
-        // ´ËÊ±µÄÁĞ±í×´Ì¬ÊÇ×îÖÕµÄ£¬¼ÆËã³öµÄË÷ÒıÊÇ°²È«µÄ¡£
+        // --- æ ¸å¿ƒä¿®æ­£ ---
+        // åœ¨é©±é€æ“ä½œå®Œæˆåï¼Œ*å¿…é¡»*é‡æ–°è·å–å¯èƒ½å·²æ”¹å˜çš„åˆ—è¡¨ï¼Œå¹¶é‡æ–°è®¡ç®—ç´¢å¼•
+        // å› ä¸º evictOne å¯èƒ½ä¼šåˆ é™¤å…ƒç´ ï¼Œå¯¼è‡´ list çš„å¼•ç”¨æˆ–å¤§å°å‘ç”Ÿå˜åŒ–
+        list = dataMap.computeIfAbsent(item.type, k -> new ArrayList<>());
         int insertionIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
-        // Èç¹ûÔÚÇıÖğÆÚ¼ä£¬Í¬Ò»¸ö item ±»ÒÔÄ³ÖÖ·½Ê½Ìí¼Ó£¨²»Ì«¿ÉÄÜµ«ÎªÁË½¡×³ĞÔ£©£¬ÔòÖ±½Ó·µ»Ø¡£
+
+        // å¥å£®æ€§æ£€æŸ¥ï¼šå¦‚æœåœ¨ evictOne è¿‡ç¨‹ä¸­ï¼Œæœ‰å…¶ä»–çº¿ç¨‹æ·»åŠ äº†è¯¥é¡¹
         if(insertionIdx >= 0) {
+            // é¡¹ç›®å·²å­˜åœ¨ï¼Œæ›´æ–°è®¿é—®æ—¶é—´
+            list.get(insertionIdx).updateAccess(currentTime);
             return;
         }
 
-        // ½« binarySearch µÄ¸ºÊı·µ»ØÖµ×ª»»ÎªÕıÈ·µÄ²åÈëµã¡£
         insertionIdx = -insertionIdx - 1;
 
-        // ²½Öè 3: Ê¹ÓÃ¸Õ¸Õ¼ÆËã³öµÄ¡¢ÏÖÔÚ¿Ï¶¨ÓĞĞ§µÄË÷Òı½øĞĞÌí¼Ó¡£
+        // æ’å…¥æ–°é¡¹
         list.add(insertionIdx, item);
         currentSize += item.size;
     }
@@ -77,20 +71,22 @@ class Cathe {
     protected boolean evictOne(long currentTime) {
         DataItem toEvict = null;
         double minScore = Double.MAX_VALUE;
-        for (Map<Integer, List<DataItem>> typeMap : dataMap.values()) {
-            for (List<DataItem> list : typeMap.values()) {
-                for (DataItem item : list) {
-                    double score = item.getCacheScore(currentTime);
-                    if (score < minScore) {
-                        minScore = score;
-                        toEvict = item;
-                    }
+        String typeOfToEvict = null;
+
+        for (Map.Entry<String, List<DataItem>> entry : dataMap.entrySet()) {
+            for (DataItem item : entry.getValue()) {
+                double score = item.getCacheScore(currentTime);
+                if (score < minScore) {
+                    minScore = score;
+                    toEvict = item;
+                    typeOfToEvict = entry.getKey();
                 }
             }
         }
+
         if (toEvict != null) {
-            List<DataItem> list = dataMap.get(toEvict.type).get(toEvict.Priority);
-            if (list.remove(toEvict)) {
+            List<DataItem> list = dataMap.get(typeOfToEvict);
+            if (list != null && list.remove(toEvict)) {
                 currentSize -= toEvict.size;
                 degrade(toEvict, currentTime);
                 return true;
@@ -99,14 +95,11 @@ class Cathe {
         return false;
     }
 
-    protected void degrade(DataItem item, long currentTime) {
-        if (lowerLevel != null) {
-            lowerLevel.put(item, currentTime);
-        }
-    }
-
-    public void clear() {
-        dataMap.clear();
-        currentSize = 0;
-    }
+    protected void degrade(DataItem item, long currentTime) { if (lowerLevel != null) { lowerLevel.put(item, currentTime); } }
+    public void clear() { dataMap.clear(); currentSize = 0; }
 }
+
+// è¾…åŠ©ç±»æ— éœ€ä¿®æ”¹
+class LocalCache extends Cathe { public LocalCache(long c) { super(c); } }
+class CloudCache extends Cathe { public CloudCache(long c) { super(c); } }
+class RemoteCloud extends Cathe { public RemoteCloud() { super(Long.MAX_VALUE); } }

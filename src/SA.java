@@ -1,10 +1,11 @@
 import java.util.*;
 
 public class SA {
-    private static final int DIMENSIONS = 6;       // È¨ÖØÎ¬¶È
-    private static final double INIT_TEMP = 1000.0; // ³õÊ¼ÎÂ¶È
-    private static final double MIN_TEMP = 1e-4;   // ×îĞ¡ÎÂ¶È
-    private static final double COOLING_RATE = 0.95; // ½µÎÂÏµÊı
+    // --- æ ¸å¿ƒä¿®æ”¹ï¼šç»´åº¦å˜ä¸º5 ---
+    private static final int DIMENSIONS = 5;
+    private static final double INIT_TEMP = 1000.0; // åˆå§‹æ¸©åº¦
+    private static final double MIN_TEMP = 1e-4;   // æœ€å°æ¸©åº¦
+    private static final double COOLING_RATE = 0.95; // é™æ¸©ç³»æ•°
     private static final int ITERATIONS_PER_TEMP = 50;
 
     private DataItem[] testData;
@@ -17,6 +18,8 @@ public class SA {
         this.random = new Random();
     }
 
+    // run() æ–¹æ³•ã€randomWeights()ã€generateNeighbor()ã€acceptanceProbability()ã€evaluate()
+    // çš„å†…éƒ¨é€»è¾‘å®Œå…¨ä¸éœ€è¦æ”¹å˜ï¼Œå› ä¸ºå®ƒä»¬æ˜¯åŸºäº DIMENSIONS å˜é‡çš„ï¼Œéå¸¸é€šç”¨ã€‚
     public double run() {
         double[] currentSolution = randomWeights();
         baseDM.normalizeL2(currentSolution);
@@ -40,7 +43,7 @@ public class SA {
                     if (currentScore > bestScore) {
                         bestSolution = currentSolution.clone();
                         bestScore = currentScore;
-                        System.out.printf("ĞÂ×îÓÅ½â: %.4f, ÎÂ¶È: %.4f, È¨ÖØ: %s\n",
+                        System.out.printf("æ–°æœ€ä¼˜è§£: %.4f, æ¸©åº¦: %.4f, æƒé‡: %s\n",
                                 bestScore, temperature, Arrays.toString(bestSolution));
                     }
                 }
@@ -48,42 +51,16 @@ public class SA {
             temperature *= COOLING_RATE;
         }
 
-        System.out.println("\n=== SA ÓÅ»¯Íê³É ===");
-        System.out.printf("×îÖÕ×îÓÅÈ¨ÖØ = %s\n", Arrays.toString(bestSolution));
-        // Ê¹ÓÃ×îÓÅÈ¨ÖØ×îºóÅÜÒ»´Î£¬´òÓ¡×îÖÕ×´Ì¬
+        System.out.println("\n=== SA ä¼˜åŒ–å®Œæˆ ===");
+        System.out.printf("æœ€ç»ˆæœ€ä¼˜æƒé‡ = %s\n", Arrays.toString(bestSolution));
         evaluate(bestSolution);
+
         baseDM.printStats();
 
         return bestScore;
     }
-
-    private double[] randomWeights() {
-        double[] w = new double[DIMENSIONS];
-        for (int i = 0; i < DIMENSIONS; i++) {
-            w[i] = random.nextDouble();
-        }
-        return w;
-    }
-
-    private double[] generateNeighbor(double[] current) {
-        double[] neighbor = current.clone();
-        int idx = random.nextInt(DIMENSIONS);
-        neighbor[idx] += (random.nextDouble() - 0.5) * 0.2; // Ğ¡·¶Î§ÈÅ¶¯
-
-        if (neighbor[idx] < 0) neighbor[idx] = 0;
-        if (neighbor[idx] > 1) neighbor[idx] = 1;
-
-        return neighbor;
-    }
-
-    private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
-        if (neighborScore > currentScore) {
-            return 1.0;
-        }
-        return Math.exp((neighborScore - currentScore) / temperature);
-    }
-
-    private double evaluate(double[] weights) {
-        return DataTest.score(weights, testData, baseDM);
-    }
+    private double[] randomWeights() { double[] w = new double[DIMENSIONS]; for (int i = 0; i < DIMENSIONS; i++) { w[i] = random.nextDouble(); } return w; }
+    private double[] generateNeighbor(double[] current) { double[] neighbor = current.clone(); int idx = random.nextInt(DIMENSIONS); neighbor[idx] += (random.nextDouble() - 0.5) * 0.2; if (neighbor[idx] < 0) neighbor[idx] = 0; if (neighbor[idx] > 1) neighbor[idx] = 1; return neighbor; }
+    private double acceptanceProbability(double currentScore, double neighborScore, double temperature) { if (neighborScore > currentScore) { return 1.0; } return Math.exp((neighborScore - currentScore) / temperature); }
+    private double evaluate(double[] weights) { return DataTest.score(weights, testData, baseDM); }
 }

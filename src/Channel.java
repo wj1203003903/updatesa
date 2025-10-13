@@ -1,10 +1,10 @@
 import java.util.Random;
 
 public class Channel {
-    private final double bandwidth;        // ´ø¿í (B) in Hz
-    private final double baseLatency;      // »ù´¡ÑÓ³Ù (Èç´«²¥ÑÓ³Ù) in seconds
-    private final double meanSnr;          // ĞÅÔë±È(S/N)µÄ¾ùÖµ (ratio, not dB)
-    private final double stdDevSnr;        // ĞÅÔë±È(S/N)µÄ±ê×¼²î£¬¿ØÖÆ²¨¶¯
+    private final double bandwidth;        // å¸¦å®½ (B) in Hz
+    private final double baseLatency;      // åŸºç¡€å»¶è¿Ÿ (å¦‚ä¼ æ’­å»¶è¿Ÿ) in seconds
+    private final double meanSnr;          // ä¿¡å™ªæ¯”(S/N)çš„å‡å€¼ (ratio, not dB)
+    private final double stdDevSnr;        // ä¿¡å™ªæ¯”(S/N)çš„æ ‡å‡†å·®ï¼Œæ§åˆ¶æ³¢åŠ¨
     private final Random random;
 
     public Channel(double bandwidth, double baseLatency, double meanSnr, double stdDevSnr) {

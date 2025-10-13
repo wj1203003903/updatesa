@@ -4,44 +4,42 @@ public class DataItem {
     String type;
     int frequency;
     long lastAccessTime;
-    int Priority;
+    // int Priority; // --- 移除 Priority ---
 
-    // --- 定义为绝对时间戳 ---
-    long arrivalTime;      // 任务到达的绝对时刻
-    long processingTime;   // 任务本身需要的处理时间 (毫秒)
-    long deadline;         // [定义] 任务必须完成的绝对时刻点 (时间戳)
+    long arrivalTime;
+    long processingTime; // 这是“基础”处理时间
+    long deadline;
 
-    // 缓存权重
-    static double w1 = 0.2, w2 = 0.2, w3 = 0.2, w4 = 0.4;
-    // 调度权重
-    static double w5 = 0.5, w6 = 0.5;
+    // --- 权重现在是5个 (w1-w2, w4-w6) ---
+    static double w1 = 0.2, w2 = 0.2, w4 = 0.4; // 缓存权重
+    static double w5 = 0.5, w6 = 0.5;          // 调度权重
 
-    public DataItem(int id, int size, String type, int frequency, int userPriority,
+    public DataItem(int id, int size, String type, int frequency,
                     long arrivalTime, long processingTime, long absoluteDeadline) {
         this.id = id;
         this.size = size;
         this.type = type;
         this.frequency = frequency;
         this.lastAccessTime = arrivalTime;
-        this.Priority = userPriority;
+        // this.Priority = userPriority; // --- 移除 ---
         this.arrivalTime = arrivalTime;
         this.processingTime = processingTime;
-        this.deadline = absoluteDeadline; // 存储绝对截止时间戳
+        this.deadline = absoluteDeadline;
     }
 
     public double getCacheScore(long currentTime) {
         double gap = currentTime - lastAccessTime;
-        return w1 * frequency - w2 * gap + w3 * Priority - w4 * size;
+        // --- 从评分函数中移除 Priority ---
+        return w1 * frequency - w2 * gap - w4 * size;
     }
 
     public double getSchedulingScore(long currentTime) {
-        // 临时计算剩余时间，用于评估紧急程度
         double remainingTime = deadline - currentTime;
-
         if (remainingTime <= 0) {
-            remainingTime = 1; // 任务已超时或即将超时，给予最高优先级
+            remainingTime = 1;
         }
-        return w3 * Priority + w5 * (1000.0 / remainingTime) + w6 * processingTime;
+        // --- 从评分函数中移除 Priority ---
+        return w5 * (1000.0 / remainingTime) + w6 * processingTime;
     }
 
     public void updateAccess(long currentTime) {
@@ -50,7 +48,12 @@ public class DataItem {
     }
 
     public static void setWeights(double[] w) {
-        if (w.length != 6) throw new IllegalArgumentException("权重数组长度必须为6");
-        w1 = w[0]; w2 = w[1]; w3 = w[2]; w4 = w[3]; w5 = w[4]; w6 = w[5];
+        // --- 权重数组长度现在是5 ---
+        if (w.length != 5) throw new IllegalArgumentException("权重数组长度必须为5");
+        w1 = w[0];
+        w2 = w[1];
+        w4 = w[2]; // 注意索引变化
+        w5 = w[3];
+        w6 = w[4];
     }
 }
