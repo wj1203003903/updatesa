@@ -43,7 +43,7 @@ public class DataItem {
         }
         // --- 核心修改：调度评分现在由 紧急性 和 size 决定 ---
         // 紧急性越高分越高，size 越大分越低 (优先处理小任务)
-        return w5_urgency * (1000.0 / remainingTime) - w4_schedule * size;
+        return w5_urgency * Math.log(1 + 1000.0 / remainingTime) - w4_schedule * size/1024;
     }
 
     public void updateAccess(long currentTime) {

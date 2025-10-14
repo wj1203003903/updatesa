@@ -67,7 +67,7 @@ public class Main {
             final int TOTAL_EXPERIMENT_RUNS = 20; // 在这里设置总的实验次数
 
             for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
-
+                originalOut.println("第" + i + "次执行");
                 System.out.printf("\n\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d of %d >>>>>>>>>>\n", i, TOTAL_EXPERIMENT_RUNS);
 
                 // --- 数据加载和环境设置 ---
