@@ -6,47 +6,35 @@ import java.util.Queue;
 import java.util.Random;
 
 public class UpdateSA {
-    // --- ºËĞÄ²ÎÊı ---
-    private static final int DIMENSIONS = 4;
+    // --- å‚æ•° ---
+    private static final int DIMENSIONS = 5;
     private static final double INIT_TEMP = 100.0;
     private static final double MIN_TEMP = 1e-3;
     private static final double COOLING_RATE_BASE = 0.9;
     private static final int ITERATIONS_PER_TEMP_BASE = 30;
-
-    // --- ÈÅ¶¯Óë¾Ö²¿ËÑË÷ ---
     private static final double LOCAL_DELTA = 0.03;
     private static final double LAMBDA = 1.0;
-
-    // --- ×ÔÊÊÓ¦½µÎÂ¿ØÖÆ ---
     private static final int STOP_GENERATION = 6;
     private static final double SLOWDOWN_FACTOR = 0.98;
-
-    // ---  ×îÓÅ½â¼ÇÒä¿âÓëÖØÆô»úÖÆ ---
     private static final int ARCHIVE_SIZE = 5;
     private static final int RESTART_STAGNATION_THRESHOLD = 18;
     private static final double RESTART_TEMP_INCREASE_FACTOR = 2.0;
     private static final int MAX_RESTART_COUNT = 6;
-
-    // ---  ¾«Ó¢¿â¶àÑùĞÔÎ¬»¤ ---
-    private static final double DIVERSITY_THRESHOLD = 0.2; // ¾«Ó¢¿â³ÉÔ±¼äµÄ×îĞ¡¾àÀë
-
-    // --- »ùÓÚ½ÓÊÜÂÊµÄ²½³¤×ÔÊÊÓ¦ ---
+    private static final double DIVERSITY_THRESHOLD = 0.2;
     private static final double ACCEPTANCE_RATE_TARGET = 0.4;
     private static final double STEP_ADJUST_FACTOR = 0.99;
-
-    // --- ½û¼ÉËÑË÷Ë¼Ïë ---
     private static final int TABU_TENURE = 10;
     private static final double TABU_SIMILARITY_THRESHOLD = 0.01;
 
-    // --- ³ÉÔ±±äÁ¿ ---
+    // --- æˆå‘˜å˜é‡ ---
     private final DataItem[] testData;
     private final DataManager baseDM;
     private final Random random;
 
-    // --- ¸÷²ßÂÔ¶ÔÓ¦µÄ³ÉÔ±±äÁ¿ ---
+    // --- ç®—æ³•çŠ¶æ€å˜é‡ ---
     private final List<double[]> eliteArchive;
     private final List<Double> eliteScores;
-    private int restartCount; // ÖØÆôÀäÈ´¼ÆÊıÆ÷
+    private int restartCount;
     private double baseStep;
     private final Queue<double[]> tabuList;
 
@@ -54,28 +42,29 @@ public class UpdateSA {
         this.testData = testData;
         this.baseDM = baseDM;
         this.random = new Random();
-
         this.eliteArchive = new ArrayList<>();
         this.eliteScores = new ArrayList<>();
-
-        this.restartCount = 0; // ³õÊ¼»¯ÖØÆô¼ÆÊı
+        this.restartCount = 0;
         this.baseStep = 0.2;
         this.tabuList = new LinkedList<>();
     }
 
     public double run() {
+        // åˆå§‹åŒ–
         double[] current = randomWeights();
         double currentScore = evaluate(current);
         updateTabuList(current);
-
         double[] best = current.clone();
         double bestScore = currentScore;
         updateArchive(best, bestScore);
 
         double temperature = INIT_TEMP;
         int stagnationCount = 0;
+        int generation = 0;
 
         while (temperature > MIN_TEMP) {
+            generation++;
+            double lastGenBestScore = bestScore;
             int iterations = ITERATIONS_PER_TEMP_BASE + (int) (ITERATIONS_PER_TEMP_BASE * (temperature / INIT_TEMP));
             int acceptedCount = 0;
             boolean improvedAtThisTemp = false;
@@ -89,7 +78,6 @@ public class UpdateSA {
                     localSearch(neighbor, subspace);
                     tryCount++;
                 } while (isTabu(neighbor) && tryCount < 10);
-
                 double neighborScore = evaluate(neighbor);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
@@ -97,7 +85,6 @@ public class UpdateSA {
                     currentScore = neighborScore;
                     acceptedCount++;
                     updateTabuList(current);
-
                     if (currentScore > bestScore) {
                         best = current.clone();
                         bestScore = currentScore;
@@ -107,6 +94,12 @@ public class UpdateSA {
                 }
             }
 
+            // åœ¨æ¯æ¬¡é™æ¸©å (å³æ¯ä»£ç»“æŸæ—¶) æ‰“å°ä¿¡æ¯
+            double improvement = bestScore - Main.baselineScore;
+            System.out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
+                    generation, temperature, improvement>0?improvement:0);
+
+            // è‡ªé€‚åº”æ­¥é•¿
             double acceptanceRate = (double) acceptedCount / iterations;
             if (acceptanceRate > ACCEPTANCE_RATE_TARGET) {
                 baseStep /= STEP_ADJUST_FACTOR;
@@ -114,41 +107,31 @@ public class UpdateSA {
                 baseStep *= STEP_ADJUST_FACTOR;
             }
 
+            // æ›´æ–°åœæ»è®¡æ•°
             if (!improvedAtThisTemp) {
                 stagnationCount++;
             } else {
                 stagnationCount = 0;
             }
 
-            // --- ÖØÆô»úÖÆ---
+            // é‡å¯æœºåˆ¶
             if (!eliteArchive.isEmpty() && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
-                System.out.printf("--- Triggering Restart #%d and removing solution from archive ---\n", restartCount + 1);
-                restartCount++; // ÖØÆô´ÎÊı¼ÓÒ»
-
-                // ´Ó¾«Ó¢¿âÖĞËæ»úÑ¡ÔñÒ»¸ö½â×÷ÎªÌø°å
+                System.out.printf("--- Triggering Restart #%d ---\n", restartCount + 1);
+                restartCount++;
                 int randomIndex = random.nextInt(eliteArchive.size());
                 current = eliteArchive.get(randomIndex).clone();
                 currentScore = eliteScores.get(randomIndex);
-
-                // ºËĞÄĞŞ¸Ä£º´Ó¾«Ó¢¿âÖĞÓÀ¾ÃÒÆ³ıÕâ¸ö±»ÓÃ×÷Ìø°åµÄ½â
                 eliteArchive.remove(randomIndex);
                 eliteScores.remove(randomIndex);
-
-                // --- ÖØÆôÀäÈ´ ---
-                // ÖØÆôÎÂ¶ÈËæ×ÅÖØÆô´ÎÊıµÄÔö¼Ó¶øË¥¼õ
                 temperature *= RESTART_TEMP_INCREASE_FACTOR;
-
-                // ¿ÉÑ¡£º¼ÓÒ»¸öÉÏÏŞ£¬·ÀÖ¹ÎÂ¶È³¬¹ı³õÊ¼ÎÂ¶È
-                if (temperature > INIT_TEMP) {
-                    temperature = INIT_TEMP;
-                }
-
+                if (temperature > INIT_TEMP) temperature = INIT_TEMP;
                 stagnationCount = 0;
                 tabuList.clear();
                 updateTabuList(current);
-                continue;
+                continue; // è·³è¿‡æœ¬æ¬¡é™æ¸©
             }
 
+            // è‡ªé€‚åº”å†·å´
             double coolingRate = COOLING_RATE_BASE;
             if (stagnationCount >= STOP_GENERATION) {
                 coolingRate = Math.pow(COOLING_RATE_BASE, SLOWDOWN_FACTOR);
@@ -156,37 +139,33 @@ public class UpdateSA {
             temperature *= coolingRate;
         }
 
-        baseDM.normalizeL2(best);
-        System.out.println("=== SA (Hybrid Advanced) Finished ===");
-        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
+        System.out.println("\n=== SA (Hybrid Advanced) Finished ===");
+        double[] finalNormalizedBest = best.clone();
+        baseDM.normalizeL2(finalNormalizedBest);
+        System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+
+        evaluate(best); // ä½¿ç”¨åŸå§‹æœ€ä¼˜è§£è¯„ä¼°
         baseDM.printStats();
         return bestScore;
     }
 
-    // --- ¸¨Öú·½·¨ ---
+    // --- è¾…åŠ©æ–¹æ³• ---
 
-    // --- ¸üĞÂ¾«Ó¢µµ°¸¿â  ---
     private void updateArchive(double[] solution, double score) {
-        // ¼ì²éÓë¿âÖĞÒÑÓĞ½âµÄ¶àÑùĞÔ
         for (int i = 0; i < eliteArchive.size(); i++) {
             if (distance(solution, eliteArchive.get(i)) < DIVERSITY_THRESHOLD) {
-                // Èç¹ûĞÂ½âÓë¿âÖĞÄ³¸ö½â¹ıÓÚÏàËÆ£¬Ö»ÓĞÔÚĞÂ½â·ÖÊı¸ü¸ßÊ±²ÅÌæ»»
                 if (score > eliteScores.get(i)) {
                     eliteArchive.set(i, solution.clone());
                     eliteScores.set(i, score);
                 }
-                return; // ÏàËÆ£¬²»ÔÙ¼ÌĞøÅĞ¶Ï£¬Ö±½Ó·µ»Ø
+                return;
             }
         }
-
-        // Èç¹û²»ÏàËÆ£¬²¢ÇÒÃûÈËÌÃ»¹Ã»Âú£¬Ö±½Ó¼ÓÈë
         if (eliteArchive.size() < ARCHIVE_SIZE) {
             eliteArchive.add(solution.clone());
             eliteScores.add(score);
             return;
         }
-
-        // Èç¹ûÃûÈËÌÃÂúÁË£¬ÔòÌæ»»µô·ÖÊı×îµÍµÄÄÇ¸ö
         int worstIdx = -1;
         double worstScore = Double.POSITIVE_INFINITY;
         for (int i = 0; i < ARCHIVE_SIZE; i++) {
@@ -195,8 +174,6 @@ public class UpdateSA {
                 worstIdx = i;
             }
         }
-
-        // Ö»ÓĞµ±ĞÂ½â±È×î²î½â¸üºÃÊ±²ÅÌæ»»
         if (score > worstScore) {
             eliteArchive.set(worstIdx, solution.clone());
             eliteScores.set(worstIdx, score);
@@ -204,21 +181,26 @@ public class UpdateSA {
     }
 
     private void updateTabuList(double[] solution) {
-        if (tabuList.size() >= TABU_TENURE) tabuList.poll();
+        if (tabuList.size() >= TABU_TENURE) {
+            tabuList.poll();
+        }
         tabuList.add(solution.clone());
     }
 
     private boolean isTabu(double[] solution) {
         for (double[] tabuSolution : tabuList) {
-            if (distance(solution, tabuSolution) < TABU_SIMILARITY_THRESHOLD)
+            if (distance(solution, tabuSolution) < TABU_SIMILARITY_THRESHOLD) {
                 return true;
+            }
         }
         return false;
     }
 
     private double distance(double[] s1, double[] s2) {
         double sum = 0;
-        for (int i = 0; i < DIMENSIONS; i++) sum += (s1[i] - s2[i]) * (s1[i] - s2[i]);
+        for (int i = 0; i < DIMENSIONS; i++) {
+            sum += (s1[i] - s2[i]) * (s1[i] - s2[i]);
+        }
         return Math.sqrt(sum);
     }
 
@@ -235,7 +217,9 @@ public class UpdateSA {
 
     private double[] randomWeights() {
         double[] w = new double[DIMENSIONS];
-        for (int i = 0; i < DIMENSIONS; i++) w[i] = random.nextDouble();
+        for (int i = 0; i < DIMENSIONS; i++) {
+            w[i] = random.nextDouble();
+        }
         return w;
     }
 
@@ -281,7 +265,9 @@ public class UpdateSA {
     }
 
     private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
-        if (neighborScore > currentScore) return 1.0;
+        if (neighborScore > currentScore) {
+            return 1.0;
+        }
         return Math.exp((neighborScore - currentScore) / (LAMBDA * Math.max(1e-12, temperature)));
     }
 

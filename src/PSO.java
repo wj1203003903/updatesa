@@ -1,18 +1,20 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 
 public class PSO {
-    private static final int POP_SIZE = 20;         // Á£×ÓÊıÁ¿
-    private static final int GENERATIONS = 40;      // µü´ú´ÎÊı
-    private static final double INERTIA = 0.7;      // ¹ßĞÔÈ¨ÖØ
-    private static final double COGNITIVE = 1.5;    // ¸öÌåÑ§Ï°Òò×Ó
-    private static final double SOCIAL = 1.5;       // ÈºÌåÑ§Ï°Òò×Ó
-    private static final int DIMENSIONS = 4;        // Î¬¶ÈÊıÁ¿£¨È¨ÖØÊıÁ¿£©
+    // --- å‚æ•° ---
+    private static final int POP_SIZE = 20;         // ç²’å­æ•°é‡
+    private static final int GENERATIONS = 40;      // è¿­ä»£æ¬¡æ•°
+    private static final double INERTIA = 0.7;      // æƒ¯æ€§æƒé‡
+    private static final double COGNITIVE = 1.5;    // ä¸ªä½“å­¦ä¹ å› å­
+    private static final double SOCIAL = 1.5;       // ç¾¤ä½“å­¦ä¹ å› å­
+    private static final int DIMENSIONS = 5;        // æƒé‡ç»´åº¦ (å·²æ›´æ­£ä¸º5)
 
-    private static DataItem[] testData;
-    private static DataManager baseDM;
-    private static Random random;
+    // --- æˆå‘˜å˜é‡ ---
+    private DataItem[] testData;
+    private DataManager baseDM;
+    private Random random;
 
-    // ¹¹Ôìº¯Êı
     public PSO(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
@@ -20,6 +22,7 @@ public class PSO {
     }
 
     public double run() {
+        // --- åˆå§‹åŒ– ---
         double[][] position = new double[POP_SIZE][DIMENSIONS];
         double[][] velocity = new double[POP_SIZE][DIMENSIONS];
         double[][] pBestPosition = new double[POP_SIZE][DIMENSIONS];
@@ -28,11 +31,11 @@ public class PSO {
         double[] best = new double[DIMENSIONS];
         double bestScore = -Double.MAX_VALUE;
 
-        // ³õÊ¼»¯Á£×ÓµÄÎ»ÖÃºÍËÙ¶È
+        // åˆå§‹åŒ–ç²’å­ç¾¤çš„ä½ç½®å’Œé€Ÿåº¦
         for (int i = 0; i < POP_SIZE; i++) {
             for (int j = 0; j < DIMENSIONS; j++) {
                 position[i][j] = random.nextDouble();
-                velocity[i][j] = random.nextDouble() * 0.1 - 0.05;  // ³õÊ¼ËÙ¶ÈÔÚ [-0.05, 0.05]
+                velocity[i][j] = random.nextDouble() * 0.1 - 0.05; // åˆå§‹é€Ÿåº¦åœ¨ [-0.05, 0.05]
             }
             pBestPosition[i] = position[i].clone();
             pBestScore[i] = evaluate(position[i]);
@@ -43,44 +46,58 @@ public class PSO {
             }
         }
 
+        System.out.println("PSO Initial Best Score: " + bestScore);
+
+        // --- ä¸»å¾ªç¯ï¼Œå¢åŠ ç›‘æ§ ---
         for (int gen = 0; gen < GENERATIONS; gen++) {
+            double lastGenBestScore = bestScore; // è®°å½•æœ¬ä»£å¼€å§‹å‰çš„æœ€ä¼˜åˆ†æ•°
+
+            // æ›´æ–°æ¯ä¸ªç²’å­çš„é€Ÿåº¦å’Œä½ç½®
             for (int i = 0; i < POP_SIZE; i++) {
                 for (int j = 0; j < DIMENSIONS; j++) {
                     double r1 = random.nextDouble();
                     double r2 = random.nextDouble();
+                    // æ›´æ–°é€Ÿåº¦
                     velocity[i][j] = INERTIA * velocity[i][j]
                             + COGNITIVE * r1 * (pBestPosition[i][j] - position[i][j])
                             + SOCIAL * r2 * (best[j] - position[i][j]);
 
+                    // æ›´æ–°ä½ç½®
                     position[i][j] += velocity[i][j];
 
-                    // ÏŞÖÆÎ»ÖÃÔÚ [0,1]
+                    // é™åˆ¶ä½ç½®åœ¨ [0,1] èŒƒå›´å†…
                     if (position[i][j] < 0) position[i][j] = 0;
                     if (position[i][j] > 1) position[i][j] = 1;
                 }
 
+                // è¯„ä¼°æ–°ä½ç½®å¹¶æ›´æ–°æœ€ä¼˜è§£
                 double score = evaluate(position[i]);
                 if (score > pBestScore[i]) {
                     pBestScore[i] = score;
                     pBestPosition[i] = position[i].clone();
                 }
-
                 if (score > bestScore) {
                     bestScore = score;
                     best = position[i].clone();
-               
                 }
             }
 
+            double improvement = bestScore - Main.baselineScore;
+            System.out.printf("Gen %2d: Improvement = %.4f\n",
+                    gen + 1, improvement>0?improvement:0);
         }
-        baseDM.normalizeL2(best);
-        System.out.println("=== PSO Finished ===");
-        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
+
+        System.out.println("\n=== PSO Finished ===");
+        double[] finalNormalizedBest = best.clone();
+        baseDM.normalizeL2(finalNormalizedBest);
+        System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+
+        evaluate(best); // ä½¿ç”¨åŸå§‹æœ€ä¼˜è§£è¯„ä¼°
         baseDM.printStats();
         return bestScore;
     }
 
-    // ÆÀ¹Àº¯Êı
+    // è¯„ä¼°å‡½æ•°
     private double evaluate(double[] w) {
         return DataTest.score(w, testData, baseDM);
     }

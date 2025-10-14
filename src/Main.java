@@ -1,34 +1,118 @@
-import java.util.Random;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        final int dataNum = 2000;
 
-        // ÈİÁ¿µ¥Î»ÊÇ×Ö½Ú(B): 800KB for local, 1600KB for edge
-        long localCapacity = 800L * 1024L;
-        long edgeCapacity = 1600L * 1024L;
+    // --- æ ¸å¿ƒä¿®æ”¹ï¼šå®šä¹‰ä¸€ä¸ªå…¬å…±é™æ€å˜é‡æ¥å­˜å‚¨åŸºå‡†åˆ†æ•° ---
+    public static double baselineScore = 0;
+
+    private static DataItem[] loadDataFromFile(String filePath) {
+        // ... (æ­¤æ–¹æ³•ä¿æŒä¸å˜)
+        List<DataItem> dataList = new ArrayList<>();
+        String line;
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                int id = Integer.parseInt(values[0].replace("\"", ""));
+                int size = Integer.parseInt(values[1].replace("\"", ""));
+                long arrivalTime = Long.parseLong(values[2].replace("\"", ""));
+                long deadline = Long.parseLong(values[3].replace("\"", ""));
+                String type = "nasa_request";
+                dataList.add(new DataItem(id, size, type, arrivalTime, deadline));
+            }
+        } catch (IOException e) {
+            System.err.println("é”™è¯¯ï¼šè¯»å–æ•°æ®æ–‡ä»¶å¤±è´¥ï¼è¯·æ£€æŸ¥è·¯å¾„æ˜¯å¦æ­£ç¡®ï¼š " + filePath);
+            e.printStackTrace();
+        }
+        return dataList.toArray(new DataItem[0]);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("æ­£åœ¨ä»æ–‡ä»¶åŠ è½½æ•°æ®é›†...");
+        DataItem[] testData = loadDataFromFile("dataset/processed_nasa_log.csv");
+        if (testData.length == 0) {
+            System.out.println("é”™è¯¯ï¼šæ— æ³•åŠ è½½æ•°æ®æˆ–æ•°æ®ä¸ºç©ºï¼");
+            return;
+        }
+        System.out.println("æ•°æ®é›†åŠ è½½å®Œæ¯•ï¼Œå…± " + testData.length + " æ¡æ•°æ®ã€‚");
+
+        long localCapacity = 2000L * 1024L;
+        long edgeCapacity = 5000L * 1024L;
         DataManager baseDM = new DataManager(localCapacity, edgeCapacity);
 
-        DataItem[] testData = new DataItem[dataNum];
-        long baseTime = System.currentTimeMillis();
-
-        System.out.println("ÕıÔÚÉú³ÉÄ£ÄâÊı¾İ¼¯...");
-        for (int i = 0; i < dataNum; i++) {
-            testData[i] = baseDM.generateDataItem(i, baseTime);
-            // ¼ÙÉèÊı¾İÔÚÆäµ½´ïÊ±±»Ìí¼Óµ½Ô¶¶ËÔÆ
-            baseDM.addDataToRemote(testData[i], testData[i].arrivalTime);
+        for (DataItem item : testData) {
+            baseDM.registerDataItem(item);
+            baseDM.addDataToRemote(item, item.arrivalTime);
         }
-        System.out.println("Êı¾İ¼¯Éú³ÉÍê±Ï£¬¹² " + dataNum + " ÌõÊı¾İ¡£");
 
+        Map<String, Double> results = new LinkedHashMap<>();
+
+        // --- æ­¥éª¤1: è¿è¡ŒåŸºå‡†æµ‹è¯•ï¼Œå¹¶ä¸ºé™æ€å˜é‡èµ‹å€¼ ---
+        System.out.println("\n=============================================");
+        System.out.println("=== 1. Running Random Search (to set Baseline) ===");
+        System.out.println("=============================================");
+        RandomSearch rs = new RandomSearch(testData, baseDM);
+        baselineScore = rs.run(); // ä¸ºé™æ€å˜é‡èµ‹å€¼
+        results.put("Random Search (Baseline)", baselineScore);
+
+
+        // --- æ­¥éª¤2: ä¾æ¬¡è¿è¡Œå…¶ä»–ç®—æ³•ï¼Œå®ƒä»¬å°†ç›´æ¥ä½¿ç”¨ Main.baselineScore ---
+        // æ³¨æ„ï¼šç°åœ¨æ‰€æœ‰ run() æ–¹æ³•éƒ½æ²¡æœ‰å‚æ•°äº†
+        System.out.println("\n=============================================");
+        System.out.println("=== 2. Running Basic Simulated Annealing (SA) ===");
+        System.out.println("=============================================");
         SA sa = new SA(testData, baseDM);
+        results.put("Simulated Annealing (SA)", sa.run());
 
         System.out.println("\n=============================================");
-        System.out.println("=== ¿ªÊ¼ÊÂ¼şÇı¶¯Ä£ÄâÏÂµÄÈ¨ÖØÓÅ»¯ ===");
+        System.out.println("=== 3. Running Particle Swarm Optimization (PSO) ===");
         System.out.println("=============================================");
+        PSO pso = new PSO(testData, baseDM);
+        results.put("Particle Swarm (PSO)", pso.run());
 
-        double bestScore = sa.run();
+        System.out.println("\n=============================================");
+        System.out.println("=== 4. Running Genetic Algorithm (GA) ===");
+        System.out.println("=============================================");
+        GA ga = new GA(testData, baseDM);
+        results.put("Genetic Algorithm (GA)", ga.run());
 
-        System.out.println("\nSA Ëã·¨ÕÒµ½µÄ×îÓÅÏµÍ³ÆÀ·ÖÎª: " + bestScore);
+        System.out.println("\n=============================================");
+        System.out.println("=== 5. Running Ant Colony Optimization (ACO) ===");
+        System.out.println("=============================================");
+        ACO aco = new ACO(testData, baseDM);
+        results.put("Ant Colony (ACO)", aco.run());
+
+        System.out.println("\n=============================================");
+        System.out.println("=== 6. Running Advanced Simulated Annealing (UpdateSA) ===");
+        System.out.println("=============================================");
+        UpdateSA updateSA = new UpdateSA(testData, baseDM);
+        results.put("Advanced SA (UpdateSA)", updateSA.run());
+
+        System.out.println("\n\n=== All algorithms finished. ===");
+
+        // --- æœ€ç»ˆæ€»ç»“æŠ¥å‘Š (æ— éœ€ä¿®æ”¹) ---
+        System.out.println("\n=============================================");
+        System.out.println("===           Final Score Summary           ===");
+        System.out.println("=============================================");
+        System.out.printf("%-30s | %-15s | %-20s\n", "Algorithm", "Best Score", "Improvement vs Baseline");
+        System.out.println("----------------------------------------------------------------------");
+
+        for (Map.Entry<String, Double> entry : results.entrySet()) {
+            String name = entry.getKey();
+            double score = entry.getValue();
+            if (name.contains("Baseline")) {
+                System.out.printf("%-30s | %-15.4f | %-20s\n", name, score, "N/A");
+            } else {
+                double improvement = score - baselineScore;
+                System.out.printf("%-30s | %-15.4f | %-20.4f\n", name, score, improvement);
+            }
+        }
+        System.out.println("=============================================");
     }
 }

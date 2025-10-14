@@ -4,33 +4,36 @@ public class DataItem {
     String type;
     int frequency;
     long lastAccessTime;
-    // int Priority; // --- ÒÆ³ı Priority ---
 
     long arrivalTime;
-    long processingTime; // ÕâÊÇ¡°»ù´¡¡±´¦ÀíÊ±¼ä
     long deadline;
 
-    // --- È¨ÖØÏÖÔÚÊÇ5¸ö (w1-w2, w4-w6) ---
-    static double w1 = 0.2, w2 = 0.2, w4 = 0.4; // »º´æÈ¨ÖØ
-    static double w5 = 0.5, w6 = 0.5;          // µ÷¶ÈÈ¨ÖØ
+    // --- æƒé‡ç°åœ¨æ˜¯5ä¸ª (w1,w2,w4 ç”¨äºç¼“å­˜, w5,w_size ç”¨äºè°ƒåº¦) ---
+    static double w1 = 0.2, w2 = 0.2, w4_cache = 0.2; // ç¼“å­˜æƒé‡
+    static double w5_urgency = 0.2, w4_schedule = 0.2; // è°ƒåº¦æƒé‡
 
-    public DataItem(int id, int size, String type, int frequency,
-                    long arrivalTime, long processingTime, long absoluteDeadline) {
+    public DataItem(int id, int size, String type, long arrivalTime, long absoluteDeadline) {
         this.id = id;
         this.size = size;
         this.type = type;
-        this.frequency = frequency;
+        this.frequency = 0;
         this.lastAccessTime = arrivalTime;
-        // this.Priority = userPriority; // --- ÒÆ³ı ---
         this.arrivalTime = arrivalTime;
-        this.processingTime = processingTime;
         this.deadline = absoluteDeadline;
     }
 
+    public DataItem(int id) { this.id = id; }
+
     public double getCacheScore(long currentTime) {
-        double gap = currentTime - lastAccessTime;
-        // --- ´ÓÆÀ·Öº¯ÊıÖĞÒÆ³ı Priority ---
-        return w1 * frequency - w2 * gap - w4 * size;
+
+        double gapInSeconds = (currentTime - lastAccessTime) / 2000.0;
+
+        double sizeInKB = size / 1024.0;
+
+
+        double scaledFrequency = Math.log(1 + frequency*10);
+
+        return 10+w1 * scaledFrequency - w2 * gapInSeconds - w4_cache * sizeInKB;
     }
 
     public double getSchedulingScore(long currentTime) {
@@ -38,8 +41,9 @@ public class DataItem {
         if (remainingTime <= 0) {
             remainingTime = 1;
         }
-        // --- ´ÓÆÀ·Öº¯ÊıÖĞÒÆ³ı Priority ---
-        return w5 * (1000.0 / remainingTime) + w6 * processingTime;
+        // --- æ ¸å¿ƒä¿®æ”¹ï¼šè°ƒåº¦è¯„åˆ†ç°åœ¨ç”± ç´§æ€¥æ€§ å’Œ size å†³å®š ---
+        // ç´§æ€¥æ€§è¶Šé«˜åˆ†è¶Šé«˜ï¼Œsize è¶Šå¤§åˆ†è¶Šä½ (ä¼˜å…ˆå¤„ç†å°ä»»åŠ¡)
+        return w5_urgency * (1000.0 / remainingTime) - w4_schedule * size;
     }
 
     public void updateAccess(long currentTime) {
@@ -48,12 +52,11 @@ public class DataItem {
     }
 
     public static void setWeights(double[] w) {
-        // --- È¨ÖØÊı×é³¤¶ÈÏÖÔÚÊÇ5 ---
-        if (w.length != 5) throw new IllegalArgumentException("È¨ÖØÊı×é³¤¶È±ØĞëÎª5");
+        if (w.length != 5) throw new IllegalArgumentException("æƒé‡æ•°ç»„é•¿åº¦å¿…é¡»ä¸º5");
         w1 = w[0];
         w2 = w[1];
-        w4 = w[2]; // ×¢ÒâË÷Òı±ä»¯
-        w5 = w[3];
-        w6 = w[4];
+        w4_cache = w[2];    // size ç”¨äºç¼“å­˜çš„æƒé‡
+        w5_urgency = w[3];  // ç´§æ€¥æ€§ç”¨äºè°ƒåº¦çš„æƒé‡
+        w4_schedule = w[4]; // size ç”¨äºè°ƒåº¦çš„æƒé‡
     }
 }

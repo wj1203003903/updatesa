@@ -1,39 +1,47 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 
 public class ACO {
-    private static final int ANT_COUNT = 20;           // ÂìÒÏÊıÁ¿
-    private static final int GENERATIONS = 40;         // µü´ú´ÎÊı
-    private static final int DIMENSIONS = 4;           // È¨ÖØÎ¬¶È
-    private static final double ALPHA = 1.0;           // ĞÅÏ¢ËØÓ°ÏìÒò×Ó
-    private static final double BETA = 2.0;            // Æô·¢º¯ÊıÓ°ÏìÒò×Ó
-    private static final double EVAPORATION = 0.5;     // ĞÅÏ¢ËØ»Ó·¢ÂÊ
-    private static final double Q = 100.0;             // ĞÅÏ¢ËØÔöÁ¿Òò×Ó
+    // --- å‚æ•° ---
+    private static final int ANT_COUNT = 20;           // èš‚èšæ•°é‡
+    private static final int GENERATIONS = 40;         // è¿­ä»£æ¬¡æ•°
+    private static final int DIMENSIONS = 5;           // æƒé‡ç»´åº¦ (å·²æ›´æ­£ä¸º5)
+    private static final double ALPHA = 1.0;           // ä¿¡æ¯ç´ å½±å“å› å­
+    private static final double BETA = 2.0;            // å¯å‘å¼å½±å“å› å­
+    private static final double EVAPORATION = 0.5;     // ä¿¡æ¯ç´ æŒ¥å‘ç‡
+    private static final double Q = 100.0;             // ä¿¡æ¯ç´ å¢å¼ºå¸¸æ•°
 
-    private static DataItem[] testData;
-    private static DataManager baseDM;
-    private static Random random;
-
-    private double[][] pheromones;  // Ã¿¸öÎ¬¶ÈÃ¿¸ö¿ÉÄÜÖµµÄĞÅÏ¢ËØ
+    // --- æˆå‘˜å˜é‡ ---
+    private DataItem[] testData;
+    private DataManager baseDM;
+    private Random random;
+    private double[][] pheromones;  // ä¿¡æ¯ç´ çŸ©é˜µ
 
     public ACO(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
         this.random = new Random();
-        this.pheromones = new double[DIMENSIONS][11]; // Ã¿¸öÎ¬¶ÈµÄÈ¨ÖØÖµ´Ó 0.0 µ½ 1.0
+
+        // å°†è§£ç©ºé—´ç¦»æ•£åŒ–ä¸º11ä¸ªç‚¹ (0.0, 0.1, ..., 1.0)
+        this.pheromones = new double[DIMENSIONS][11];
         for (int i = 0; i < DIMENSIONS; i++) {
-            Arrays.fill(pheromones[i], 1.0); // ³õÊ¼ĞÅÏ¢ËØÎª 1
+            Arrays.fill(pheromones[i], 1.0); // åˆå§‹ä¿¡æ¯ç´ ä¸º1
         }
     }
 
     public double run() {
         double bestScore = -Double.MAX_VALUE;
         double[] best = new double[DIMENSIONS];
+        System.out.println("ACO Initializing...");
 
+        // --- ä¸»å¾ªç¯ï¼Œå¢åŠ ç›‘æ§ ---
         for (int gen = 0; gen < GENERATIONS; gen++) {
+            double lastGenBestScore = bestScore; // è®°å½•æœ¬ä»£å¼€å§‹å‰çš„æœ€ä¼˜åˆ†æ•°
+
             double[][] ants = new double[ANT_COUNT][DIMENSIONS];
             double[] scores = new double[ANT_COUNT];
 
-            // Ã¿Ö»ÂìÒÏ¹¹Ôì½â
+            // æ¯åªèš‚èšæ„å»ºè§£
             for (int k = 0; k < ANT_COUNT; k++) {
                 for (int d = 0; d < DIMENSIONS; d++) {
                     ants[k][d] = selectValue(d);
@@ -42,44 +50,54 @@ public class ACO {
                 if (scores[k] > bestScore) {
                     bestScore = scores[k];
                     best = ants[k].clone();
-
                 }
             }
 
-            // ĞÅÏ¢ËØ»Ó·¢
+            // ä¿¡æ¯ç´ æŒ¥å‘
             for (int i = 0; i < DIMENSIONS; i++) {
                 for (int j = 0; j < 11; j++) {
                     pheromones[i][j] *= (1 - EVAPORATION);
                 }
             }
 
-            // ¸üĞÂĞÅÏ¢ËØ
+            // æ›´æ–°ä¿¡æ¯ç´ 
             for (int k = 0; k < ANT_COUNT; k++) {
                 for (int d = 0; d < DIMENSIONS; d++) {
                     int idx = (int) Math.round(ants[k][d] * 10);
-                    pheromones[d][idx] += Q * (scores[k] / bestScore);
+                    // é€‚åº”åº¦è¶Šé«˜ï¼Œå¢åŠ çš„ä¿¡æ¯ç´ è¶Šå¤š
+                    pheromones[d][idx] += Q * (scores[k] / Math.max(bestScore, 1e-6));
                 }
             }
 
-
+            double improvement = bestScore - Main.baselineScore;
+            System.out.printf("Gen %2d: Improvement = %.4f\n",
+                    gen + 1, improvement>0?improvement:0);
         }
-        baseDM.normalizeL2(best);
-        System.out.println("=== ACO Finished ===");
-        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
+
+        System.out.println("\n=== ACO Finished ===");
+        double[] finalNormalizedBest = best.clone();
+        baseDM.normalizeL2(finalNormalizedBest);
+        System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+
+        evaluate(best); // ä½¿ç”¨åŸå§‹æœ€ä¼˜è§£è¯„ä¼°
         baseDM.printStats();
         return bestScore;
     }
 
-    // °´¸ÅÂÊ´Óµ±Ç°Î¬¶ÈÑ¡ÔñÒ»¸öÖµ
+    // è½®ç›˜èµŒé€‰æ‹©
     private double selectValue(int dimension) {
         double[] probs = new double[11];
         double sum = 0;
 
         for (int i = 0; i < 11; i++) {
             double pheromone = pheromones[dimension][i];
-            double heuristic = (i + 1) / 10.0;
+            double heuristic = (i + 1) / 11.0; // å¯å‘å¼ä¿¡æ¯ï¼Œåå‘äºé€‰æ‹©æ›´å¤§çš„å€¼
             probs[i] = Math.pow(pheromone, ALPHA) * Math.pow(heuristic, BETA);
             sum += probs[i];
+        }
+
+        if (sum == 0) { // é¿å…å› æ¦‚ç‡æ€»å’Œä¸ºé›¶è€Œå¡æ­»
+            return random.nextInt(11) / 10.0;
         }
 
         double r = random.nextDouble() * sum;
@@ -87,7 +105,7 @@ public class ACO {
             r -= probs[i];
             if (r <= 0) return i / 10.0;
         }
-        return 1.0;
+        return 1.0; // ä½œä¸ºæµ®ç‚¹æ•°è¯¯å·®çš„ä¿éšœ
     }
 
     private double evaluate(double[] weights) {

@@ -3,7 +3,6 @@ import java.util.*;
 class Cathe {
     long capacity;
     long currentSize = 0;
-    // --- 确认数据结构：一个类型对应一个按ID排序的列表 ---
     Map<String, List<DataItem>> dataMap = new HashMap<>();
     protected Cathe lowerLevel = null;
 
@@ -11,17 +10,15 @@ class Cathe {
     public void bindLowerLevel(Cathe lower) { this.lowerLevel = lower; }
     public long getCurrentSize() { return currentSize; }
 
-    // --- 修正 get 方法 ---
-    // priority 参数虽然还在 DataManager.access 的调用栈中，但在这里不再使用
-    public DataItem get(String type, int priority, int id, long currentTime) {
+    public DataItem get(String type, int id, long currentTime) {
         List<DataItem> list = dataMap.get(type);
         if (list == null) return null;
 
-        // 使用正确的构造函数 (已移除 priority)
-        int idx = Collections.binarySearch(list, new DataItem(id, 0, type, 0, 0, 0, 0), (a, b) -> a.id - b.id);
+        // --- 使用新的辅助构造函数进行查找 ---
+        int idx = Collections.binarySearch(list, new DataItem(id), (a, b) -> a.id - b.id);
         if (idx >= 0) {
             DataItem item = list.get(idx);
-            item.updateAccess(currentTime);
+            item.updateAccess(currentTime); // 触发 frequency 增加
             return item;
         }
         return null;
@@ -33,12 +30,11 @@ class Cathe {
             return;
         }
 
-        // 获取对应类型的列表
         List<DataItem> list = dataMap.computeIfAbsent(item.type, k -> new ArrayList<>());
 
         int existingIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
         if (existingIdx >= 0) {
-            list.get(existingIdx).updateAccess(currentTime);
+            list.get(existingIdx).updateAccess(currentTime); // 触发 frequency 增加
             return;
         }
 
@@ -48,22 +44,16 @@ class Cathe {
             }
         }
 
-        // --- 核心修正 ---
-        // 在驱逐操作完成后，*必须*重新获取可能已改变的列表，并重新计算索引
-        // 因为 evictOne 可能会删除元素，导致 list 的引用或大小发生变化
         list = dataMap.computeIfAbsent(item.type, k -> new ArrayList<>());
         int insertionIdx = Collections.binarySearch(list, item, (a, b) -> a.id - b.id);
 
-        // 健壮性检查：如果在 evictOne 过程中，有其他线程添加了该项
         if(insertionIdx >= 0) {
-            // 项目已存在，更新访问时间
             list.get(insertionIdx).updateAccess(currentTime);
             return;
         }
 
         insertionIdx = -insertionIdx - 1;
 
-        // 插入新项
         list.add(insertionIdx, item);
         currentSize += item.size;
     }
@@ -99,7 +89,6 @@ class Cathe {
     public void clear() { dataMap.clear(); currentSize = 0; }
 }
 
-// 辅助类无需修改
 class LocalCache extends Cathe { public LocalCache(long c) { super(c); } }
 class CloudCache extends Cathe { public CloudCache(long c) { super(c); } }
 class RemoteCloud extends Cathe { public RemoteCloud() { super(Long.MAX_VALUE); } }

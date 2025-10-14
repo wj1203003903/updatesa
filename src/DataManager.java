@@ -1,108 +1,187 @@
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 class DataManager {
+    // æˆå‘˜å˜é‡
     LocalCache local;
     CloudCache cloud;
     RemoteCloud remote;
-    private final double LOCAL_BUS_SPEED_BPS = 10 * 1e9;
+
+    // æœ¬åœ°æ€»çº¿é€Ÿåº¦ï¼Œæš‚æ—¶ä¿æŒä¸å˜ï¼Œä»ç„¶å¾ˆå¿«
+    private final double LOCAL_BUS_SPEED_BPS = 1 * 1e9; // 1 GB/s
+
+    // ç½‘ç»œä¿¡é“ï¼Œå°†åœ¨æ„é€ å‡½æ•°ä¸­åˆå§‹åŒ–ä¸ºæ€§èƒ½è¾ƒå·®çš„é…ç½®
     private final Channel cloudChannel;
     private final Channel remoteChannel;
+
+    // ç»Ÿè®¡å˜é‡
     private double totalDelaySeconds = 0.0;
     int totalAccessed = 0, localHits = 0, cloudHits = 0;
     int localAccesses = 0, cloudAccesses = 0, remoteAccesses = 0;
     int completedTasks = 0, totalTasks = 0;
+
+    // ç”¨äºåœ¨ç¼“å­˜ä¸­æ‰¾ä¸åˆ°æ•°æ®æ—¶çš„æœ€ç»ˆæŸ¥æ‰¾
     private Map<Integer, DataItem> idToDataItemMap = new HashMap<>();
 
+    /**
+     * DataManager çš„æ„é€ å‡½æ•°.
+     * --- æ ¸å¿ƒä¿®æ”¹åœ¨æ­¤å¤„ ---
+     * æˆ‘ä»¬å°† Channel çš„å‚æ•°è®¾ç½®å¾—æ›´å·®ï¼Œä»¥å¢åŠ æ¨¡æ‹Ÿçš„éš¾åº¦ã€‚
+     */
     public DataManager(long localCap, long edgeCap) {
         local = new LocalCache(localCap);
         cloud = new CloudCache(edgeCap);
         remote = new RemoteCloud();
+
         local.bindLowerLevel(cloud);
         cloud.bindLowerLevel(remote);
-        this.cloudChannel = new Channel(20 * 1e6, 0.030, 100.0, 40.0);
-        this.remoteChannel = new Channel(100 * 1e6, 0.150, 50.0, 30.0);
+
+        // --- ä¿®æ”¹æ–¹æ¡ˆï¼šåˆ›å»ºä¸€ä¸ªæ›´â€œæ‹¥å µâ€çš„ç½‘ç»œç¯å¢ƒ ---
+
+        this.cloudChannel = new Channel(1.5 * 1e5, 0.150, 15.0, 8.0);   // 150KHz, 150ms
+        this.remoteChannel = new Channel(4 * 1e5, 0.500, 10.0, 5.0);  // 400KHz, 500ms
     }
 
-    public DataItem generateDataItem(int id, long baseTime) {
-        if (idToDataItemMap.containsKey(id)) {
-            return idToDataItemMap.get(id);
-        }
-        Random rand = new Random(id);
-        int size = (rand.nextInt(50) + 10) * 1024;
-        String type = "type" + rand.nextInt(5);
-        int frequency = rand.nextInt(10) + 1;
-        // int priority = rand.nextInt(3) + 1; // --- ÒÆ³ı ---
-
-        long arrivalTime = baseTime + rand.nextInt(1000);
-        long processingTime = rand.nextInt(100) + 50;
-        long bufferTime = rand.nextInt(500) + 200;
-        long absoluteDeadline = arrivalTime + processingTime + bufferTime;
-
-        // --- Ê¹ÓÃĞÂµÄ¹¹Ôìº¯Êı ---
-        DataItem item = new DataItem(id, size, type, frequency, arrivalTime, processingTime, absoluteDeadline);
-        idToDataItemMap.put(id, item);
-        return item;
-    }
-
-    // access ·½·¨ÏÖÔÚĞèÒª´«µİµÄ²ÎÊı¼õÉÙ
+    /**
+     * æ¨¡æ‹Ÿä¸€æ¬¡æ•°æ®è®¿é—®ï¼Œè¯¥æ–¹æ³•é€»è¾‘ä¿æŒä¸å˜.
+     */
     private double access(String type, int id, long currentTime) {
         totalAccessed++;
         double delaySeconds;
+
+        // 1. æŸ¥æœ¬åœ°ç¼“å­˜
         localAccesses++;
-        // --- get ·½·¨²»ÔÙĞèÒª priority ---
-        DataItem item = local.get(type, 0, id, currentTime); // priority¿ÉÒÔ´«ÈÎÒâÖµ£¬ÒòÎª²»ÔÙÊ¹ÓÃ
-        if (item != null) { localHits++; delaySeconds = (item.size * 8.0) / LOCAL_BUS_SPEED_BPS; return delaySeconds; }
+        DataItem item = local.get(type, id, currentTime);
+        if (item != null) {
+            localHits++;
+            delaySeconds = (item.size * 8.0) / LOCAL_BUS_SPEED_BPS;
+            return delaySeconds;
+        }
+
+        // 2. æŸ¥è¾¹ç¼˜äº‘ç¼“å­˜
         cloudAccesses++;
-        item = cloud.get(type, 0, id, currentTime);
-        if (item != null) { cloudHits++; delaySeconds = cloudChannel.getTotalDelay(item.size); local.put(item, currentTime); return delaySeconds; }
+        item = cloud.get(type, id, currentTime);
+        if (item != null) {
+            cloudHits++;
+            delaySeconds = cloudChannel.getTotalDelay(item.size);
+            local.put(item, currentTime); // å¡«å……åˆ°æœ¬åœ°ç¼“å­˜
+            return delaySeconds;
+        }
+
+        // 3. æŸ¥è¿œç«¯äº‘
         remoteAccesses++;
-        item = remote.get(type, 0, id, currentTime);
-        if (item != null) { delaySeconds = remoteChannel.getTotalDelay(item.size); cloud.put(item, currentTime); local.put(item, currentTime); return delaySeconds; }
+        item = remote.get(type, id, currentTime);
+        if (item != null) {
+            delaySeconds = remoteChannel.getTotalDelay(item.size);
+            cloud.put(item, currentTime); // å¡«å……åˆ°è¾¹ç¼˜äº‘
+            local.put(item, currentTime); // å¡«å……åˆ°æœ¬åœ°ç¼“å­˜
+            return delaySeconds;
+        }
+
+        // 4. ä½œä¸ºæœ€åçš„å¤‡ç”¨æ‰‹æ®µï¼Œç›´æ¥ä»æ•°æ®æ³¨å†Œè¡¨ä¸­æŸ¥æ‰¾ï¼ˆæ¨¡æ‹Ÿæ•°æ®æºï¼‰
+        item = idToDataItemMap.get(id);
+        if (item != null) {
+            delaySeconds = remoteChannel.getTotalDelay(item.size);
+            cloud.put(item, currentTime);
+
+            local.put(item, currentTime);
+            return delaySeconds;
+        }
+
+        // å¦‚æœæ•°æ®å®Œå…¨ä¸å­˜åœ¨
         return Double.POSITIVE_INFINITY;
     }
 
-    // --- ºËĞÄĞŞ¸Ä£ºprocessAndGetDuration Ôö¼ÓÒ»¸ö readyQueueSize ²ÎÊı ---
+    /**
+     * å¤„ç†ä¸€ä¸ªä»»åŠ¡å¹¶è¿”å›å…¶è€—æ—¶ï¼Œè¯¥æ–¹æ³•é€»è¾‘ä¿æŒä¸å˜.
+     */
     public long processAndGetDuration(DataItem item, long currentTime, int readyQueueSize) {
         totalTasks++;
+
+        // ä»»åŠ¡çš„å”¯ä¸€è€—æ—¶å°±æ˜¯æ•°æ®è®¿é—®æ—¶å»¶
         double accessDelaySeconds = access(item.type, item.id, currentTime);
 
-        // --- ÒıÈë¶¯Ì¬ processingTime ---
-        // Ä£Äâ¸ºÔØ£º¾ÍĞ÷¶ÓÁĞÔ½³¤£¬CPUÔ½·±Ã¦£¬´¦ÀíÊ±¼äÔ½³¤
-        // ¸ºÔØÒò×Ó£ºÃ¿Ôö¼ÓÒ»¸öÅÅ¶ÓÈÎÎñ£¬´¦ÀíÊ±¼äÔö¼Ó5%
-        double loadFactor = 1.0 + (readyQueueSize * 0.05);
-        long actualProcessingTime = (long)(item.processingTime * loadFactor);
+        // å°†è®¿é—®æ—¶å»¶ç´¯åŠ åˆ°æ€»å»¶è¿Ÿ
+        this.totalDelaySeconds += accessDelaySeconds;
 
-        double processingDelaySeconds = actualProcessingTime / 1000.0;
-
-        // --- ºËĞÄĞŞÕı£º½« access ºÍ processing µÄÑÓ³Ù¶¼¼Ó½øÈ¥ ---
-        double totalTaskDurationSeconds = accessDelaySeconds + processingDelaySeconds;
-        this.totalDelaySeconds += totalTaskDurationSeconds;
-
-        long totalTaskDurationMillis = (long)(totalTaskDurationSeconds * 1000);
-        long taskCompletionTime = currentTime + totalTaskDurationMillis;
+        // è®¡ç®—å®Œæˆæ—¶é—´å¹¶åˆ¤æ–­æ˜¯å¦è¶…æ—¶
+        long durationMillis = (long)(accessDelaySeconds * 1000);
+        long taskCompletionTime = currentTime + durationMillis;
 
         if (taskCompletionTime <= item.deadline) {
             completedTasks++;
         }
 
-        return totalTaskDurationMillis;
+        // è¿”å›è¿™ä¸ªå”¯ä¸€çš„è€—æ—¶
+        return durationMillis;
+    }
+
+    // --- å…¶ä»–è¾…åŠ©æ–¹æ³•å’Œç»Ÿè®¡æ–¹æ³•ä¿æŒä¸å˜ ---
+
+    public void registerDataItem(DataItem item) {
+        idToDataItemMap.put(item.id, item);
     }
 
     public void addDataToRemote(DataItem item, long currentTime) {
         remote.put(item, currentTime);
     }
 
-    // ÆäËû·½·¨ (getSystemScore, normalizeL2, reset, printStats) ±£³Ö²»±ä
     public double getSystemScore() {
         if (totalAccessed == 0 || totalTasks == 0) return 0;
+
         double localHitRate = (double) localHits / Math.max(1, localAccesses);
         double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
         double completionRate = (double) completedTasks / totalTasks;
         double averageDelay = totalDelaySeconds / totalTasks;
+
+        // è¯„åˆ†å…¬å¼æƒé‡ï¼Œå¯ä»¥æ ¹æ®éœ€è¦è°ƒæ•´
         double w1 = 2.0, w2 = 1.0, w3 = 5.0;
+
+        // æƒ©ç½šé¡¹ï¼šå¹³å‡å»¶è¿Ÿè¶Šé«˜ï¼Œåˆ†æ¯è¶Šå¤§ï¼Œæ€»åˆ†è¶Šä½
         return (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (1.0 + averageDelay * 10);
     }
-    public void normalizeL2(double[] vector) { double sumOfSquares = 0.0; for (double value : vector) { sumOfSquares += value * value; } if (sumOfSquares == 0) return; double l2Norm = Math.sqrt(sumOfSquares); for (int i = 0; i < vector.length; i++) { vector[i] = vector[i] / l2Norm; } }
-    public void reset() { local.clear(); cloud.clear(); totalAccessed = 0; localHits = 0; cloudHits = 0; localAccesses = 0; cloudAccesses = 0; remoteAccesses = 0; completedTasks = 0; totalTasks = 0; totalDelaySeconds = 0.0; }
-    public void printStats() { if (totalTasks == 0) { System.out.println("Ã»ÓĞÈÎÎñ±»´¦Àí£¬ÎŞ·¨Éú³ÉÍ³¼ÆÊı¾İ¡£"); return; } double localHitRate = (double) localHits / Math.max(1, localAccesses); double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses); double completionRate = (double) completedTasks / totalTasks; System.out.println("==== ÏµÍ³ĞÔÄÜÍ³¼Æ ===="); System.out.println("×Ü´¦ÀíÈÎÎñÊı: " + totalTasks); System.out.printf("ÈÎÎñÍê³ÉÂÊ: %.3f (%d / %d)\n", completionRate, completedTasks, totalTasks); System.out.printf("±¾µØ»º´æÃüÖĞÂÊ: %.3f\n", localHitRate); System.out.printf("±ßÔµÔÆÃüÖĞÂÊ: %.3f\n", cloudHitRate); System.out.printf("×Ü¼ÆÑÓ³Ù: %.3f s\n", totalDelaySeconds); System.out.printf("Æ½¾ùÈÎÎñÑÓ³Ù: %.3f ms\n", (totalDelaySeconds / totalTasks) * 1000); }
+
+    public void normalizeL2(double[] vector) {
+        double sumOfSquares = 0.0;
+        for (double value : vector) {
+            sumOfSquares += value * value;
+        }
+        if (sumOfSquares == 0) return;
+        double l2Norm = Math.sqrt(sumOfSquares);
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = vector[i] / l2Norm;
+        }
+    }
+
+    public void reset() {
+        local.clear();
+        cloud.clear();
+        totalAccessed = 0;
+        localHits = 0;
+        cloudHits = 0;
+        localAccesses = 0;
+        cloudAccesses = 0;
+        remoteAccesses = 0;
+        completedTasks = 0;
+        totalTasks = 0;
+        totalDelaySeconds = 0.0;
+    }
+
+    public void printStats() {
+        if (totalTasks == 0) {
+            System.out.println("æ²¡æœ‰ä»»åŠ¡è¢«å¤„ç†ï¼Œæ— æ³•ç”Ÿæˆç»Ÿè®¡æ•°æ®ã€‚");
+            return;
+        }
+        double localHitRate = (double) localHits / Math.max(1, localAccesses);
+        double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
+        double completionRate = (double) completedTasks / totalTasks;
+
+        System.out.println("==== ç³»ç»Ÿæ€§èƒ½ç»Ÿè®¡ ====");
+        System.out.println("æ€»å¤„ç†ä»»åŠ¡æ•°: " + totalTasks);
+        System.out.printf("ä»»åŠ¡å®Œæˆç‡: %.3f (%d / %d)\n", completionRate, completedTasks, totalTasks);
+        System.out.printf("æœ¬åœ°ç¼“å­˜å‘½ä¸­ç‡: %.3f\n", localHitRate);
+        System.out.printf("è¾¹ç¼˜äº‘å‘½ä¸­ç‡: %.3f\n", cloudHitRate);
+        System.out.printf("æ€»è®¡å»¶è¿Ÿ: %.3f s\n", totalDelaySeconds);
+        System.out.printf("å¹³å‡ä»»åŠ¡å»¶è¿Ÿ: %.3f ms\n", (totalDelaySeconds / totalTasks) * 1000);
+    }
 }

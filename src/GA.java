@@ -1,15 +1,19 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 
 public class GA {
-    private static final int POP_SIZE = 20;
-    private static final int GENERATIONS = 40;
-    private static final double MUTATION_RATE = 0.2;
-    private static final int TOURNAMENT_SIZE = 3;
-    private static DataItem[] testData;
-    private static DataManager baseDM;
-    private static Random random;
+    // --- å‚æ•° ---
+    private static final int POP_SIZE = 20;            // ç§ç¾¤å¤§å°
+    private static final int GENERATIONS = 40;         // è¿­ä»£æ¬¡æ•°
+    private static final double MUTATION_RATE = 0.2;    // å˜å¼‚ç‡
+    private static final int TOURNAMENT_SIZE = 3;      // é”¦æ ‡èµ›é€‰æ‹©çš„è§„æ¨¡
+    private static final int DIMENSIONS = 5;           // æƒé‡ç»´åº¦ (å·²æ›´æ­£ä¸º5)
 
-    // ¹¹Ôìº¯Êı£º½ÓÊÜ testData ºÍ baseDM ×÷Îª²ÎÊı
+    // --- æˆå‘˜å˜é‡ ---
+    private DataItem[] testData;
+    private DataManager baseDM;
+    private Random random;
+
     public GA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
@@ -17,56 +21,70 @@ public class GA {
     }
 
     public double run() {
-        double[][] population = new double[POP_SIZE][4];
+        double[][] population = new double[POP_SIZE][DIMENSIONS];
 
-        // ³õÊ¼»¯ÖÖÈº
+        // åˆå§‹åŒ–ç§ç¾¤
         for (int i = 0; i < POP_SIZE; i++) {
-            for (int j = 0; j < 4; j++) {
+            for (int j = 0; j < DIMENSIONS; j++) {
                 population[i][j] = random.nextDouble();
             }
         }
 
-        double[] best = null;
-        double bestScore = -Double.MAX_VALUE;
+        // åˆå§‹åŒ–æœ€ä¼˜è§£
+        double[] best = population[0].clone();
+        double bestScore = evaluate(best);
+        System.out.println("GA Initial Best Score: " + bestScore);
 
+        // --- ä¸»å¾ªç¯ï¼Œå¢åŠ ç›‘æ§ ---
         for (int gen = 0; gen < GENERATIONS; gen++) {
-            double[][] newPopulation = new double[POP_SIZE][4];
+            double lastGenBestScore = bestScore; // è®°å½•æœ¬ä»£å¼€å§‹å‰çš„æœ€ä¼˜åˆ†æ•°
+
+            double[][] newPopulation = new double[POP_SIZE][DIMENSIONS];
 
             for (int i = 0; i < POP_SIZE; i++) {
+                // é€‰æ‹©
                 double[] parent1 = tournamentSelection(population);
                 double[] parent2 = tournamentSelection(population);
 
+                // äº¤å‰
                 double[] child = crossover(parent1, parent2);
+
+                // å˜å¼‚
                 mutate(child);
                 newPopulation[i] = child;
 
+                // è¯„ä¼°å¹¶æ›´æ–°æœ€ä¼˜è§£ (ä»…åœ¨å½“å‰ä»£å†…éƒ¨æ›´æ–°)
                 double score = evaluate(child);
                 if (score > bestScore) {
                     bestScore = score;
                     best = child.clone();
-        
                 }
-             
             }
 
-            // ¸üĞÂÖÖÈº
+            // ç”¨æ–°ä¸€ä»£æ›¿æ¢æ—§ä¸€ä»£
             population = newPopulation;
 
+            double improvement = bestScore - Main.baselineScore;
+            System.out.printf("Gen %2d: Improvement = %.4f\n",
+                    gen + 1, improvement>0?improvement:0);
         }
-        baseDM.normalizeL2(best);
-        System.out.println("=== GA Finished ===");
-        System.out.printf("Best Weights = %s\n", Arrays.toString(best));
+
+        System.out.println("\n=== GA Finished ===");
+        double[] finalNormalizedBest = best.clone();
+        baseDM.normalizeL2(finalNormalizedBest);
+        System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+
+        evaluate(best); // ä½¿ç”¨åŸå§‹æœ€ä¼˜è§£è¯„ä¼°
         baseDM.printStats();
         return bestScore;
     }
 
-    // ÆÀ¹À¸öÌå£¨¼´¼ÆËãÄ³Ò»×éÈ¨ÖØÏÂµÄ·ÖÊı£©
+    // è¯„ä¼°å‡½æ•°
     private double evaluate(double[] w) {
-   
         return DataTest.score(w, testData, baseDM);
     }
 
-    // ½õ±êÈüÑ¡Ôñ
+    // é”¦æ ‡èµ›é€‰æ‹©
     private double[] tournamentSelection(double[][] population) {
         double[] best = null;
         double bestScore = -Double.MAX_VALUE;
@@ -80,18 +98,15 @@ public class GA {
                 best = individual;
             }
         }
-
         return best.clone();
     }
 
-    // ½»²æ²Ù×÷£º½«Á½¸ö¸¸´ú¸öÌåµÄÈ¨ÖØÆ½¾ù»¯Éú³É×Ó´ú
- // ¸Ä½øµÄ½»²æ²Ù×÷£ºÊ¹ÓÃµ¥µã½»²æ
+    // å•ç‚¹äº¤å‰
     private double[] crossover(double[] p1, double[] p2) {
-        Random rand = new Random();
-        double[] child = new double[4];
-        int crossoverPoint = rand.nextInt(4);  // Ëæ»úÑ¡Ôñ½»²æµã
+        double[] child = new double[DIMENSIONS];
+        int crossoverPoint = random.nextInt(DIMENSIONS);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < DIMENSIONS; i++) {
             if (i < crossoverPoint) {
                 child[i] = p1[i];
             } else {
@@ -101,16 +116,15 @@ public class GA {
         return child;
     }
 
-    // ¸Ä½øµÄ±äÒì²Ù×÷£ºÔö¼Ó±äÒì·ù¶È²¢ÏŞÖÆ·¶Î§
+    // é«˜æ–¯å˜å¼‚
     private void mutate(double[] individual) {
-        Random rand = new Random();
-        for (int i = 0; i < 4; i++) {
-            if (rand.nextDouble() < MUTATION_RATE) {
-                individual[i] += rand.nextGaussian() * 0.2;  // Ôö¼Ó±äÒì·ù¶È
-                if (individual[i] < 0) individual[i] = 0;   // È¨ÖØ²»ÄÜÎª¸º
-                if (individual[i] > 1) individual[i] = 1;   // È¨ÖØ²»ÄÜ´óÓÚ 1
+        for (int i = 0; i < DIMENSIONS; i++) {
+            if (random.nextDouble() < MUTATION_RATE) {
+                individual[i] += random.nextGaussian() * 0.2;  // å¢åŠ é«˜æ–¯å™ªå£°
+                // ç¡®ä¿æƒé‡å€¼åœ¨ [0, 1] èŒƒå›´å†…
+                if (individual[i] < 0) individual[i] = 0;
+                if (individual[i] > 1) individual[i] = 1;
             }
         }
     }
-
 }
