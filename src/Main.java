@@ -42,8 +42,8 @@ public class Main {
         }
         System.out.println("数据集加载完毕，共 " + testData.length + " 条数据。");
 
-        long localCapacity = 2000L * 1024L;
-        long edgeCapacity = 5000L * 1024L;
+        long localCapacity = 1000L * 1024L;
+        long edgeCapacity = 6000L * 1024L;
         DataManager baseDM = new DataManager(localCapacity, edgeCapacity);
 
         for (DataItem item : testData) {

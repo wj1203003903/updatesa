@@ -9,8 +9,8 @@ public class UpdateSA {
     // --- 参数 ---
     private static final int DIMENSIONS = 5;
     private static final double INIT_TEMP = 100.0;
-    private static final double MIN_TEMP = 1e-3;
-    private static final double COOLING_RATE_BASE = 0.9;
+    private static final double MIN_TEMP = 2e-3;
+    private static final double COOLING_RATE_BASE = 0.88;
     private static final int ITERATIONS_PER_TEMP_BASE = 30;
     private static final double LOCAL_DELTA = 0.03;
     private static final double LAMBDA = 1.0;

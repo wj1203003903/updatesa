@@ -4,7 +4,7 @@ import java.util.Random;
 public class PSO {
     // --- 参数 ---
     private static final int POP_SIZE = 20;         // 粒子数量
-    private static final int GENERATIONS = 40;      // 迭代次数
+    private static final int GENERATIONS = 100;      // 迭代次数
     private static final double INERTIA = 0.7;      // 惯性权重
     private static final double COGNITIVE = 1.5;    // 个体学习因子
     private static final double SOCIAL = 1.5;       // 群体学习因子
@@ -45,9 +45,6 @@ public class PSO {
                 best = pBestPosition[i].clone();
             }
         }
-
-        System.out.println("PSO Initial Best Score: " + bestScore);
-
         // --- 主循环，增加监控 ---
         for (int gen = 0; gen < GENERATIONS; gen++) {
             double lastGenBestScore = bestScore; // 记录本代开始前的最优分数

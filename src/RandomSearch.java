@@ -26,7 +26,7 @@ public class RandomSearch { // 您可以将类名改回 Nomal
         // 1. 生成一组随机权重
         double[] best = new double[DIMENSIONS];
         for (int j = 0; j < DIMENSIONS; j++) {
-            best[j] = random.nextDouble(); // 在 [0.0, 1.0) 范围内随机
+            best[j] = 0.5;
         }
 
         // 2. 使用这组原始权重来评估分数

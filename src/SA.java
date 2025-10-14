@@ -5,8 +5,8 @@ public class SA {
     // --- 参数 ---
     private static final int DIMENSIONS = 5;
     private static final double INIT_TEMP = 1000.0;
-    private static final double MIN_TEMP = 1e-4;
-    private static final double COOLING_RATE = 0.9;
+    private static final double MIN_TEMP = 2e-3;
+    private static final double COOLING_RATE = 0.88;
     private static final int ITERATIONS_PER_TEMP = 50;
 
     // --- 成员变量 ---

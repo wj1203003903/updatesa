@@ -4,7 +4,7 @@ import java.util.Random;
 public class ACO {
     // --- 参数 ---
     private static final int ANT_COUNT = 20;           // 蚂蚁数量
-    private static final int GENERATIONS = 40;         // 迭代次数
+    private static final int GENERATIONS = 100;         // 迭代次数
     private static final int DIMENSIONS = 5;           // 权重维度 (已更正为5)
     private static final double ALPHA = 1.0;           // 信息素影响因子
     private static final double BETA = 2.0;            // 启发式影响因子

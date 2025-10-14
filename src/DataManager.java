@@ -8,7 +8,7 @@ class DataManager {
     RemoteCloud remote;
 
     // 本地总线速度，暂时保持不变，仍然很快
-    private final double LOCAL_BUS_SPEED_BPS = 1 * 1e9; // 1 GB/s
+    private final double LOCAL_BUS_SPEED_BPS = 2 * 1e5;
 
     // 网络信道，将在构造函数中初始化为性能较差的配置
     private final Channel cloudChannel;
@@ -38,8 +38,8 @@ class DataManager {
 
         // --- 修改方案：创建一个更“拥堵”的网络环境 ---
 
-        this.cloudChannel = new Channel(1.5 * 1e5, 0.150, 15.0, 8.0);   // 150KHz, 150ms
-        this.remoteChannel = new Channel(4 * 1e5, 0.500, 10.0, 5.0);  // 400KHz, 500ms
+        this.cloudChannel = new Channel(5 * 1e4, 0.200, 15.0, 5.0);   // 150KHz, 150ms
+        this.remoteChannel = new Channel(5 * 1e4, 0.400, 10.0, 6.0);  // 400KHz, 500ms
     }
 
     /**
@@ -135,10 +135,10 @@ class DataManager {
         double averageDelay = totalDelaySeconds / totalTasks;
 
         // 评分公式权重，可以根据需要调整
-        double w1 = 2.0, w2 = 1.0, w3 = 5.0;
+        double w1 = 4.0, w2 = 2.0, w3 = 8.0;
 
         // 惩罚项：平均延迟越高，分母越大，总分越低
-        return (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (1.0 + averageDelay * 10);
+        return 100*(w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (1.0 + averageDelay);
     }
 
     public void normalizeL2(double[] vector) {
@@ -168,20 +168,30 @@ class DataManager {
     }
 
     public void printStats() {
-        if (totalTasks == 0) {
-            System.out.println("没有任务被处理，无法生成统计数据。");
-            return;
-        }
-        double localHitRate = (double) localHits / Math.max(1, localAccesses);
-        double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
+        if (totalTasks == 0) { /* ... */ return; }
+
+        // --- 核心修改在此处 ---
+
+        // 全局本地命中率 = (本地命中数) / (总请求数)
+        double globalLocalHitRate = (double) localHits / Math.max(1, totalAccessed);
+
+        // 全局边缘云命中率 = (边缘云命中数) / (总请求数)
+        double globalCloudHitRate = (double) cloudHits / Math.max(1, totalAccessed);
+
+        // 全局远端命中率 (所有穿透到最底层的请求都视为在远端“命中”)
+        int remoteHits = remoteAccesses; // 假设所有到底层的请求都能在数据源找到
+        double globalRemoteHitRate = (double) remoteHits / Math.max(1, totalAccessed);
+
+
         double completionRate = (double) completedTasks / totalTasks;
 
-        System.out.println("==== 系统性能统计 ====");
+        System.out.println("---- 系统性能统计 (全局口径) ----");
         System.out.println("总处理任务数: " + totalTasks);
         System.out.printf("任务完成率: %.3f (%d / %d)\n", completionRate, completedTasks, totalTasks);
-        System.out.printf("本地缓存命中率: %.3f\n", localHitRate);
-        System.out.printf("边缘云命中率: %.3f\n", cloudHitRate);
-        System.out.printf("总计延迟: %.3f s\n", totalDelaySeconds);
+
+        System.out.printf("全局本地缓存命中率: %.3f\n", globalLocalHitRate);
+        System.out.printf("全局边缘云命中率: %.3f\n", globalCloudHitRate);
+        System.out.printf("全局远端访问率: %.3f\n", globalRemoteHitRate);
         System.out.printf("平均任务延迟: %.3f ms\n", (totalDelaySeconds / totalTasks) * 1000);
     }
 }
