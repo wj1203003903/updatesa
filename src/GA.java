@@ -5,7 +5,7 @@ public class GA {
     // --- 参数 ---
     private static final int POP_SIZE = 20;            // 种群大小
     private static final int GENERATIONS = 100;         // 迭代次数
-    private static final double MUTATION_RATE = 0.2;    // 变异率
+    private static final double MUTATION_RATE = 0.4;    // 变异率
     private static final int TOURNAMENT_SIZE = 3;      // 锦标赛选择的规模
     private static final int DIMENSIONS = 5;           // 权重维度 (已更正为5)
 

@@ -38,7 +38,6 @@ public class DataTest {
                 DataItem bestTask = readyQueue.stream()
                         .max(Comparator.comparingDouble(item -> item.getSchedulingScore(decisionTime)))
                         .orElse(null);
-
                 readyQueue.remove(bestTask);
 
                 // b. 处理任务，并获取其持续时间

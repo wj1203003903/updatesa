@@ -1,30 +1,22 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 
 public class UpdateSA {
-    // --- 参数 ---
+    // --- 【最终优化版】推荐参数 ---
     private static final int DIMENSIONS = 5;
-    private static final double INIT_TEMP = 100.0;
-    private static final double MIN_TEMP = 2e-3;
-    private static final double COOLING_RATE_BASE = 0.88;
-    private static final int ITERATIONS_PER_TEMP_BASE = 30;
-    private static final double LOCAL_DELTA = 0.03;
-    private static final double LAMBDA = 1.0;
-    private static final int STOP_GENERATION = 6;
-    private static final double SLOWDOWN_FACTOR = 0.98;
-    private static final int ARCHIVE_SIZE = 5;
-    private static final int RESTART_STAGNATION_THRESHOLD = 18;
-    private static final double RESTART_TEMP_INCREASE_FACTOR = 2.0;
-    private static final int MAX_RESTART_COUNT = 6;
-    private static final double DIVERSITY_THRESHOLD = 0.2;
-    private static final double ACCEPTANCE_RATE_TARGET = 0.4;
-    private static final double STEP_ADJUST_FACTOR = 0.99;
-    private static final int TABU_TENURE = 10;
-    private static final double TABU_SIMILARITY_THRESHOLD = 0.01;
+    private static final double INIT_TEMP = 1000.0;        // 足够高的初始温度，以支持大范围探索
+    private static final double MIN_TEMP = 2e-3;           // 足够低的终止温度，用于精细收敛
+    private static final double COOLING_RATE = 0.9;      // 【关键】非常慢的降温速率，给予充分探索时间
+    private static final int ITERATIONS_PER_TEMP = 100;     // 【关键】在每个温度下进行更多次尝试（因为速度变快了）
+
+    // --- 精英存档与重启机制参数 ---
+    private static final int ARCHIVE_SIZE = 5;              // 精英解存档数量
+    private static final int RESTART_STAGNATION_THRESHOLD = 25; // 停滞25代后考虑重启
+    private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5; // 重启时温度恢复系数
+    private static final int MAX_RESTART_COUNT = 5;         // 最多重启5次
+    private static final double DIVERSITY_THRESHOLD = 0.1;   // 精英解之间的最小距离
 
     // --- 成员变量 ---
     private final DataItem[] testData;
@@ -35,8 +27,7 @@ public class UpdateSA {
     private final List<double[]> eliteArchive;
     private final List<Double> eliteScores;
     private int restartCount;
-    private double baseStep;
-    private final Queue<double[]> tabuList;
+    private double baseStep; // 用于自适应步长
 
     public UpdateSA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
@@ -45,15 +36,13 @@ public class UpdateSA {
         this.eliteArchive = new ArrayList<>();
         this.eliteScores = new ArrayList<>();
         this.restartCount = 0;
-        this.baseStep = 0.2;
-        this.tabuList = new LinkedList<>();
+        this.baseStep = 0.4; // 初始步长可以稍大一些
     }
 
     public double run() {
         // 初始化
         double[] current = randomWeights();
         double currentScore = evaluate(current);
-        updateTabuList(current);
         double[] best = current.clone();
         double bestScore = currentScore;
         updateArchive(best, bestScore);
@@ -64,27 +53,19 @@ public class UpdateSA {
 
         while (temperature > MIN_TEMP) {
             generation++;
-            double lastGenBestScore = bestScore;
-            int iterations = ITERATIONS_PER_TEMP_BASE + (int) (ITERATIONS_PER_TEMP_BASE * (temperature / INIT_TEMP));
             int acceptedCount = 0;
             boolean improvedAtThisTemp = false;
 
-            for (int it = 0; it < iterations; it++) {
-                double[] neighbor;
-                int tryCount = 0;
-                do {
-                    int[] subspace = chooseSubspace(temperature);
-                    neighbor = generateNeighbor(current, subspace, temperature);
-                    localSearch(neighbor, subspace);
-                    tryCount++;
-                } while (isTabu(neighbor) && tryCount < 10);
+            for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
+                // 【核心简化】直接生成邻域解，完全移除了 localSearch 和 isTabu
+                int[] subspace = chooseSubspace(temperature);
+                double[] neighbor = generateNeighbor(current, subspace, temperature);
                 double neighborScore = evaluate(neighbor);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
                     current = neighbor;
                     currentScore = neighborScore;
                     acceptedCount++;
-                    updateTabuList(current);
                     if (currentScore > bestScore) {
                         best = current.clone();
                         bestScore = currentScore;
@@ -94,17 +75,17 @@ public class UpdateSA {
                 }
             }
 
-            // 在每次降温后 (即每代结束时) 打印信息
+            // 打印信息
             double improvement = bestScore - Main.baselineScore;
             System.out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
-                    generation, temperature, improvement>0?improvement:0);
+                    generation, temperature, improvement > 0 ? improvement : 0);
 
-            // 自适应步长
-            double acceptanceRate = (double) acceptedCount / iterations;
-            if (acceptanceRate > ACCEPTANCE_RATE_TARGET) {
-                baseStep /= STEP_ADJUST_FACTOR;
-            } else {
-                baseStep *= STEP_ADJUST_FACTOR;
+            // 【保留】自适应步长
+            double acceptanceRate = (double) acceptedCount / ITERATIONS_PER_TEMP;
+            if (acceptanceRate > 0.4) { // 接受率过高，说明步长太小，需要扩大探索
+                baseStep /= 0.99;
+            } else { // 接受率过低，说明步长太大，需要缩小探索
+                baseStep *= 0.99;
             }
 
             // 更新停滞计数
@@ -116,35 +97,27 @@ public class UpdateSA {
 
             // 重启机制
             if (!eliteArchive.isEmpty() && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
-                System.out.printf("--- Triggering Restart #%d ---\n", restartCount + 1);
+                System.out.printf("--- Stagnation detected. Triggering Restart #%d ---\n", restartCount + 1);
                 restartCount++;
                 int randomIndex = random.nextInt(eliteArchive.size());
                 current = eliteArchive.get(randomIndex).clone();
                 currentScore = eliteScores.get(randomIndex);
-                eliteArchive.remove(randomIndex);
-                eliteScores.remove(randomIndex);
                 temperature *= RESTART_TEMP_INCREASE_FACTOR;
                 if (temperature > INIT_TEMP) temperature = INIT_TEMP;
                 stagnationCount = 0;
-                tabuList.clear();
-                updateTabuList(current);
-                continue; // 跳过本次降温
+                continue;
             }
 
-            // 自适应冷却
-            double coolingRate = COOLING_RATE_BASE;
-            if (stagnationCount >= STOP_GENERATION) {
-                coolingRate = Math.pow(COOLING_RATE_BASE, SLOWDOWN_FACTOR);
-            }
-            temperature *= coolingRate;
+            // 标准降温
+            temperature *= COOLING_RATE;
         }
 
-        System.out.println("\n=== SA (Hybrid Advanced) Finished ===");
+        System.out.println("\n=== SA (Optimized Hybrid) Finished ===");
         double[] finalNormalizedBest = best.clone();
         baseDM.normalizeL2(finalNormalizedBest);
         System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
 
-        evaluate(best); // 使用原始最优解评估
+        evaluate(best);
         baseDM.printStats();
         return bestScore;
     }
@@ -180,22 +153,6 @@ public class UpdateSA {
         }
     }
 
-    private void updateTabuList(double[] solution) {
-        if (tabuList.size() >= TABU_TENURE) {
-            tabuList.poll();
-        }
-        tabuList.add(solution.clone());
-    }
-
-    private boolean isTabu(double[] solution) {
-        for (double[] tabuSolution : tabuList) {
-            if (distance(solution, tabuSolution) < TABU_SIMILARITY_THRESHOLD) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private double distance(double[] s1, double[] s2) {
         double sum = 0;
         for (int i = 0; i < DIMENSIONS; i++) {
@@ -225,7 +182,7 @@ public class UpdateSA {
 
     private int[] chooseSubspace(double temperature) {
         double tRatio = Math.min(1.0, temperature / INIT_TEMP);
-        int k = (int) Math.round(1 + (DIMENSIONS - 1) * tRatio);
+        int k = 1 + (int) Math.round((DIMENSIONS - 1) * tRatio);
         return randomSampleIndices(k);
     }
 
@@ -242,33 +199,11 @@ public class UpdateSA {
         return res;
     }
 
-    private void localSearch(double[] candidate, int[] subspace) {
-        double bestLocalScore = evaluate(candidate);
-        double[] bestLocal = candidate.clone();
-        for (int idx : subspace) {
-            double old = candidate[idx];
-            candidate[idx] = clamp(old + LOCAL_DELTA, 0.0, 1.0);
-            double sPlus = evaluate(candidate);
-            if (sPlus > bestLocalScore) {
-                bestLocalScore = sPlus;
-                bestLocal = candidate.clone();
-            }
-            candidate[idx] = clamp(old - LOCAL_DELTA, 0.0, 1.0);
-            double sMinus = evaluate(candidate);
-            if (sMinus > bestLocalScore) {
-                bestLocalScore = sMinus;
-                bestLocal = candidate.clone();
-            }
-            candidate[idx] = old;
-        }
-        System.arraycopy(bestLocal, 0, candidate, 0, DIMENSIONS);
-    }
-
     private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
         if (neighborScore > currentScore) {
             return 1.0;
         }
-        return Math.exp((neighborScore - currentScore) / (LAMBDA * Math.max(1e-12, temperature)));
+        return Math.exp((neighborScore - currentScore) / temperature);
     }
 
     private double evaluate(double[] weights) {
