@@ -2,12 +2,19 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class SA {
-    // --- 您的参数 (保持不变) ---
+    // --- 【原始版推荐参数】- 旨在减慢收敛 ---
     private static final int DIMENSIONS = 5;
-    private static final double INIT_TEMP = 1000.0;
-    private static final double MIN_TEMP = 2e-3;
+
+    // 使用一个非常高的初始温度来强行增加早期探索
+    private static final double INIT_TEMP = 1000;
+
+    // 使用一个非常慢的冷却速率，让算法有更多时间探索
     private static final double COOLING_RATE = 0.9;
+
+    // 在每个温度下进行更多的迭代
     private static final int ITERATIONS_PER_TEMP = 100;
+
+    private static final double MIN_TEMP = 2e-3;
 
     // --- 成员变量 ---
     private DataItem[] testData;
@@ -31,8 +38,8 @@ public class SA {
         while (temperature > MIN_TEMP) {
             generation++;
             for (int i = 0; i < ITERATIONS_PER_TEMP; i++) {
-                // 调用升级版的邻域函数，并传入温度
-                double[] neighborSolution = generateNeighbor(currentSolution, temperature);
+                // 调用最原始的、固定的邻域函数
+                double[] neighborSolution = generateNeighbor(currentSolution);
                 double neighborScore = evaluate(neighborSolution);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
@@ -53,10 +60,11 @@ public class SA {
             temperature *= COOLING_RATE;
         }
 
-        System.out.println("\n=== SA (Enhanced V2) Finished ===");
+        System.out.println("\n=== SA (Standard Version) Finished ===");
         double[] finalNormalizedBest = bestSolution.clone();
         baseDM.normalizeL2(finalNormalizedBest);
         System.out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+
         evaluate(bestSolution);
         baseDM.printStats();
         return bestScore;
@@ -73,49 +81,19 @@ public class SA {
     }
 
     /**
-     * 【【【 核心升级在此 】】】
-     * 邻域生成函数 V2：使用非线性衰减和最小步长保证
-     * @param current 当前解
-     * @param temperature 当前温度
-     * @return 一个新的邻域解
+     * 【最原始的版本】
+     * 邻域生成函数：单点、固定小步长扰动
      */
-    private double[] generateNeighbor(double[] current, double temperature) {
+    private double[] generateNeighbor(double[] current) {
         double[] neighbor = current.clone();
+        int idx = random.nextInt(DIMENSIONS);
 
-        // 1. 定义最大和最小扰动幅度
-        double maxMagnitude = 0.5; // 最高温时的最大步长
-        double minMagnitude = 0.01; // 【关键】保证在低温时仍有最小的探索能力
+        // 固定的、小范围的扰动
+        neighbor[idx] += (random.nextDouble() - 0.5) * 0.3;
 
-        // 2. 使用开方根进行非线性衰减
-        // tempFactor 仍然是从 1 到 0，但 sqrt() 会让它在高温时下降快，低温时下降慢
-        double tempFactor = Math.sqrt(temperature / INIT_TEMP);
-
-        // 3. 线性插值计算当前步长
-        // 公式与之前相同，但由于tempFactor的变化曲线不同，magnitude的行为也完全不同
-        double magnitude = minMagnitude + (maxMagnitude - minMagnitude) * tempFactor;
-
-        // 4. 动态决定扰动维度数量
-        // 在快速冷却场景下，让多维度扰动的概率更高一些
-        int dimsToChange = 1;
-        if (random.nextDouble() < tempFactor) { // 温度越高，越有可能改变多个维度
-            dimsToChange = 1 + random.nextInt(DIMENSIONS);
-        }
-
-        // 随机选择维度 (Fisher-Yates shuffle)
-        int[] allIndices = {0, 1, 2, 3, 4};
-        for (int i = 0; i < dimsToChange; i++) {
-            int j = i + random.nextInt(DIMENSIONS - i);
-            int temp = allIndices[i]; allIndices[i] = allIndices[j]; allIndices[j] = temp;
-        }
-
-        // 5. 应用扰动
-        for (int i = 0; i < dimsToChange; i++) {
-            int idx = allIndices[i];
-            neighbor[idx] += (random.nextDouble() - 0.5) * 2 * magnitude;
-            // 边界检查
-            if (neighbor[idx] < 0) neighbor[idx] = 0;
-            if (neighbor[idx] > 1) neighbor[idx] = 1;
-        }
+        // 边界检查
+        if (neighbor[idx] < 0) neighbor[idx] = 0;
+        if (neighbor[idx] > 1) neighbor[idx] = 1;
 
         return neighbor;
     }
