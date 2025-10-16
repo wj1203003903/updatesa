@@ -152,30 +152,53 @@ public class UpdateSA {
     }
 
     // --- [MODIFIED] runGARescue不再需要参数和返回值 ---
-    private void runGARescue() {
-        List<double[]> currentPopulation = new ArrayList<>(eliteArchive);
+    // ... UpdateSA 类的其他部分保持不变 ...
 
+    // --- [YOUR NEW STRATEGY] 修改 runGARescue 方法 ---
+    private void runGARescue() {
+        List<double[]> currentPopulation = new ArrayList<>(eliteArchive); // 使用全部15个精英作为GA种群
+
+        // 运行一个短暂的GA
         for (int gen = 0; gen < GA_RESCUE_GENERATIONS; gen++) {
             List<double[]> newPopulation = new ArrayList<>();
-
+            // ... GA的内部繁衍过程保持不变 ...
             if (!currentPopulation.isEmpty()) {
                 currentPopulation.sort((s1, s2) -> Double.compare(evaluate(s2), evaluate(s1)));
                 newPopulation.add(currentPopulation.get(0).clone());
             }
-
             while (newPopulation.size() < currentPopulation.size()) {
                 double[] parent1 = tournamentSelection(currentPopulation);
                 double[] parent2 = tournamentSelection(currentPopulation);
                 double[] child = crossover(parent1, parent2);
                 mutate(child);
-                evaluate(child); // 在这里评估，如果产生了新的全局最优，会直接更新 this.best
+                evaluate(child); // 实时更新全局best
                 newPopulation.add(child);
             }
             currentPopulation = newPopulation;
         }
 
+        // --- [YOUR REQUEST IMPLEMENTED] “精英换血”逻辑 ---
+
+        // 1. 先对旧的精英组进行排序
+        List<Object[]> sortedOldElites = new ArrayList<>();
+        for(int i=0; i < eliteArchive.size(); i++){
+            sortedOldElites.add(new Object[]{ eliteArchive.get(i), eliteScores.get(i) });
+        }
+        sortedOldElites.sort((o1, o2) -> Double.compare((Double)o2[1], (Double)o1[1]));
+
+        // 2. 清空当前的精英组
         eliteArchive.clear();
         eliteScores.clear();
+
+        // 3. 只保留最强的3个“元老”
+        for(int i=0; i < Math.min(5, sortedOldElites.size()); i++){
+            eliteArchive.add((double[])sortedOldElites.get(i)[0]);
+            eliteScores.add((Double)sortedOldElites.get(i)[1]);
+        }
+
+        System.out.println("--- Elite Archive cleansed. Kept top 3, now accepting new generation. ---");
+
+        // 4. 让GA创造的所有新后代，去竞争剩下的12个空位
         for (double[] solution : currentPopulation) {
             updateArchive(solution, evaluate(solution));
         }
