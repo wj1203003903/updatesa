@@ -8,7 +8,7 @@ public class ACO {
     private static final int DIMENSIONS = 5;
 
     // 【核心修改】将BETA设为0，并可以适当增强ALPHA
-    private static final double ALPHA = 0.7;           // 信息素影响因子 (可以设为1.0)
+    private static final double ALPHA = 0.4;           // 信息素影响因子 (可以设为1.0)
 
     private static final double EVAPORATION = 0.7;
     private static final double Q = 100.0;
