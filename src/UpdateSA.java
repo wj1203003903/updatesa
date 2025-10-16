@@ -4,21 +4,23 @@ import java.util.List;
 import java.util.Random;
 
 public class UpdateSA {
-    // ... 参数部分与之前完全相同 ...
-    private static final int DIMENSIONS = 5;
-    private static final double INIT_TEMP = 1000.0;
-    private static final double MIN_TEMP = 2e-3;
-    private static final double COOLING_RATE = 0.9;
-    private static final int ITERATIONS_PER_TEMP = 120;
-    private static final int ARCHIVE_SIZE = 15;
-    private static final int RESTART_STAGNATION_THRESHOLD = 10;
-    private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5;
-    private static final int MAX_RESTART_COUNT = 5;
-    private static final double DIVERSITY_THRESHOLD = 0.15;
-    private static final int GA_RESCUE_GENERATIONS = 5;
-    private static final double GA_RESCUE_MUTATION_RATE = 0.2;
-    private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;
+    private static final int DIMENSIONS = 5;                        // 解向量的维度（基因数量）
+    private static final double INIT_TEMP = 1000.0;                 // 初始温度：决定了算法初期的探索胆量
+    private static final double MIN_TEMP = 2e-3;                    // 终止温度：当温度低于此值时，算法结束
+    private static final double COOLING_RATE = 0.9;                 // 冷却速率：每一代温度降低的比例
+    private static final int ITERATIONS_PER_TEMP = 120;             // 每个温度下的迭代次数：决定了在当前“胆量”下探索的充分程度
 
+    // --- 精英存档与GA救援触发参数 ---
+    private static final int ARCHIVE_SIZE = 15;                     // 精英存档的大小：决定了GA救援时的“初始种群”规模
+    private static final int RESTART_STAGNATION_THRESHOLD = 10;     // 【GA救援触发器】停滞容忍上限：当连续这么多代最优解没有更新时，触发GA救援
+    private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5; // 重启/救援后的温度提升系数：让算法重新获得探索活力
+    private static final int MAX_RESTART_COUNT = 5;                 // 最大救援次数：限制GA救援这个“大招”的使用次数
+    private static final double DIVERSITY_THRESHOLD = 0.15;          // 精英多样性门槛：确保精英存档中的解足够不同，为GA提供多样化的基因
+
+    // --- GA救援阶段自身参数 ---
+    private static final int GA_RESCUE_GENERATIONS = 5;             // GA救援运行的代数：一次救援中基因重组的轮次
+    private static final double GA_RESCUE_MUTATION_RATE = 0.2;       // GA救援中的变异率：新生代个体发生基因突变的概率
+    private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;         // GA救援中的锦标赛选择规模：决定了“选拔父母”的竞争激烈程度
     // --- 成员变量 ---
     private final DataItem[] testData;
     private final DataManager baseDM;
