@@ -64,7 +64,7 @@ public class Main {
             System.out.println("实验开始时间: " + new Date());
             System.out.println("所有输出将被记录到文件: " + logFileName);
 
-            final int TOTAL_EXPERIMENT_RUNS = 20; // 在这里设置总的实验次数
+            final int TOTAL_EXPERIMENT_RUNS = 10; // 在这里设置总的实验次数
 
             for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
                 originalOut.println("第" + i + "次执行");

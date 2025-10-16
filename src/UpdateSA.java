@@ -9,7 +9,7 @@ public class UpdateSA {
     private static final double INIT_TEMP = 1000.0;        // 足够高的初始温度，以支持大范围探索
     private static final double MIN_TEMP = 2e-3;           // 足够低的终止温度，用于精细收敛
     private static final double COOLING_RATE = 0.9;      // 【关键】非常慢的降温速率，给予充分探索时间
-    private static final int ITERATIONS_PER_TEMP = 100;     // 【关键】在每个温度下进行更多次尝试（因为速度变快了）
+    private static final int ITERATIONS_PER_TEMP = 120;     // 【关键】在每个温度下进行更多次尝试（因为速度变快了）
 
     // --- 精英存档与重启机制参数 ---
     private static final int ARCHIVE_SIZE = 5;              // 精英解存档数量
