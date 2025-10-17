@@ -30,15 +30,15 @@ public class UpdateSA {
 
     // --- 精英存档与GA救援触发参数 ---
     private static final int ARCHIVE_SIZE = 15;
-    private static final int RESTART_STAGNATION_THRESHOLD = 30;
+    private static final int RESTART_STAGNATION_THRESHOLD = 25;
     private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5;
     private static final int MAX_RESTART_COUNT = 5;
     private static final double DIVERSITY_THRESHOLD = 0.15;
 
     // --- GA救援阶段自身参数 ---
-    private static final int GA_RESCUE_GENERATIONS = 5;
+    private static final int GA_RESCUE_GENERATIONS = 10;
     private static final double GA_RESCUE_MUTATION_RATE = 0.2;
-    private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;
+    private static final int GA_RESCUE_TOURNAMENT_SIZE = 3;
 
     // --- 【新增】预热阶段参数 ---
     private static final int PRE_SEED_COUNT = 100; // 在开始前，生成100个随机解来预填充精英库
