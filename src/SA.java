@@ -14,7 +14,7 @@ public class SA {
     // 在每个温度下进行更多的迭代
     private static final int ITERATIONS_PER_TEMP = 100;
 
-    private static final double MIN_TEMP = 2e-3;
+    private static final double MIN_TEMP = 1e-3;
 
     // --- 成员变量 ---
     private DataItem[] testData;

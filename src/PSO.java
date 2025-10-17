@@ -4,7 +4,7 @@ import java.util.Random;
 public class PSO {
     // --- 参数 ---
     private static final int POP_SIZE = 20;         // 粒子数量
-    private static final int GENERATIONS = 100;      // 迭代次数
+    private static final int GENERATIONS = 130;      // 迭代次数
     private static final double INERTIA = 0.7;      // 惯性权重
     private static final double COGNITIVE = 1.5;    // 个体学习因子
     private static final double SOCIAL = 1.5;       // 群体学习因子

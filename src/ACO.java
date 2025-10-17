@@ -4,7 +4,7 @@ import java.util.Random;
 public class ACO {
     // --- 参数 ---
     private static final int ANT_COUNT = 20;
-    private static final int GENERATIONS = 100;
+    private static final int GENERATIONS = 130;
     private static final int DIMENSIONS = 5;
 
     private static final double ALPHA = 0.4;
