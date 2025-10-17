@@ -7,44 +7,48 @@ public class ACO {
     private static final int GENERATIONS = 100;
     private static final int DIMENSIONS = 5;
 
-    // 【核心修改】将BETA设为0，并可以适当增强ALPHA
-    private static final double ALPHA = 0.4;           // 信息素影响因子 (可以设为1.0)
-
+    private static final double ALPHA = 0.4;
     private static final double EVAPORATION = 0.9;
     private static final double Q = 50.0;
 
-    // --- 成员变量 (无变化) ---
+    // --- 【核心修改】引入粒度参数 ---
+    private static final int GRANULARITY = 41; // 将解空间离散化为41个点 (0.00, 0.025, ..., 1.00)
+
+    // --- 成员变量 ---
     private DataItem[] testData;
     private DataManager baseDM;
     private Random random;
     private double[][] pheromones;
 
     public ACO(DataItem[] testData, DataManager baseDM) {
-        // ... (构造函数无变化) ...
         this.testData = testData;
         this.baseDM = baseDM;
         this.random = new Random(Main.randomseal);
-        this.pheromones = new double[DIMENSIONS][11];
+
+        // 【修改】信息素矩阵的大小现在由GRANULARITY决定
+        this.pheromones = new double[DIMENSIONS][GRANULARITY];
         for (int i = 0; i < DIMENSIONS; i++) {
-            Arrays.fill(pheromones[i], random.nextDouble());
+            // 初始化信息素，可以简单地设为一个固定值或随机值
+            Arrays.fill(pheromones[i], 1.0);
         }
     }
 
     public double run() {
-        // ... (run方法无变化) ...
         double bestScore = -Double.MAX_VALUE;
         double[] best = new double[DIMENSIONS];
-        System.out.println("ACO Initializing (Heuristics Disabled)..."); // 修改了打印信息
+        System.out.println("ACO Initializing (Granularity: " + GRANULARITY + ")...");
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
-            // ... (循环内部无变化) ...
             double[][] ants = new double[ANT_COUNT][DIMENSIONS];
             double[] scores = new double[ANT_COUNT];
 
             for (int k = 0; k < ANT_COUNT; k++) {
+                // 每只蚂蚁构建一个解
                 for (int d = 0; d < DIMENSIONS; d++) {
                     ants[k][d] = selectValue(d);
                 }
+
+                // 评估解
                 scores[k] = evaluate(ants[k]);
                 if (scores[k] > bestScore) {
                     bestScore = scores[k];
@@ -52,15 +56,19 @@ public class ACO {
                 }
             }
 
-            // ... (信息素更新无变化) ...
+            // 更新信息素
+            // 1. 信息素挥发
             for (int i = 0; i < DIMENSIONS; i++) {
-                for (int j = 0; j < 11; j++) {
-                    pheromones[i][j] *= (1 - EVAPORATION);
+                for (int j = 0; j < GRANULARITY; j++) {
+                    pheromones[i][j] *= EVAPORATION;
                 }
             }
+
+            // 2. 信息素增强
             for (int k = 0; k < ANT_COUNT; k++) {
                 for (int d = 0; d < DIMENSIONS; d++) {
-                    int idx = (int) Math.round(ants[k][d] * 10);
+                    // 【修改】将连续值映射到新的离散索引
+                    int idx = (int) Math.round(ants[k][d] * (GRANULARITY - 1));
                     pheromones[d][idx] += Q * (scores[k] / Math.max(bestScore, 1e-6));
                 }
             }
@@ -70,7 +78,7 @@ public class ACO {
                     gen + 1, improvement > 0 ? improvement : 0);
         }
 
-        // ... (结束打印无变化) ...
+        // 结束打印
         System.out.println("\n=== ACO Finished ===");
         double[] finalNormalizedBest = best.clone();
         baseDM.normalizeL2(finalNormalizedBest);
@@ -81,31 +89,34 @@ public class ACO {
     }
 
     // 轮盘赌选择
-    // 【【【 核心修改在此 】】】
     private double selectValue(int dimension) {
-        double[] probs = new double[11];
+        // 【修改】概率数组的大小现在由GRANULARITY决定
+        double[] probs = new double[GRANULARITY];
         double sum = 0;
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < GRANULARITY; i++) {
             double pheromone = pheromones[dimension][i];
-
             probs[i] = Math.pow(pheromone, ALPHA);
-            // --- 修改结束 ---
-
             sum += probs[i];
         }
 
-        // 增加对sum为0或NaN的健壮性检查
         if (sum == 0 || Double.isNaN(sum)) {
-            return random.nextInt(11) / 10.0;
+            // 如果信息素总和为0（罕见情况），则随机选择一个值
+            int randomIndex = random.nextInt(GRANULARITY);
+            return (double) randomIndex / (GRANULARITY - 1);
         }
 
         double r = random.nextDouble() * sum;
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < GRANULARITY; i++) {
             r -= probs[i];
-            if (r <= 0) return i / 10.0;
+            if (r <= 0) {
+                // 【修改】将索引转换回 [0, 1] 范围内的连续值
+                return (double) i / (GRANULARITY - 1);
+            }
         }
-        return 1.0; // 作为浮点数误差的保障
+
+        // 作为浮点数误差的保障
+        return 1.0;
     }
 
     private double evaluate(double[] weights) {
