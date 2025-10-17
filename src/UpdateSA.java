@@ -30,22 +30,17 @@ public class UpdateSA {
 
     // --- 精英存档与GA救援触发参数 ---
     private static final int ARCHIVE_SIZE = 15;                     // 精英存档的大小：决定了GA救援时的“初始种群”规模
-    private static final int RESTART_STAGNATION_THRESHOLD = 10;     // 【GA救援触发器】停滞容忍上限：当连续这么多代最优解没有更新时，触发GA救援
+    // 【战略调整】给SA更多耐心：停滞阈值从10改为30
+    private static final int RESTART_STAGNATION_THRESHOLD = 20;
     private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5; // 重启/救援后的温度提升系数：让算法重新获得探索活力
     private static final int MAX_RESTART_COUNT = 5;                 // 最大救援次数：限制GA救援这个“大招”的使用次数
-    private static final double DIVERSITY_THRESHOLD = 0.15;          // 精英多样性门槛：确保精英存档中的解足够不同，为GA提供多样化的基因
+    private static final double DIVERSITY_THRESHOLD = 0.15;         // 精英多样性门槛：确保精英存档中的解足够不同，为GA提供多样化的基因
 
     // --- GA救援阶段自身参数 ---
     private static final int GA_RESCUE_GENERATIONS = 5;             // GA救援运行的代数：一次救援中基因重组的轮次
     private static final double GA_RESCUE_MUTATION_RATE = 0.2;       // GA救援中的变异率：新生代个体发生基因突变的概率
     private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;         // GA救援中的锦标赛选择规模：决定了“选拔父母”的竞争激烈程度
 
-    // --- 动态步长SA的参数 ---
-    private static final double CAUCHY_PROBABILITY = 0.1;           // 使用柯西分布进行大跳跃的概率
-    private static final double ACCEPTANCE_RATE_TARGET = 0.4;       // 目标接受率，用于调整步长
-    private static final double STEP_ADJUST_FACTOR = 0.99;          // 步长调整因子
-
-    // --- 成员变量 ---
     private final DataItem[] testData;
     private final DataManager baseDM;
     private final Random random;
@@ -53,7 +48,9 @@ public class UpdateSA {
     private int restartCount;
     private double[] best;
     private double bestScore;
-    private double baseStep;
+
+    // 【移除】不再需要baseStep
+    // private double baseStep;
 
     public UpdateSA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
@@ -63,7 +60,9 @@ public class UpdateSA {
         this.restartCount = 0;
         this.best = new double[DIMENSIONS];
         this.bestScore = -Double.MAX_VALUE;
-        this.baseStep = 0.4;
+
+        // 【移除】构造函数中不再需要初始化baseStep
+        // this.baseStep = 0.4;
     }
 
     public double run() {
@@ -77,36 +76,45 @@ public class UpdateSA {
         while (temperature > MIN_TEMP) {
             generation++;
             double bestScoreAtTempStart = this.bestScore;
-            int acceptedCount = 0;
+
+            // 【移除】不再需要统计acceptedCount（用于自适应步长调整）
+            // int acceptedCount = 0;
 
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
-                double[] neighbor = generateNeighborSA(current, temperature);
+                // 【核心修改】调用新的、无状态的邻域生成器
+                double[] neighbor = generateNeighborSA_Stateless(current, temperature);
                 double neighborScore = evaluate(neighbor);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
                     current = neighbor;
                     currentScore = neighborScore;
-                    acceptedCount++;
+
+                    // 【移除】不再需要累加acceptedCount
+                    // acceptedCount++;
                 }
             }
 
+            // 停滞计数逻辑保持不变
             if (this.bestScore > bestScoreAtTempStart) {
                 stagnationCount = 0;
             } else {
                 stagnationCount++;
             }
 
-            double acceptanceRate = (double) acceptedCount / ITERATIONS_PER_TEMP;
-            if (acceptanceRate > ACCEPTANCE_RATE_TARGET) {
-                baseStep /= STEP_ADJUST_FACTOR;
-            } else {
-                baseStep *= STEP_ADJUST_FACTOR;
-            }
+            // 【移除】不再需要自适应步长调整的逻辑
+            // double acceptanceRate = (double) acceptedCount / ITERATIONS_PER_TEMP;
+            // if (acceptanceRate > ACCEPTANCE_RATE_TARGET) {
+            //     baseStep /= STEP_ADJUST_FACTOR;
+            // } else {
+            //     baseStep *= STEP_ADJUST_FACTOR;
+            // }
 
+            // 迭代信息输出保持不变
             double improvement = this.bestScore - Main.baselineScore;
             System.out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
                     generation, temperature, improvement > 0 ? improvement : 0);
 
+            // GA救援触发逻辑保持不变
             if (eliteArchive.size() >= ARCHIVE_SIZE / 2 && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
                 System.out.printf("--- Stagnation detected. Triggering GA Rescue #%d ---\n", restartCount + 1);
                 restartCount++;
@@ -132,27 +140,29 @@ public class UpdateSA {
         return this.bestScore;
     }
 
-    private double[] generateNeighborSA(double[] current, double temperature) {
+    // 【核心修改】全新的、无状态的SA邻域生成方法
+    private double[] generateNeighborSA_Stateless(double[] current, double temperature) {
         double[] neighbor = current.clone();
         int[] subspace = chooseSubspace(temperature);
 
-        if (random.nextDouble() < CAUCHY_PROBABILITY) {
-            double scale = this.baseStep * 0.1;
-            for (int idx : subspace) {
-                neighbor[idx] += scale * Math.tan(Math.PI * (random.nextDouble() - 0.5));
-                neighbor[idx] = clamp(neighbor[idx], 0, 1);
-            }
-        } else {
-            double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
-            double sigma = this.baseStep * (0.3 + 0.7 * tempFactor);
-            for (int idx : subspace) {
-                neighbor[idx] += random.nextGaussian() * sigma/1.6;
-                neighbor[idx] = clamp(neighbor[idx], 0, 1);
-            }
+        // 步长sigma完全由温度决定，提供“高温大步探索、低温小步精调”的平滑过渡
+        double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
+        double maxStep = 0.3; // 高温时的最大步长（全局探索）
+        double minStep = 0.05; // 低温时的最小步长（局部精细搜索）
+        double sigma = minStep + (maxStep - minStep) * tempFactor;
+
+        // 高斯分布扰动子空间维度
+        for (int idx : subspace) {
+            neighbor[idx] += random.nextGaussian() * sigma;
+            neighbor[idx] = clamp(neighbor[idx], 0, 1); // 限制解在[0,1]范围内
         }
         return neighbor;
     }
 
+    // 【移除】旧的、有状态的generateNeighborSA方法（依赖自适应步长和柯西分布）
+    // private double[] generateNeighborSA(double[] current, double temperature) { ... }
+
+    // --- 以下所有方法（GA救援、评估、精英存档等）保持不变 ---
     private double evaluate(double[] weights) {
         double score = DataTest.score(weights, testData, baseDM);
         if (score > this.bestScore) {
