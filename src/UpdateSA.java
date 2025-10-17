@@ -58,7 +58,7 @@ public class UpdateSA {
     public UpdateSA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
-        this.random = new Random();
+        this.random = new Random(Main.randomseal);
         this.eliteArchive = new ArrayList<>();
         this.restartCount = 0;
         this.best = new double[DIMENSIONS];
@@ -146,7 +146,7 @@ public class UpdateSA {
             double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
             double sigma = this.baseStep * (0.3 + 0.7 * tempFactor);
             for (int idx : subspace) {
-                neighbor[idx] += random.nextGaussian() * sigma/2;
+                neighbor[idx] += random.nextGaussian() * sigma/1.6;
                 neighbor[idx] = clamp(neighbor[idx], 0, 1);
             }
         }

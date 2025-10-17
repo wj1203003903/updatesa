@@ -14,7 +14,7 @@ public class Main {
 
     // 静态变量 baselineScore 保持不变
     public static double baselineScore = 0;
-
+    public static int randomseal=1;
     private static DataItem[] loadDataFromFile(String filePath) {
         // ... (此方法保持不变)
         List<DataItem> dataList = new ArrayList<>();
@@ -68,6 +68,7 @@ public class Main {
 
             for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
                 originalOut.println("第" + i + "次执行");
+                randomseal*=i;
                 System.out.printf("\n\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d of %d >>>>>>>>>>\n", i, TOTAL_EXPERIMENT_RUNS);
 
                 // --- 数据加载和环境设置 ---

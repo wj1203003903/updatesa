@@ -23,7 +23,7 @@ public class ACO {
         // ... (构造函数无变化) ...
         this.testData = testData;
         this.baseDM = baseDM;
-        this.random = new Random();
+        this.random = new Random(Main.randomseal);
         this.pheromones = new double[DIMENSIONS][11];
         for (int i = 0; i < DIMENSIONS; i++) {
             Arrays.fill(pheromones[i], random.nextDouble());
@@ -89,9 +89,6 @@ public class ACO {
         for (int i = 0; i < 11; i++) {
             double pheromone = pheromones[dimension][i];
 
-            // --- 修改开始 ---
-            // 由于BETA参数已设为0，Math.pow(heuristic, BETA) 的结果永远是 1。
-            // 我们可以直接移除启发式部分，让逻辑更清晰。
             probs[i] = Math.pow(pheromone, ALPHA);
             // --- 修改结束 ---
 

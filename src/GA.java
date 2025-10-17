@@ -17,7 +17,7 @@ public class GA {
     public GA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
-        this.random = new Random();
+        this.random = new Random(Main.randomseal);
     }
 
     public double run() {

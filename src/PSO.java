@@ -18,7 +18,7 @@ public class PSO {
     public PSO(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
-        this.random = new Random();
+        this.random = new Random(Main.randomseal);
     }
 
     public double run() {
@@ -35,8 +35,12 @@ public class PSO {
         for (int i = 0; i < POP_SIZE; i++) {
             for (int j = 0; j < DIMENSIONS; j++) {
                 position[i][j] = random.nextDouble();
+            }}
+        for (int i = 0; i < POP_SIZE; i++) {
+            for (int j = 0; j < DIMENSIONS; j++) {
                 velocity[i][j] = random.nextDouble() * 0.1 - 0.05; // 初始速度在 [-0.05, 0.05]
-            }
+            }}
+        for (int i = 0; i < POP_SIZE; i++) {
             pBestPosition[i] = position[i].clone();
             pBestScore[i] = evaluate(position[i]);
 
