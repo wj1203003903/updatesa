@@ -158,7 +158,6 @@ public class UpdateSA {
         if (score > this.bestScore) {
             this.bestScore = score;
             System.arraycopy(weights, 0, this.best, 0, DIMENSIONS);
-            System.out.printf("!!! New Global Best found: %.4f !!!\n", this.bestScore - Main.baselineScore);
             updateArchive(new EliteSolution(this.best.clone(), this.bestScore));
         }
         return score;
@@ -188,8 +187,6 @@ public class UpdateSA {
         while (eliteArchive.size() > 3) {
             eliteArchive.remove(eliteArchive.size() - 1);
         }
-
-        System.out.println("--- Elite Archive cleansed. Kept top 3, now accepting new generation. ---");
 
         for (EliteSolution solution : currentPopulation) {
             updateArchive(solution);
