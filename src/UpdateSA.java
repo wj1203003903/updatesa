@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 public class UpdateSA {
-    // --- 内部类 ---
+    // ... 内部类 EliteSolution 和所有参数部分保持不变 ...
+    // ... (All parameters and the EliteSolution inner class are the same) ...
     private static class EliteSolution implements Comparable<EliteSolution> {
         final double[] solution;
         final double score;
@@ -29,7 +30,6 @@ public class UpdateSA {
 
     // --- 精英存档与GA救援触发参数 ---
     private static final int ARCHIVE_SIZE = 15;
-    // 【战略调整】给SA更多耐心，从10改为30，这是最重要的修改！
     private static final int RESTART_STAGNATION_THRESHOLD = 30;
     private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5;
     private static final int MAX_RESTART_COUNT = 5;
@@ -40,10 +40,8 @@ public class UpdateSA {
     private static final double GA_RESCUE_MUTATION_RATE = 0.2;
     private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;
 
-    // 【移除】不再需要自适应步长相关的参数
-    // private static final double CAUCHY_PROBABILITY = 0.1;
-    // private static final double ACCEPTANCE_RATE_TARGET = 0.4;
-    // private static final double STEP_ADJUST_FACTOR = 0.99;
+    // --- 【新增】预热阶段参数 ---
+    private static final int PRE_SEED_COUNT = 100; // 在开始前，生成100个随机解来预填充精英库
 
     // --- 成员变量 ---
     private final DataItem[] testData;
@@ -53,8 +51,6 @@ public class UpdateSA {
     private int restartCount;
     private double[] best;
     private double bestScore;
-    // 【移除】不再需要baseStep
-    // private double baseStep;
 
     public UpdateSA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
@@ -66,10 +62,32 @@ public class UpdateSA {
         this.bestScore = -Double.MAX_VALUE;
     }
 
-    public double run() {
-        double[] current = randomWeights();
-        double currentScore = evaluate(current);
 
+    public double run() {
+        // --- 【您的核心思路】预热阶段 (Pre-seeding Phase) ---
+        System.out.println("--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---");
+        for (int i = 0; i < PRE_SEED_COUNT; i++) {
+            double[] randomSolution = randomWeights();
+            // 使用 evaluate 方法，因为它会自动更新 best 并调用 updateArchive
+            evaluate(randomSolution);
+        }
+        System.out.println("--- Pre-seeding finished. Elite archive size: " + eliteArchive.size() + " ---");
+
+        // 初始化SA的当前解
+        // 我们可以从预热阶段找到的精英中选一个最好的作为起点，而不是完全随机
+        double[] current;
+        double currentScore;
+        if (!eliteArchive.isEmpty()) {
+            eliteArchive.sort(null); // 确保第一个是最好的
+            current = eliteArchive.get(0).solution.clone();
+            currentScore = eliteArchive.get(0).score;
+        } else {
+            // 如果预热后精英库依然是空的（极罕见），则退回完全随机
+            current = randomWeights();
+            currentScore = evaluate(current);
+        }
+
+        // --- SA主循环开始 (与之前版本相同) ---
         double temperature = INIT_TEMP;
         int stagnationCount = 0;
         int generation = 0;
@@ -79,7 +97,6 @@ public class UpdateSA {
             double bestScoreAtTempStart = this.bestScore;
 
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
-                // 【核心修改】调用新的、无状态的邻域生成器
                 double[] neighbor = generateNeighborSA_Stateless(current, temperature);
                 double neighborScore = evaluate(neighbor);
 
@@ -95,13 +112,11 @@ public class UpdateSA {
                 stagnationCount++;
             }
 
-            // 【移除】自适应步长调整逻辑
-
             double improvement = this.bestScore - Main.baselineScore;
             System.out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
                     generation, temperature, improvement > 0 ? improvement : 0);
 
-            if (eliteArchive.size() >= ARCHIVE_SIZE / 2 && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
+            if (eliteArchive.size() >= ARCHIVE_SIZE / 3 && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
                 System.out.printf("--- Stagnation detected. Triggering GA Rescue #%d ---\n", restartCount + 1);
                 restartCount++;
                 runGARescue();
@@ -126,17 +141,15 @@ public class UpdateSA {
         return this.bestScore;
     }
 
-    // 【核心修改】全新的、无状态的SA邻域生成方法
+    // ... 其余所有方法 (generateNeighborSA_Stateless, evaluate, runGARescue, 等) 与上一版完全相同 ...
     private double[] generateNeighborSA_Stateless(double[] current, double temperature) {
         double[] neighbor = current.clone();
         int[] subspace = chooseSubspace(temperature);
 
-        // 步长sigma完全由温度决定，提供“高温大步探索、低温小步精调”的平滑过渡
         double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
 
-        // 定义步长的最大和最小值
-        double maxStep = 0.4; // 高温时的最大标准差
-        double minStep = 0.01; // 低温时的最小标准差
+        double maxStep = 0.4;
+        double minStep = 0.01;
         double sigma = minStep + (maxStep - minStep) * tempFactor;
 
         for (int idx : subspace) {
@@ -146,7 +159,6 @@ public class UpdateSA {
         return neighbor;
     }
 
-    // --- 以下所有方法（GA救援、评估、精英存档等）保持不变 ---
     private double evaluate(double[] weights) {
         double score = DataTest.score(weights, testData, baseDM);
         if (score > this.bestScore) {
@@ -166,7 +178,7 @@ public class UpdateSA {
                 currentPopulation.sort(null);
                 newPopulation.add(currentPopulation.get(0));
             }
-            while (newPopulation.size() < currentPopulation.size()) {
+            while (newPopulation.size() < ARCHIVE_SIZE) {
                 EliteSolution parent1 = tournamentSelection(currentPopulation);
                 EliteSolution parent2 = tournamentSelection(currentPopulation);
                 double[] childSolution = crossover(parent1.solution, parent2.solution);
@@ -178,7 +190,7 @@ public class UpdateSA {
         }
 
         eliteArchive.sort(null);
-        while (eliteArchive.size() > 3) {
+        while (eliteArchive.size() > ARCHIVE_SIZE / 3) {
             eliteArchive.remove(eliteArchive.size() - 1);
         }
 
