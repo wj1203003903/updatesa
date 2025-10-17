@@ -54,8 +54,8 @@ public class Main {
         PrintStream originalOut = System.out;
 
         // d. 将标准输出 (System.out) 重定向到文件打印流
-        System.setOut(printStream);
 
+        System.setOut(printStream);
         // --- 从这里开始，所有的 System.out.println() 都会被自动写入文件 ---
 
         try {
@@ -68,7 +68,7 @@ public class Main {
 
             for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
                 originalOut.println("第" + i + "次执行");
-                randomseal*=i;
+                randomseal=i*i*i*1000;
                 System.out.printf("\n\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d of %d >>>>>>>>>>\n", i, TOTAL_EXPERIMENT_RUNS);
 
                 // --- 数据加载和环境设置 ---
@@ -99,6 +99,7 @@ public class Main {
                 RandomSearch rs = new RandomSearch(testData, baseDM);
                 baselineScore = rs.run();
                 results.put("Random Search (Baseline)", baselineScore);
+
 
                 System.out.println("\n=============================================");
                 System.out.println("=== 2. Running Basic Simulated Annealing (SA) ===");
