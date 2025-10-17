@@ -4,6 +4,24 @@ import java.util.List;
 import java.util.Random;
 
 public class UpdateSA {
+    // --- 内部类：用于封装解和分数，使代码更简洁、更健壮 ---
+    private static class EliteSolution implements Comparable<EliteSolution> {
+        final double[] solution;
+        final double score;
+
+        EliteSolution(double[] solution, double score) {
+            this.solution = solution;
+            this.score = score;
+        }
+
+        @Override
+        public int compareTo(EliteSolution other) {
+            // 用于排序，分数高的在前
+            return Double.compare(other.score, this.score);
+        }
+    }
+
+    // --- 参数 ---
     private static final int DIMENSIONS = 5;                        // 解向量的维度（基因数量）
     private static final double INIT_TEMP = 1000.0;                 // 初始温度：决定了算法初期的探索胆量
     private static final double MIN_TEMP = 2e-3;                    // 终止温度：当温度低于此值时，算法结束
@@ -21,35 +39,36 @@ public class UpdateSA {
     private static final int GA_RESCUE_GENERATIONS = 5;             // GA救援运行的代数：一次救援中基因重组的轮次
     private static final double GA_RESCUE_MUTATION_RATE = 0.2;       // GA救援中的变异率：新生代个体发生基因突变的概率
     private static final int GA_RESCUE_TOURNAMENT_SIZE = 2;         // GA救援中的锦标赛选择规模：决定了“选拔父母”的竞争激烈程度
+
+    // --- 动态步长SA的参数 ---
+    private static final double CAUCHY_PROBABILITY = 0.1;           // 使用柯西分布进行大跳跃的概率
+    private static final double ACCEPTANCE_RATE_TARGET = 0.4;       // 目标接受率，用于调整步长
+    private static final double STEP_ADJUST_FACTOR = 0.99;          // 步长调整因子
+
     // --- 成员变量 ---
     private final DataItem[] testData;
     private final DataManager baseDM;
     private final Random random;
-    private final List<double[]> eliteArchive;
-    private final List<Double> eliteScores;
+    private final List<EliteSolution> eliteArchive;
     private int restartCount;
-
-    // --- [YOUR REQUEST IMPLEMENTED] best 和 bestScore 提升为成员变量 ---
     private double[] best;
     private double bestScore;
+    private double baseStep;
 
     public UpdateSA(DataItem[] testData, DataManager baseDM) {
         this.testData = testData;
         this.baseDM = baseDM;
         this.random = new Random();
         this.eliteArchive = new ArrayList<>();
-        this.eliteScores = new ArrayList<>();
         this.restartCount = 0;
-
-        // 初始化成员变量
         this.best = new double[DIMENSIONS];
         this.bestScore = -Double.MAX_VALUE;
+        this.baseStep = 0.4;
     }
 
     public double run() {
-        // 初始化
         double[] current = randomWeights();
-        double currentScore = evaluate(current); // evaluate现在会隐式更新best
+        double currentScore = evaluate(current);
 
         double temperature = INIT_TEMP;
         int stagnationCount = 0;
@@ -57,70 +76,44 @@ public class UpdateSA {
 
         while (temperature > MIN_TEMP) {
             generation++;
-            boolean improvedAtThisTemp = false;
-
-            for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
-                double[] neighbor = generateNeighbor(current);
-                double neighborScore = evaluate(neighbor); // 评估时会自动更新全局best
-
-                // 检查是否通过评估找到了新的全局最优解
-                if (neighborScore > this.bestScore) {
-                    // This check is implicitly handled by the new evaluate method,
-                    // but we need to track if improvement happened *at this temperature*
-                    // for the stagnation counter. The 'bestScore' would already be updated.
-                    // A cleaner way is to let evaluate() return a boolean.
-                    // For now, we compare against a snapshot.
-                    double scoreBeforeEval = this.bestScore;
-                    evaluate(neighbor); // Re-evaluating is inefficient, but shows the logic
-                    // In a real refactor, evaluate would return an object with score and whether it was a new best.
-                    if(this.bestScore > scoreBeforeEval){
-                        improvedAtThisTemp = true;
-                    }
-                }
-
-                if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
-                    current = neighbor;
-                    currentScore = neighborScore;
-                }
-            }
-
-            // A simpler check for improvement at this temperature
-            // This logic needs refinement. Let's simplify and assume any bestScore update is an improvement.
-            // Let's refine the loop logic to be correct.
-
-            // CORRECTED LOOP LOGIC:
             double bestScoreAtTempStart = this.bestScore;
+            int acceptedCount = 0;
+
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
-                double[] neighbor = generateNeighbor(current);
-                double neighborScore = evaluate(neighbor); // This will update this.best and this.bestScore if needed
+                double[] neighbor = generateNeighborSA(current, temperature);
+                double neighborScore = evaluate(neighbor);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
                     current = neighbor;
                     currentScore = neighborScore;
+                    acceptedCount++;
                 }
             }
-            if(this.bestScore > bestScoreAtTempStart){
-                improvedAtThisTemp = true;
+
+            if (this.bestScore > bestScoreAtTempStart) {
+                stagnationCount = 0;
+            } else {
+                stagnationCount++;
             }
 
+            double acceptanceRate = (double) acceptedCount / ITERATIONS_PER_TEMP;
+            if (acceptanceRate > ACCEPTANCE_RATE_TARGET) {
+                baseStep /= STEP_ADJUST_FACTOR;
+            } else {
+                baseStep *= STEP_ADJUST_FACTOR;
+            }
 
             double improvement = this.bestScore - Main.baselineScore;
             System.out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
                     generation, temperature, improvement > 0 ? improvement : 0);
 
-            if (!improvedAtThisTemp) { stagnationCount++; }
-            else { stagnationCount = 0; }
-
-            // 停滞时触发GA救援
             if (eliteArchive.size() >= ARCHIVE_SIZE / 2 && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
                 System.out.printf("--- Stagnation detected. Triggering GA Rescue #%d ---\n", restartCount + 1);
                 restartCount++;
-
-                runGARescue(); // 不再需要传递参数或接收返回值
-
+                runGARescue();
                 int newStartIndex = random.nextInt(Math.min(5, eliteArchive.size()));
-                current = eliteArchive.get(newStartIndex).clone();
-                currentScore = eliteScores.get(newStartIndex);
+                current = eliteArchive.get(newStartIndex).solution.clone();
+                currentScore = eliteArchive.get(newStartIndex).score;
                 temperature *= RESTART_TEMP_INCREASE_FACTOR;
                 if (temperature > INIT_TEMP) temperature = INIT_TEMP;
                 stagnationCount = 0;
@@ -139,98 +132,99 @@ public class UpdateSA {
         return this.bestScore;
     }
 
-    // --- [MODIFIED] evaluate方法现在会自动更新成员变量best和bestScore ---
+    private double[] generateNeighborSA(double[] current, double temperature) {
+        double[] neighbor = current.clone();
+        int[] subspace = chooseSubspace(temperature);
+
+        if (random.nextDouble() < CAUCHY_PROBABILITY) {
+            double scale = this.baseStep * 0.2;
+            for (int idx : subspace) {
+                neighbor[idx] += scale * Math.tan(Math.PI * (random.nextDouble() - 0.5));
+                neighbor[idx] = clamp(neighbor[idx], 0, 1);
+            }
+        } else {
+            double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
+            double sigma = this.baseStep * (0.3 + 0.7 * tempFactor);
+            for (int idx : subspace) {
+                neighbor[idx] += random.nextGaussian() * sigma/2.5;
+                neighbor[idx] = clamp(neighbor[idx], 0, 1);
+            }
+        }
+        return neighbor;
+    }
+
     private double evaluate(double[] weights) {
         double score = DataTest.score(weights, testData, baseDM);
         if (score > this.bestScore) {
             this.bestScore = score;
             System.arraycopy(weights, 0, this.best, 0, DIMENSIONS);
-            // 任何新的全局最优解，都应该尝试加入精英存档
-            updateArchive(this.best, this.bestScore);
+            System.out.printf("!!! New Global Best found: %.4f !!!\n", this.bestScore - Main.baselineScore);
+            updateArchive(new EliteSolution(this.best.clone(), this.bestScore));
         }
         return score;
     }
 
-    // --- [MODIFIED] runGARescue不再需要参数和返回值 ---
-    // ... UpdateSA 类的其他部分保持不变 ...
-
-    // --- [YOUR NEW STRATEGY] 修改 runGARescue 方法 ---
     private void runGARescue() {
-        List<double[]> currentPopulation = new ArrayList<>(eliteArchive); // 使用全部15个精英作为GA种群
+        List<EliteSolution> currentPopulation = new ArrayList<>(eliteArchive);
 
-        // 运行一个短暂的GA
         for (int gen = 0; gen < GA_RESCUE_GENERATIONS; gen++) {
-            List<double[]> newPopulation = new ArrayList<>();
-            // ... GA的内部繁衍过程保持不变 ...
+            List<EliteSolution> newPopulation = new ArrayList<>();
             if (!currentPopulation.isEmpty()) {
-                currentPopulation.sort((s1, s2) -> Double.compare(evaluate(s2), evaluate(s1)));
-                newPopulation.add(currentPopulation.get(0).clone());
+                currentPopulation.sort(null);
+                newPopulation.add(currentPopulation.get(0));
             }
             while (newPopulation.size() < currentPopulation.size()) {
-                double[] parent1 = tournamentSelection(currentPopulation);
-                double[] parent2 = tournamentSelection(currentPopulation);
-                double[] child = crossover(parent1, parent2);
-                mutate(child);
-                evaluate(child); // 实时更新全局best
-                newPopulation.add(child);
+                EliteSolution parent1 = tournamentSelection(currentPopulation);
+                EliteSolution parent2 = tournamentSelection(currentPopulation);
+                double[] childSolution = crossover(parent1.solution, parent2.solution);
+                mutate(childSolution);
+                double childScore = evaluate(childSolution);
+                newPopulation.add(new EliteSolution(childSolution, childScore));
             }
             currentPopulation = newPopulation;
         }
 
-        // --- [YOUR REQUEST IMPLEMENTED] “精英换血”逻辑 ---
-
-        // 1. 先对旧的精英组进行排序
-        List<Object[]> sortedOldElites = new ArrayList<>();
-        for(int i=0; i < eliteArchive.size(); i++){
-            sortedOldElites.add(new Object[]{ eliteArchive.get(i), eliteScores.get(i) });
-        }
-        sortedOldElites.sort((o1, o2) -> Double.compare((Double)o2[1], (Double)o1[1]));
-
-        // 2. 清空当前的精英组
-        eliteArchive.clear();
-        eliteScores.clear();
-
-        // 3. 只保留最强的3个“元老”
-        for(int i=0; i < Math.min(5, sortedOldElites.size()); i++){
-            eliteArchive.add((double[])sortedOldElites.get(i)[0]);
-            eliteScores.add((Double)sortedOldElites.get(i)[1]);
+        eliteArchive.sort(null);
+        while (eliteArchive.size() > 3) {
+            eliteArchive.remove(eliteArchive.size() - 1);
         }
 
         System.out.println("--- Elite Archive cleansed. Kept top 3, now accepting new generation. ---");
 
-        // 4. 让GA创造的所有新后代，去竞争剩下的12个空位
-        for (double[] solution : currentPopulation) {
-            updateArchive(solution, evaluate(solution));
+        for (EliteSolution solution : currentPopulation) {
+            updateArchive(solution);
         }
     }
 
-    // --- [MODIFIED] tournamentSelection也不再需要传递best ---
-    private double[] tournamentSelection(List<double[]> population) {
-        double[] tournamentBest = null;
-        double tournamentBestScore = -Double.MAX_VALUE;
+    private EliteSolution tournamentSelection(List<EliteSolution> population) {
+        EliteSolution bestInTournament = null;
         for (int i = 0; i < GA_RESCUE_TOURNAMENT_SIZE; i++) {
             int index = random.nextInt(population.size());
-            double[] individual = population.get(index);
-            // 注意：这里我们只评估用于比较，而不触发全局best的更新，以避免副作用
-            // 一个更好的设计是有一个不更新全局best的纯评估函数。
-            // For simplicity, we accept the side-effect here.
-            double score = DataTest.score(individual, testData, baseDM);
-            if (score > tournamentBestScore) {
-                tournamentBestScore = score;
-                tournamentBest = individual;
+            EliteSolution individual = population.get(index);
+            if (bestInTournament == null || individual.score > bestInTournament.score) {
+                bestInTournament = individual;
             }
         }
-        return tournamentBest.clone();
+        return bestInTournament;
     }
 
-    // ... 其余所有方法 (generateNeighbor, crossover, mutate, updateArchive等) 都保持不变 ...
-    private double[] generateNeighbor(double[] current) {
-        double[] neighbor = current.clone();
-        int idx = random.nextInt(DIMENSIONS);
-        neighbor[idx] += (random.nextDouble() - 0.5) * 0.3;
-        if (neighbor[idx] < 0) neighbor[idx] = 0;
-        if (neighbor[idx] > 1) neighbor[idx] = 1;
-        return neighbor;
+    private void updateArchive(EliteSolution newSolution) {
+        for (int i = 0; i < eliteArchive.size(); i++) {
+            if (distance(newSolution.solution, eliteArchive.get(i).solution) < DIVERSITY_THRESHOLD) {
+                if (newSolution.score > eliteArchive.get(i).score) {
+                    eliteArchive.set(i, newSolution);
+                }
+                return;
+            }
+        }
+        if (eliteArchive.size() < ARCHIVE_SIZE) {
+            eliteArchive.add(newSolution);
+        } else {
+            eliteArchive.sort(null);
+            if (newSolution.score > eliteArchive.get(eliteArchive.size() - 1).score) {
+                eliteArchive.set(eliteArchive.size() - 1, newSolution);
+            }
+        }
     }
 
     private double[] crossover(double[] p1, double[] p2) {
@@ -250,35 +244,6 @@ public class UpdateSA {
         }
     }
 
-    private void updateArchive(double[] solution, double score) {
-        for (int i = 0; i < eliteArchive.size(); i++) {
-            if (distance(solution, eliteArchive.get(i)) < DIVERSITY_THRESHOLD) {
-                if (score > eliteScores.get(i)) {
-                    eliteArchive.set(i, solution.clone());
-                    eliteScores.set(i, score);
-                }
-                return;
-            }
-        }
-        if (eliteArchive.size() < ARCHIVE_SIZE) {
-            eliteArchive.add(solution.clone());
-            eliteScores.add(score);
-        } else {
-            int worstIdx = -1;
-            double worstScore = Double.POSITIVE_INFINITY;
-            for (int i = 0; i < eliteScores.size(); i++) {
-                if (eliteScores.get(i) < worstScore) {
-                    worstScore = eliteScores.get(i);
-                    worstIdx = i;
-                }
-            }
-            if (score > worstScore) {
-                eliteArchive.set(worstIdx, solution.clone());
-                eliteScores.set(worstIdx, score);
-            }
-        }
-    }
-
     private double distance(double[] s1, double[] s2) {
         double sum = 0;
         for (int i = 0; i < DIMENSIONS; i++) {
@@ -293,6 +258,27 @@ public class UpdateSA {
             w[i] = random.nextDouble();
         }
         return w;
+    }
+
+    private int[] chooseSubspace(double temperature) {
+        double tRatio = Math.min(1.0, temperature / INIT_TEMP);
+        int k = 1 + (int) Math.round((DIMENSIONS - 1) * tRatio);
+        return randomSampleIndices(k);
+    }
+
+    private int[] randomSampleIndices(int k) {
+        k = Math.max(1, Math.min(k, DIMENSIONS));
+        int[] all = new int[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) all[i] = i;
+        for (int i = 0; i < k; i++) {
+            int j = i + random.nextInt(DIMENSIONS - i);
+            int tmp = all[i];
+            all[i] = all[j];
+            all[j] = tmp;
+        }
+        int[] res = new int[k];
+        System.arraycopy(all, 0, res, 0, k);
+        return res;
     }
 
     private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
