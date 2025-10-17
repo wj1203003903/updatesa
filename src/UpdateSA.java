@@ -137,7 +137,7 @@ public class UpdateSA {
         int[] subspace = chooseSubspace(temperature);
 
         if (random.nextDouble() < CAUCHY_PROBABILITY) {
-            double scale = this.baseStep * 0.15;
+            double scale = this.baseStep * 0.1;
             for (int idx : subspace) {
                 neighbor[idx] += scale * Math.tan(Math.PI * (random.nextDouble() - 0.5));
                 neighbor[idx] = clamp(neighbor[idx], 0, 1);
@@ -146,7 +146,7 @@ public class UpdateSA {
             double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
             double sigma = this.baseStep * (0.3 + 0.7 * tempFactor);
             for (int idx : subspace) {
-                neighbor[idx] += random.nextGaussian() * sigma/2.5;
+                neighbor[idx] += random.nextGaussian() * sigma/2;
                 neighbor[idx] = clamp(neighbor[idx], 0, 1);
             }
         }
