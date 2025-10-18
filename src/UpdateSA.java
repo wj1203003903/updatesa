@@ -23,8 +23,8 @@ public class UpdateSA {
 
     // --- 参数 ---
     private static final int DIMENSIONS = 5;
-    private static final double INIT_TEMP = 1000.0;
-    private static final double MIN_TEMP = 2e-3;
+    private static final double INIT_TEMP = 500.0;
+    private static final double MIN_TEMP = 1e-3;
     private static final double COOLING_RATE = 0.9;
     private static final int ITERATIONS_PER_TEMP = 120;
 
@@ -148,8 +148,8 @@ public class UpdateSA {
 
         double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
 
-        double maxStep = 0.4;
-        double minStep = 0.01;
+        double maxStep = 0.3;
+        double minStep = 0.02;
         double sigma = minStep + (maxStep - minStep) * tempFactor;
 
         for (int idx : subspace) {

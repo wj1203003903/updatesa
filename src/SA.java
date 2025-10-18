@@ -6,7 +6,7 @@ public class SA {
     private static final int DIMENSIONS = 5;
 
     // 使用一个非常高的初始温度来强行增加早期探索
-    private static final double INIT_TEMP = 1000;
+    private static final double INIT_TEMP = 500;
 
     // 使用一个非常慢的冷却速率，让算法有更多时间探索
     private static final double COOLING_RATE = 0.9;
@@ -14,7 +14,7 @@ public class SA {
     // 在每个温度下进行更多的迭代
     private static final int ITERATIONS_PER_TEMP = 100;
 
-    private static final double MIN_TEMP = 1e-3;
+    private static final double MIN_TEMP = 5e-4;
 
     // --- 成员变量 ---
     private DataItem[] testData;
