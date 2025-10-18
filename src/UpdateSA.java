@@ -66,7 +66,8 @@ public class UpdateSA {
     public double run() {
         // --- 【您的核心思路】预热阶段 (Pre-seeding Phase) ---
         System.out.println("--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---");
-        for (int i = 0; i < PRE_SEED_COUNT; i++) {
+        while(eliteArchive.size()<=ARCHIVE_SIZE/3)
+        {
             double[] randomSolution = randomWeights();
             // 使用 evaluate 方法，因为它会自动更新 best 并调用 updateArchive
             evaluate(randomSolution);
@@ -148,7 +149,7 @@ public class UpdateSA {
 
         double tempFactor = Math.min(1.0, temperature / INIT_TEMP);
 
-        double maxStep = 0.3;
+        double maxStep = 0.4;
         double minStep = 0.02;
         double sigma = minStep + (maxStep - minStep) * tempFactor;
 
