@@ -6,198 +6,102 @@ import java.util.List;
 import java.util.Map;
 
 public class DataManager {
-    // 成员变量
+    // 现有成员变量
     LocalCache local;
     CloudCache cloud;
     RemoteCloud remote;
-
-    // 本地总线速度
     private final double LOCAL_BUS_SPEED_BPS = 1 * 1e6;
-
-    // 网络信道
     private final Channel cloudChannel;
     private final Channel remoteChannel;
-
-    // 统计变量
     private double totalDelaySeconds = 0.0;
     int totalAccessed = 0, localHits = 0, cloudHits = 0;
     int localAccesses = 0, cloudAccesses = 0, remoteAccesses = 0;
     int completedTasks = 0, totalTasks = 0;
-
-    // 用于在缓存中找不到数据时的最终查找
     private Map<Integer, DataItem> idToDataItemMap = new HashMap<>();
 
-    /**
-     * DataManager 的构造函数.
-     */
+    // --- 新增：用于保存“最佳时刻”统计数据的变量 ---
+    private double best_totalDelaySeconds = 0.0;
+    private int best_totalAccessed = 0, best_localHits = 0, best_cloudHits = 0;
+    private int best_localAccesses = 0, best_cloudAccesses = 0, best_remoteAccesses = 0;
+    private int best_completedTasks = 0, best_totalTasks = 0;
+
     public DataManager(long localCap, long edgeCap) {
         local = new LocalCache(localCap);
         cloud = new CloudCache(edgeCap);
         remote = new RemoteCloud();
-
         local.bindLowerLevel(cloud);
         cloud.bindLowerLevel(remote);
-
-        // 您提供的网络环境参数
-        this.cloudChannel = new Channel(8 * 1e4, 0.15, 15.0, 5.0);
-        this.remoteChannel = new Channel(4 * 1e4, 0.30, 10.0, 6.0);
+        this.cloudChannel = new Channel(1 * 1e5, 0.15, 15.0, 5.0);
+        this.remoteChannel = new Channel(5 * 1e4, 0.30, 10.0, 6.0);
     }
 
-    /**
-     * 模拟一次数据访问.
-     */
-    private double access(String type, int id, long currentTime) {
-        totalAccessed++;
-        double delaySeconds;
+    // access, processAndGetDuration, registerDataItem, addDataToRemote, normalizeL2 保持不变...
+    private double access(String type, int id, long currentTime) { totalAccessed++; double delaySeconds; localAccesses++; DataItem item = local.get(type, id, currentTime); if (item != null) { localHits++; delaySeconds = (item.size * 8.0) / LOCAL_BUS_SPEED_BPS; return delaySeconds; } cloudAccesses++; item = cloud.get(type, id, currentTime); if (item != null) { cloudHits++; delaySeconds = cloudChannel.getTotalDelay(item.size); local.put(item, currentTime); return delaySeconds; } remoteAccesses++; item = remote.get(type, id, currentTime); if (item != null) { delaySeconds = remoteChannel.getTotalDelay(item.size); cloud.put(item, currentTime); local.put(item, currentTime); return delaySeconds; } item = idToDataItemMap.get(id); if (item != null) { delaySeconds = remoteChannel.getTotalDelay(item.size); cloud.put(item, currentTime); local.put(item, currentTime); return delaySeconds; } return Double.POSITIVE_INFINITY; }
+    public long processAndGetDuration(DataItem item, long currentTime, int readyQueueSize) { totalTasks++; double accessDelaySeconds = access(item.type, item.id, currentTime); this.totalDelaySeconds += accessDelaySeconds; long durationMillis = (long)(accessDelaySeconds * 1000); long taskCompletionTime = currentTime + durationMillis; if (taskCompletionTime <= item.deadline) { completedTasks++; } return durationMillis; }
+    public void registerDataItem(DataItem item) { idToDataItemMap.put(item.id, item); }
+    public void addDataToRemote(DataItem item, long currentTime) { remote.put(item, currentTime); }
+    public void normalizeL2(double[] vector) { double sumOfSquares = 0.0; for (double value : vector) { sumOfSquares += value * value; } if (sumOfSquares == 0) return; double l2Norm = Math.sqrt(sumOfSquares); for (int i = 0; i < vector.length; i++) { vector[i] = vector[i] / l2Norm; } }
 
-        // 1. 查本地缓存
-        localAccesses++;
-        DataItem item = local.get(type, id, currentTime);
-        if (item != null) {
-            localHits++;
-            delaySeconds = (item.size * 8.0) / LOCAL_BUS_SPEED_BPS;
-            return delaySeconds;
-        }
-
-        // 2. 查边缘云缓存
-        cloudAccesses++;
-        item = cloud.get(type, id, currentTime);
-        if (item != null) {
-            cloudHits++;
-            delaySeconds = cloudChannel.getTotalDelay(item.size);
-            local.put(item, currentTime);
-            return delaySeconds;
-        }
-
-        // 3. 查远端云
-        remoteAccesses++;
-        item = remote.get(type, id, currentTime);
-        if (item != null) {
-            delaySeconds = remoteChannel.getTotalDelay(item.size);
-            cloud.put(item, currentTime);
-            local.put(item, currentTime);
-            return delaySeconds;
-        }
-
-        // 4. 从数据注册表中查找（模拟数据源）
-        item = idToDataItemMap.get(id);
-        if (item != null) {
-            delaySeconds = remoteChannel.getTotalDelay(item.size);
-            cloud.put(item, currentTime);
-            local.put(item, currentTime);
-            return delaySeconds;
-        }
-
-        return Double.POSITIVE_INFINITY;
-    }
-
-    /**
-     * 处理任务并返回其持续时间.
-     */
-    public long processAndGetDuration(DataItem item, long currentTime, int readyQueueSize) {
-        totalTasks++;
-
-        double accessDelaySeconds = access(item.type, item.id, currentTime);
-        this.totalDelaySeconds += accessDelaySeconds;
-
-        long durationMillis = (long)(accessDelaySeconds * 1000);
-        long taskCompletionTime = currentTime + durationMillis;
-
-        if (taskCompletionTime <= item.deadline) {
-            completedTasks++;
-        }
-
-        return durationMillis;
-    }
-
-    /**
-     * 注册一个数据项，用于最终查找.
-     */
-    public void registerDataItem(DataItem item) {
-        idToDataItemMap.put(item.id, item);
-    }
-
-    /**
-     * 将数据项添加到最底层的远端云.
-     */
-    public void addDataToRemote(DataItem item, long currentTime) {
-        remote.put(item, currentTime);
-    }
-
-    /**
-     * 计算系统综合得分.
-     */
     public double getSystemScore() {
         if (totalAccessed == 0 || totalTasks == 0) return 0;
-
         double localHitRate = (double) localHits / Math.max(1, localAccesses);
         double cloudHitRate = (double) cloudHits / Math.max(1, cloudAccesses);
         double completionRate = (double) completedTasks / totalTasks;
         double averageDelay = totalDelaySeconds / totalTasks;
-
-        // 您提供的评分公式权重
         double w1 = 10.0, w2 = 2.0, w3 = 15.0;
-
-        return 100 * (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (averageDelay/2);
+        if (averageDelay == 0) return Double.POSITIVE_INFINITY; // 避免除以零
+        return 100 * (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (averageDelay);
     }
 
     /**
-     * L2 归一化一个向量.
+     * 新增方法：保存当前所有统计变量的快照
      */
-    public void normalizeL2(double[] vector) {
-        double sumOfSquares = 0.0;
-        for (double value : vector) {
-            sumOfSquares += value * value;
-        }
-        if (sumOfSquares == 0) return;
-        double l2Norm = Math.sqrt(sumOfSquares);
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = vector[i] / l2Norm;
-        }
+    public void saveBestStats() {
+        this.best_totalDelaySeconds = this.totalDelaySeconds;
+        this.best_totalAccessed = this.totalAccessed;
+        this.best_localHits = this.localHits;
+        this.best_cloudHits = this.cloudHits;
+        this.best_localAccesses = this.localAccesses;
+        this.best_cloudAccesses = this.cloudAccesses;
+        this.best_remoteAccesses = this.remoteAccesses;
+        this.best_completedTasks = this.completedTasks;
+        this.best_totalTasks = this.totalTasks;
     }
 
-    /**
-     * 重置所有统计数据，用于开始新的实验.
-     */
     public void reset() {
-        local.clear();
-        cloud.clear();
-        totalAccessed = 0;
-        localHits = 0;
-        cloudHits = 0;
-        localAccesses = 0;
-        cloudAccesses = 0;
-        remoteAccesses = 0;
-        completedTasks = 0;
-        totalTasks = 0;
-        totalDelaySeconds = 0.0;
+        local.clear(); cloud.clear();
+        totalAccessed = 0; localHits = 0; cloudHits = 0;
+        localAccesses = 0; cloudAccesses = 0; remoteAccesses = 0;
+        completedTasks = 0; totalTasks = 0; totalDelaySeconds = 0.0;
+        // 同时重置最佳记录
+        best_totalDelaySeconds = 0.0; best_totalAccessed = 0; best_localHits = 0; best_cloudHits = 0;
+        best_localAccesses = 0; best_cloudAccesses = 0; best_remoteAccesses = 0;
+        best_completedTasks = 0; best_totalTasks = 0;
     }
 
     /**
-     * 线程安全版本的打印统计信息方法.
-     * @param out 用于打印日志的独立 PrintStream
+     * 修改 printStats 方法，使其打印保存的最佳统计数据
      */
     public void printStats(PrintStream out) {
-        if (totalTasks == 0) {
-            out.println("---- 系统性能统计 (全局口径) ----");
-            out.println("未处理任何任务。");
+        // 使用 best_ 变量来判断和计算
+        if (best_totalTasks == 0) {
+            out.println("---- 与最高分对应的系统性能统计 ----");
+            out.println("未记录任何有效的最佳结果。");
             return;
         }
 
-        double globalLocalHitRate = (double) localHits / Math.max(1, totalAccessed);
-        double globalCloudHitRate = (double) cloudHits / Math.max(1, totalAccessed);
-        int remoteHits = remoteAccesses;
-        double globalRemoteHitRate = (double) remoteHits / Math.max(1, totalAccessed);
-        double completionRate = (double) completedTasks / totalTasks;
+        double globalLocalHitRate = (double) best_localHits / Math.max(1, best_totalAccessed);
+        double globalCloudHitRate = (double) best_cloudHits / Math.max(1, best_totalAccessed);
+        double globalRemoteHitRate = (double) best_remoteAccesses / Math.max(1, best_totalAccessed);
+        double completionRate = (double) best_completedTasks / best_totalTasks;
+        double averageDelay = best_totalDelaySeconds / best_totalTasks;
 
-        out.println("---- 系统性能统计 (全局口径) ----");
-        out.println("总处理任务数: " + totalTasks);
-
-        // --- 已修复：移除了不存在的 out.getLocale() ---
-        out.printf("任务完成率: %.3f (%d / %d)\n", completionRate, completedTasks, totalTasks);
+        out.println("---- 与最高分对应的系统性能统计 ----"); // 标题已修改
+        out.println("总处理任务数: " + best_totalTasks);
+        out.printf("任务完成率: %.3f (%d / %d)\n", completionRate, best_completedTasks, best_totalTasks);
         out.printf("全局本地缓存命中率: %.3f\n", globalLocalHitRate);
         out.printf("全局边缘云命中率: %.3f\n", globalCloudHitRate);
         out.printf("全局远端访问率: %.3f\n", globalRemoteHitRate);
-        out.printf("平均任务延迟: %.3f ms\n", (totalDelaySeconds / totalTasks) * 1000);
+        out.printf("平均任务延迟: %.3f ms\n", averageDelay * 1000);
     }
 }

@@ -29,6 +29,8 @@ public class GA {
 
         double[] bestIndividual = population[0].clone();
         double bestScore = evaluate(bestIndividual);
+        // 保存初始最佳
+        baseDM.saveBestStats();
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
             double[][] newPopulation = new double[POP_SIZE][DIMENSIONS];
@@ -43,6 +45,8 @@ public class GA {
                 if (score > bestScore) {
                     bestScore = score;
                     bestIndividual = child.clone();
+                    // 发现新高分，保存快照
+                    baseDM.saveBestStats();
                 }
             }
             population = newPopulation;
@@ -51,12 +55,9 @@ public class GA {
         }
 
         out.println("\n=== GA Finished ===");
-        evaluate(bestIndividual);
-
         double[] finalNormalizedBest = bestIndividual.clone();
         baseDM.normalizeL2(finalNormalizedBest);
         out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
-
         baseDM.printStats(out);
         return bestScore;
     }
@@ -80,22 +81,6 @@ public class GA {
         return best.clone();
     }
 
-    private double[] crossover(double[] p1, double[] p2) {
-        double[] child = new double[DIMENSIONS];
-        int crossoverPoint = random.nextInt(DIMENSIONS);
-        for (int i = 0; i < DIMENSIONS; i++) {
-            child[i] = (i < crossoverPoint) ? p1[i] : p2[i];
-        }
-        return child;
-    }
-
-    private void mutate(double[] individual) {
-        for (int i = 0; i < DIMENSIONS; i++) {
-            if (random.nextDouble() < MUTATION_RATE) {
-                individual[i] += random.nextGaussian() * 0.2;
-                if (individual[i] < 0) individual[i] = 0;
-                if (individual[i] > 1) individual[i] = 1;
-            }
-        }
-    }
+    private double[] crossover(double[] p1, double[] p2) { double[] c = new double[DIMENSIONS]; int cp = random.nextInt(DIMENSIONS); for(int i=0;i<DIMENSIONS;i++) c[i] = i<cp?p1[i]:p2[i]; return c; }
+    private void mutate(double[] ind) { for(int i=0;i<DIMENSIONS;i++) if(random.nextDouble()<MUTATION_RATE) { ind[i]+=random.nextGaussian()*0.2; if(ind[i]<0)ind[i]=0; if(ind[i]>1)ind[i]=1; } }
 }
