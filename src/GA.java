@@ -5,7 +5,7 @@ import java.util.Random;
 public class GA {
     private static final int POP_SIZE = 20;
     private static final int GENERATIONS = 100;
-    private static final double MUTATION_RATE = 0.2;
+    private static final double MUTATION_RATE = 0.5;
     private static final int TOURNAMENT_SIZE = 2;
     private static final int DIMENSIONS = 5;
 
