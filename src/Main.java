@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Main {
 
-    // loadDataFromFile 方法保持不变
+    // loadDataFromFile 方法保持不变...
     private static DataItem[] loadDataFromFile(String filePath, int maxLines) {
         List<DataItem> dataList = new ArrayList<>();
         String line;
@@ -56,10 +56,10 @@ public class Main {
 
         out.println("\n--- 1. Running Random Search (to set Baseline) ---");
         RandomSearch rs = new RandomSearch(dataSet, dm, seed);
-        baselineScore = rs.run(out); // RandomSearch.run 的签名是 run(PrintStream out)
+        baselineScore = rs.run(out); // RandomSearch.run 不需要 baselineScore
         results.put("Random Search (Baseline)", baselineScore);
 
-        // --- 【核心修改】将 baselineScore 传递给每个算法的 run 方法 ---
+        // --- 核心修改：将 baselineScore 传递给每个算法的 run 方法 ---
         out.println("\n--- 2. Running Basic Simulated Annealing (SA) ---");
         SA sa = new SA(dataSet, dm, seed);
         results.put("Simulated Annealing (SA)", sa.run(out, baselineScore));
@@ -80,7 +80,7 @@ public class Main {
         UpdateSA updateSA = new UpdateSA(dataSet, dm, seed);
         results.put("Advanced SA (UpdateSA)", updateSA.run(out, baselineScore));
 
-        // 打印总结报告
+        // 打印总结报告 (这部分逻辑不变，因为它本来就能访问 baselineScore)
         out.println("\n==========================================================");
         out.printf("=== Final Score Summary for: [%-20s] ===\n", datasetName);
         out.println("==========================================================");
@@ -100,54 +100,43 @@ public class Main {
         out.println("==========================================================");
     }
 
-    /**
-     * 封装一次完整实验运行的全部逻辑。
-     */
+    // runSingleFullExperiment 和 main 方法保持不变...
     public static void runSingleFullExperiment(int runNumber) {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
         String logFileName = String.format("experiment_run-%d_%s.txt", runNumber, timestamp);
         try (FileOutputStream fos = new FileOutputStream(logFileName);
              PrintStream out = new PrintStream(fos, true, "UTF-8")) {
-
             out.println("实验 #" + runNumber + " 开始时间: " + new Date());
             long randomseed = (long)runNumber * runNumber * runNumber * 1000;
             out.printf("\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d (Seed: %d) >>>>>>>>>>\n", runNumber, randomseed);
-
             long localCapacity = 500L * 1024L;
             long edgeCapacity = 2000L * 1024L;
             DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
-
-            String realDataPath = "dataset/processed_nasa_log.csv";
-
-            // 您指定的数据规模
             out.println("从 dataset/processed_nasa_log.csv 加载了 10000 条数据。");
-            runExperimentOnDataset("真实数据 (1万行)", loadDataFromFile(realDataPath, 10000), dataManager, randomseed, out);
-
-            out.println("从 dataset/processed_nasa_log.csv 加载了 15000 条数据。");
-            runExperimentOnDataset("真实数据 (1.5万行)", loadDataFromFile(realDataPath, 15000), dataManager, randomseed, out);
-
+            runExperimentOnDataset("真实数据 (1万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 10000), dataManager, randomseed, out);
             out.println("从 dataset/processed_nasa_log.csv 加载了 20000 条数据。");
-            runExperimentOnDataset("真实数据 (2万行)", loadDataFromFile(realDataPath, 20000), dataManager, randomseed, out);
-
-            // 您指定的合成数据规模
+            runExperimentOnDataset("真实数据 (1.5万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 15000), dataManager, randomseed, out);
+            out.println("从 dataset/processed_nasa_log.csv 加载了 40000 条数据。");
+            runExperimentOnDataset("真实数据 (2万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 20000), dataManager, randomseed, out);
+            // 定义新的参数
             int syntheticRequests = 15000;
             int syntheticUniqueIds = 1000;
 
+            // 使用新参数创建 DataGenerator
             DataGenerator generator = new DataGenerator(syntheticRequests, syntheticUniqueIds, randomseed);
 
+            // 运行测试
             runExperimentOnDataset("合成数据-正态分布 (1.5万行, 1000 ID)", generator.generateNormalDistribution(), dataManager, randomseed, out);
             runExperimentOnDataset("合成数据-指数分布 (1.5万行, 1000 ID)", generator.generateExponentialDistribution(), dataManager, randomseed, out);
 
             out.println("\n\n=== Run #" + runNumber + " Finished. ===");
             out.println("实验 #" + runNumber + " 结束时间: " + new Date());
-
         } catch (IOException e) {
             System.err.println("运行实验 #" + runNumber + " 时发生严重IO错误:");
             e.printStackTrace();
         }
     }
 
-    // main 方法保持不变
     public static void main(String[] args) {
         System.out.println("主程序启动，开始并行执行所有实验...");
         final int TOTAL_EXPERIMENT_RUNS = 10;

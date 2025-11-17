@@ -5,9 +5,9 @@ import java.util.Random;
 public class PSO {
     private static final int POP_SIZE = 20;
     private static final int GENERATIONS = 100;
-    private static final double INERTIA = 0.8;
+    private static final double INERTIA = 0.7;
     private static final double COGNITIVE = 1.0;
-    private static final double SOCIAL = 1.0;
+    private static final double SOCIAL = 2.0;
     private static final int DIMENSIONS = 5;
 
     private DataItem[] testData;

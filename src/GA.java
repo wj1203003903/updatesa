@@ -6,7 +6,7 @@ public class GA {
     private static final int POP_SIZE = 20;
     private static final int GENERATIONS = 100;
     private static final double MUTATION_RATE = 0.2;
-    private static final int TOURNAMENT_SIZE = 2;
+    private static final int TOURNAMENT_SIZE = 3;
     private static final int DIMENSIONS = 5;
 
     private DataItem[] testData;
