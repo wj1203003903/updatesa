@@ -12,7 +12,7 @@ public class DataManager {
     RemoteCloud remote;
 
     // 本地总线速度
-    private final double LOCAL_BUS_SPEED_BPS = 2 * 1e6;
+    private final double LOCAL_BUS_SPEED_BPS = 1 * 1e6;
 
     // 网络信道
     private final Channel cloudChannel;
@@ -39,8 +39,8 @@ public class DataManager {
         cloud.bindLowerLevel(remote);
 
         // 您提供的网络环境参数
-        this.cloudChannel = new Channel(1 * 1e5, 0.15, 15.0, 5.0);
-        this.remoteChannel = new Channel(5 * 1e4, 0.30, 10.0, 6.0);
+        this.cloudChannel = new Channel(8 * 1e4, 0.15, 15.0, 5.0);
+        this.remoteChannel = new Channel(4 * 1e4, 0.30, 10.0, 6.0);
     }
 
     /**
@@ -136,9 +136,9 @@ public class DataManager {
         double averageDelay = totalDelaySeconds / totalTasks;
 
         // 您提供的评分公式权重
-        double w1 = 10.0, w2 = 2.0, w3 = 10.0;
+        double w1 = 10.0, w2 = 2.0, w3 = 15.0;
 
-        return 100 * (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (1.0 + averageDelay);
+        return 100 * (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (averageDelay/2);
     }
 
     /**

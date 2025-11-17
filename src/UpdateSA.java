@@ -22,7 +22,7 @@ public class UpdateSA {
     private static final double INIT_TEMP = 500.0;
     private static final double MIN_TEMP = 1e-3;
     private static final double COOLING_RATE = 0.9;
-    private static final int ITERATIONS_PER_TEMP = 150;
+    private static final int ITERATIONS_PER_TEMP = 100;
     private static final int ARCHIVE_SIZE = 15;
     private static final int RESTART_STAGNATION_THRESHOLD = 25;
     private static final double RESTART_TEMP_INCREASE_FACTOR = 1.5;

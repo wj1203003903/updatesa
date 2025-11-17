@@ -112,15 +112,23 @@ public class Main {
             long localCapacity = 500L * 1024L;
             long edgeCapacity = 2000L * 1024L;
             DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
-            out.println("从 dataset/processed_nasa_log.csv 加로드了 10000 条数据。");
+            out.println("从 dataset/processed_nasa_log.csv 加载了 10000 条数据。");
             runExperimentOnDataset("真实数据 (1万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 10000), dataManager, randomseed, out);
             out.println("从 dataset/processed_nasa_log.csv 加载了 20000 条数据。");
-            runExperimentOnDataset("真实数据 (2万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 20000), dataManager, randomseed, out);
+            runExperimentOnDataset("真实数据 (1.5万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 15000), dataManager, randomseed, out);
             out.println("从 dataset/processed_nasa_log.csv 加载了 40000 条数据。");
-            runExperimentOnDataset("真实数据 (4万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 40000), dataManager, randomseed, out);
-            DataGenerator generator = new DataGenerator(10000, 500, randomseed);
-            runExperimentOnDataset("合成数据-正态分布", generator.generateNormalDistribution(), dataManager, randomseed, out);
-            runExperimentOnDataset("合成数据-指数分布", generator.generateExponentialDistribution(), dataManager, randomseed, out);
+            runExperimentOnDataset("真实数据 (2万行)", loadDataFromFile("dataset/processed_nasa_log.csv", 20000), dataManager, randomseed, out);
+            // 定义新的参数
+            int syntheticRequests = 15000;
+            int syntheticUniqueIds = 1000;
+
+            // 使用新参数创建 DataGenerator
+            DataGenerator generator = new DataGenerator(syntheticRequests, syntheticUniqueIds, randomseed);
+
+            // 运行测试
+            runExperimentOnDataset("合成数据-正态分布 (1.5万行, 1000 ID)", generator.generateNormalDistribution(), dataManager, randomseed, out);
+            runExperimentOnDataset("合成数据-指数分布 (1.5万行, 1000 ID)", generator.generateExponentialDistribution(), dataManager, randomseed, out);
+
             out.println("\n\n=== Run #" + runNumber + " Finished. ===");
             out.println("实验 #" + runNumber + " 结束时间: " + new Date());
         } catch (IOException e) {
