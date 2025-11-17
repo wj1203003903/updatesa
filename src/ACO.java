@@ -26,17 +26,20 @@ public class ACO {
         }
     }
 
+    private double evaluate(double[] weights) {
+        baseDM.resetCurrentRunStats();
+        return DataTest.score(weights, testData, baseDM);
+    }
+
     public double run(PrintStream out, double baselineScore) {
         double bestScore = -Double.MAX_VALUE;
         double[] bestSolution = new double[DIMENSIONS];
         out.println("ACO Initializing (Granularity: " + GRANULARITY + ")...");
 
-        // 运行一代来获取初始分数，并保存
+        // 初始化最佳分数
         double initialScore = evaluate(randomWeights());
-        if (initialScore > bestScore) {
-            bestScore = initialScore;
-            baseDM.saveBestStats();
-        }
+        bestScore = initialScore;
+        baseDM.saveBestStats();
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
             double[][] ants = new double[ANT_COUNT][DIMENSIONS];
@@ -50,7 +53,6 @@ public class ACO {
                 if (scores[k] > bestScore) {
                     bestScore = scores[k];
                     bestSolution = ants[k].clone();
-                    // 发现新高分，保存快照
                     baseDM.saveBestStats();
                 }
             }
@@ -78,7 +80,7 @@ public class ACO {
         baseDM.printStats(out);
         return bestScore;
     }
-    private double evaluate(double[] weights) { return DataTest.score(weights, testData, baseDM); }
+
     private double[] randomWeights() { double[] w = new double[DIMENSIONS]; for (int i = 0; i < DIMENSIONS; i++) w[i] = random.nextDouble(); return w; }
     private double selectValue(int dimension) { double[] probs = new double[GRANULARITY]; double sum = 0; for (int i = 0; i < GRANULARITY; i++) { probs[i] = Math.pow(pheromones[dimension][i], ALPHA); sum += probs[i]; } if (sum == 0 || Double.isNaN(sum)) { return (double) random.nextInt(GRANULARITY) / (GRANULARITY - 1); } double r = random.nextDouble() * sum; for (int i = 0; i < GRANULARITY; i++) { r -= probs[i]; if (r <= 0) { return (double) i / (GRANULARITY - 1); } } return 1.0; }
 }

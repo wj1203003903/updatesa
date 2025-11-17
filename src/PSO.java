@@ -20,6 +20,11 @@ public class PSO {
         this.random = new Random(seed);
     }
 
+    private double evaluate(double[] weights) {
+        baseDM.resetCurrentRunStats();
+        return DataTest.score(weights, testData, baseDM);
+    }
+
     public double run(PrintStream out, double baselineScore) {
         double[][] position = new double[POP_SIZE][DIMENSIONS];
         double[][] velocity = new double[POP_SIZE][DIMENSIONS];
@@ -28,7 +33,6 @@ public class PSO {
         double[] gBestPosition = new double[DIMENSIONS];
         double gBestScore = -Double.MAX_VALUE;
 
-        // 初始化
         for (int i = 0; i < POP_SIZE; i++) {
             for (int j = 0; j < DIMENSIONS; j++) {
                 position[i][j] = random.nextDouble();
@@ -39,7 +43,6 @@ public class PSO {
             if (pBestScore[i] > gBestScore) {
                 gBestScore = pBestScore[i];
                 gBestPosition = pBestPosition[i].clone();
-                // 初始阶段也可能产生最佳，保存快照
                 baseDM.saveBestStats();
             }
         }
@@ -56,8 +59,9 @@ public class PSO {
                     if (position[i][j] < 0) position[i][j] = 0;
                     if (position[i][j] > 1) position[i][j] = 1;
                 }
+
                 double score = evaluate(position[i]);
-                // 注意：这里每次评估后都需要检查，因为 gBestScore 可能被更新
+
                 if (score > pBestScore[i]) {
                     pBestScore[i] = score;
                     pBestPosition[i] = position[i].clone();
@@ -65,7 +69,6 @@ public class PSO {
                 if (score > gBestScore) {
                     gBestScore = score;
                     gBestPosition = position[i].clone();
-                    // 全局最优被更新，立即保存此刻的统计快照
                     baseDM.saveBestStats();
                 }
             }
@@ -79,9 +82,5 @@ public class PSO {
         out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
         baseDM.printStats(out);
         return gBestScore;
-    }
-
-    private double evaluate(double[] w) {
-        return DataTest.score(w, testData, baseDM);
     }
 }

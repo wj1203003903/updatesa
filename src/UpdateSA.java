@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 public class UpdateSA {
-    // ... (内部类 EliteSolution 保持不变)
     private static class EliteSolution implements Comparable<EliteSolution> { final double[] solution; final double score; EliteSolution(double[] solution, double score) { this.solution = solution; this.score = score; } @Override public int compareTo(EliteSolution other) { return Double.compare(other.score, this.score); } }
 
     private static final int DIMENSIONS = 5;
@@ -40,10 +39,22 @@ public class UpdateSA {
         this.bestScore = -Double.MAX_VALUE;
     }
 
+    private double evaluate(double[] weights) {
+        baseDM.resetCurrentRunStats();
+        double score = DataTest.score(weights, testData, baseDM);
+        if (score > this.bestScore) {
+            this.bestScore = score;
+            this.bestSolution = weights.clone();
+            updateArchive(new EliteSolution(this.bestSolution.clone(), this.bestScore));
+            baseDM.saveBestStats();
+        }
+        return score;
+    }
+
     public double run(PrintStream out, double baselineScore) {
         out.println("--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---");
         while(eliteArchive.size() <= ARCHIVE_SIZE / 3) {
-            evaluate(randomWeights()); // evaluate内部会调用saveBestStats
+            evaluate(randomWeights());
         }
         out.println("--- Pre-seeding finished. Elite archive size: " + eliteArchive.size() + " ---");
 
@@ -54,6 +65,7 @@ public class UpdateSA {
             current = eliteArchive.get(0).solution.clone();
             currentScore = eliteArchive.get(0).score;
         } else {
+            // 这几乎不会发生，但作为保障
             current = randomWeights();
             currentScore = evaluate(current);
         }
@@ -68,12 +80,11 @@ public class UpdateSA {
 
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
                 double[] neighbor = generateNeighborSA_Stateless(current, temperature);
-                evaluate(neighbor); // evaluate内部会调用saveBestStats
+                double neighborScore = evaluate(neighbor);
 
-                // acceptanceProbability现在只用于决定是否移动，不再需要重新评估
-                if (acceptanceProbability(currentScore, evaluate(neighbor), temperature) > random.nextDouble()) {
+                if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
                     current = neighbor;
-                    currentScore = evaluate(current);
+                    currentScore = neighborScore;
                 }
             }
 
@@ -110,18 +121,7 @@ public class UpdateSA {
         return this.bestScore;
     }
 
-    private double evaluate(double[] weights) {
-        double score = DataTest.score(weights, testData, baseDM);
-        if (score > this.bestScore) {
-            this.bestScore = score;
-            this.bestSolution = weights.clone();
-            updateArchive(new EliteSolution(this.bestSolution.clone(), this.bestScore));
-            // 发现新高分，保存快照
-            baseDM.saveBestStats();
-        }
-        return score;
-    }
-    // ... (所有其他辅助方法保持不变)
+    // ... 所有其他辅助方法保持不变
     private double[] randomWeights() { double[] w = new double[DIMENSIONS]; for (int i = 0; i < DIMENSIONS; i++) w[i] = random.nextDouble(); return w; }
     private double acceptanceProbability(double cs, double ns, double t) { if (ns > cs) return 1.0; return Math.exp((ns - cs) / t); }
     private void runGARescue() { List<EliteSolution> pop = new ArrayList<>(eliteArchive); for (int g = 0; g < GA_RESCUE_GENERATIONS; g++) { List<EliteSolution> newPop = new ArrayList<>(); if (!pop.isEmpty()) { pop.sort(null); newPop.add(pop.get(0)); } while (newPop.size() < ARCHIVE_SIZE) { EliteSolution p1 = tournamentSelection(pop); EliteSolution p2 = tournamentSelection(pop); double[] child = crossover(p1.solution, p2.solution); mutate(child); newPop.add(new EliteSolution(child, evaluate(child))); } pop = newPop; } eliteArchive.sort(null); while (eliteArchive.size() > ARCHIVE_SIZE / 3) eliteArchive.remove(eliteArchive.size() - 1); for (EliteSolution s : pop) updateArchive(s); }

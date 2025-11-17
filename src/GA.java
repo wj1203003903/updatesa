@@ -19,6 +19,11 @@ public class GA {
         this.random = new Random(seed);
     }
 
+    private double evaluate(double[] weights) {
+        baseDM.resetCurrentRunStats();
+        return DataTest.score(weights, testData, baseDM);
+    }
+
     public double run(PrintStream out, double baselineScore) {
         double[][] population = new double[POP_SIZE][DIMENSIONS];
         for (int i = 0; i < POP_SIZE; i++) {
@@ -29,25 +34,27 @@ public class GA {
 
         double[] bestIndividual = population[0].clone();
         double bestScore = evaluate(bestIndividual);
-        // 保存初始最佳
         baseDM.saveBestStats();
 
         for (int gen = 0; gen < GENERATIONS; gen++) {
             double[][] newPopulation = new double[POP_SIZE][DIMENSIONS];
+            // 评估整个旧种群，为锦标赛选择做准备
+            double[] scores = new double[POP_SIZE];
+            for(int i = 0; i < POP_SIZE; i++) {
+                scores[i] = evaluate(population[i]);
+                if (scores[i] > bestScore) {
+                    bestScore = scores[i];
+                    bestIndividual = population[i].clone();
+                    baseDM.saveBestStats();
+                }
+            }
+
             for (int i = 0; i < POP_SIZE; i++) {
-                double[] parent1 = tournamentSelection(population);
-                double[] parent2 = tournamentSelection(population);
+                double[] parent1 = tournamentSelection(population, scores);
+                double[] parent2 = tournamentSelection(population, scores);
                 double[] child = crossover(parent1, parent2);
                 mutate(child);
                 newPopulation[i] = child;
-
-                double score = evaluate(child);
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestIndividual = child.clone();
-                    // 发现新高分，保存快照
-                    baseDM.saveBestStats();
-                }
             }
             population = newPopulation;
             double improvement = bestScore - baselineScore;
@@ -62,23 +69,17 @@ public class GA {
         return bestScore;
     }
 
-    private double evaluate(double[] w) {
-        return DataTest.score(w, testData, baseDM);
-    }
-
-    private double[] tournamentSelection(double[][] population) {
-        double[] best = null;
+    private double[] tournamentSelection(double[][] population, double[] scores) {
+        int bestIndex = -1;
         double bestScore = -Double.MAX_VALUE;
         for (int i = 0; i < TOURNAMENT_SIZE; i++) {
             int index = random.nextInt(POP_SIZE);
-            double[] individual = population[index];
-            double score = evaluate(individual);
-            if (score > bestScore) {
-                bestScore = score;
-                best = individual;
+            if (scores[index] > bestScore) {
+                bestScore = scores[index];
+                bestIndex = index;
             }
         }
-        return best.clone();
+        return population[bestIndex].clone();
     }
 
     private double[] crossover(double[] p1, double[] p2) { double[] c = new double[DIMENSIONS]; int cp = random.nextInt(DIMENSIONS); for(int i=0;i<DIMENSIONS;i++) c[i] = i<cp?p1[i]:p2[i]; return c; }
