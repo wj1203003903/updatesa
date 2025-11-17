@@ -5,7 +5,20 @@ import java.util.List;
 import java.util.Random;
 
 public class UpdateSA {
-    private static class EliteSolution implements Comparable<EliteSolution> { final double[] solution; final double score; EliteSolution(double[] solution, double score) { this.solution = solution; this.score = score; } @Override public int compareTo(EliteSolution other) { return Double.compare(other.score, this.score); } }
+    private static class EliteSolution implements Comparable<EliteSolution> {
+        final double[] solution;
+        final double score;
+
+        EliteSolution(double[] solution, double score) {
+            this.solution = solution;
+            this.score = score;
+        }
+
+        @Override
+        public int compareTo(EliteSolution other) {
+            return Double.compare(other.score, this.score);
+        }
+    }
 
     private static final int DIMENSIONS = 5;
     private static final double INIT_TEMP = 500.0;
@@ -53,21 +66,20 @@ public class UpdateSA {
 
     public double run(PrintStream out, double baselineScore) {
         out.println("--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---");
-        while(eliteArchive.size() <= ARCHIVE_SIZE / 3) {
+        while (eliteArchive.size() <= ARCHIVE_SIZE / 3) {
             evaluate(randomWeights());
         }
         out.println("--- Pre-seeding finished. Elite archive size: " + eliteArchive.size() + " ---");
 
-        double[] current;
+        double[] currentSolution;
         double currentScore;
         if (!eliteArchive.isEmpty()) {
             eliteArchive.sort(null);
-            current = eliteArchive.get(0).solution.clone();
+            currentSolution = eliteArchive.get(0).solution.clone();
             currentScore = eliteArchive.get(0).score;
         } else {
-            // 这几乎不会发生，但作为保障
-            current = randomWeights();
-            currentScore = evaluate(current);
+            currentSolution = randomWeights();
+            currentScore = evaluate(currentSolution);
         }
 
         double temperature = INIT_TEMP;
@@ -79,11 +91,11 @@ public class UpdateSA {
             double bestScoreAtTempStart = this.bestScore;
 
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
-                double[] neighbor = generateNeighborSA_Stateless(current, temperature);
-                double neighborScore = evaluate(neighbor);
+                double[] neighborSolution = generateNeighborSA_Stateless(currentSolution, temperature);
+                double neighborScore = evaluate(neighborSolution);
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
-                    current = neighbor;
+                    currentSolution = neighborSolution;
                     currentScore = neighborScore;
                 }
             }
@@ -103,10 +115,12 @@ public class UpdateSA {
                 restartCount++;
                 runGARescue();
                 int newStartIndex = random.nextInt(Math.min(5, eliteArchive.size()));
-                current = eliteArchive.get(newStartIndex).solution.clone();
+                currentSolution = eliteArchive.get(newStartIndex).solution.clone();
                 currentScore = eliteArchive.get(newStartIndex).score;
                 temperature *= RESTART_TEMP_INCREASE_FACTOR;
-                if (temperature > INIT_TEMP) temperature = INIT_TEMP;
+                if (temperature > INIT_TEMP) {
+                    temperature = INIT_TEMP;
+                }
                 stagnationCount = 0;
                 continue;
             }
@@ -121,15 +135,125 @@ public class UpdateSA {
         return this.bestScore;
     }
 
-    // ... 所有其他辅助方法保持不变
-    private double[] randomWeights() { double[] w = new double[DIMENSIONS]; for (int i = 0; i < DIMENSIONS; i++) w[i] = random.nextDouble(); return w; }
-    private double acceptanceProbability(double cs, double ns, double t) { if (ns > cs) return 1.0; return Math.exp((ns - cs) / t); }
-    private void runGARescue() { List<EliteSolution> pop = new ArrayList<>(eliteArchive); for (int g = 0; g < GA_RESCUE_GENERATIONS; g++) { List<EliteSolution> newPop = new ArrayList<>(); if (!pop.isEmpty()) { pop.sort(null); newPop.add(pop.get(0)); } while (newPop.size() < ARCHIVE_SIZE) { EliteSolution p1 = tournamentSelection(pop); EliteSolution p2 = tournamentSelection(pop); double[] child = crossover(p1.solution, p2.solution); mutate(child); newPop.add(new EliteSolution(child, evaluate(child))); } pop = newPop; } eliteArchive.sort(null); while (eliteArchive.size() > ARCHIVE_SIZE / 3) eliteArchive.remove(eliteArchive.size() - 1); for (EliteSolution s : pop) updateArchive(s); }
-    private EliteSolution tournamentSelection(List<EliteSolution> p) { EliteSolution b = null; for (int i = 0; i < GA_RESCUE_TOURNAMENT_SIZE; i++) { EliteSolution ind = p.get(random.nextInt(p.size())); if (b == null || ind.score > b.score) b = ind; } return b; }
-    private double[] crossover(double[] p1, double[] p2) { double[] c = new double[DIMENSIONS]; for(int i=0;i<DIMENSIONS;i++) c[i] = random.nextBoolean()?p1[i]:p2[i]; return c; }
-    private void mutate(double[] ind) { for(int i=0;i<DIMENSIONS;i++) if(random.nextDouble()<GA_RESCUE_MUTATION_RATE) { ind[i]+=random.nextGaussian()*0.1; ind[i]=Math.max(0,Math.min(1,ind[i])); } }
-    private void updateArchive(EliteSolution s) { for (int i=0;i<eliteArchive.size();i++) { if (distance(s.solution, eliteArchive.get(i).solution) < DIVERSITY_THRESHOLD) { if (s.score > eliteArchive.get(i).score) eliteArchive.set(i, s); return; } } if (eliteArchive.size() < ARCHIVE_SIZE) eliteArchive.add(s); else { eliteArchive.sort(null); if (s.score > eliteArchive.get(eliteArchive.size()-1).score) eliteArchive.set(eliteArchive.size()-1, s); } }
-    private double distance(double[] s1, double[] s2) { double sum=0; for(int i=0;i<DIMENSIONS;i++) sum+=(s1[i]-s2[i])*(s1[i]-s2[i]); return Math.sqrt(sum); }
-    private double[] generateNeighborSA_Stateless(double[] c, double t) { double[] n = c.clone(); int k = 1+(int)Math.round((DIMENSIONS-1)*Math.min(1.0, t/INIT_TEMP)); int[] ids = randomSampleIndices(k); double step = 0.02+(0.4-0.02)*Math.min(1.0, t/INIT_TEMP); for(int id : ids) { n[id]+=random.nextGaussian()*step; n[id]=Math.max(0,Math.min(1,n[id])); } return n; }
-    private int[] randomSampleIndices(int k) { int[] all = new int[DIMENSIONS]; for(int i=0;i<DIMENSIONS;i++) all[i]=i; for(int i=0;i<k;i++) { int j=i+random.nextInt(DIMENSIONS-i); int tmp=all[i]; all[i]=all[j]; all[j]=tmp; } return Arrays.copyOf(all, k); }
+    private double[] randomWeights() {
+        double[] w = new double[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) {
+            w[i] = random.nextDouble();
+        }
+        return w;
+    }
+
+    private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
+        if (neighborScore > currentScore) {
+            return 1.0;
+        }
+        return Math.exp((neighborScore - currentScore) / temperature);
+    }
+
+    private void runGARescue() {
+        List<EliteSolution> currentPopulation = new ArrayList<>(eliteArchive);
+        for (int gen = 0; gen < GA_RESCUE_GENERATIONS; gen++) {
+            List<EliteSolution> newPopulation = new ArrayList<>();
+            if (!currentPopulation.isEmpty()) {
+                currentPopulation.sort(null);
+                newPopulation.add(currentPopulation.get(0));
+            }
+            while (newPopulation.size() < ARCHIVE_SIZE) {
+                EliteSolution p1 = tournamentSelection(currentPopulation);
+                EliteSolution p2 = tournamentSelection(currentPopulation);
+                double[] child = crossover(p1.solution, p2.solution);
+                mutate(child);
+                newPopulation.add(new EliteSolution(child, evaluate(child)));
+            }
+            currentPopulation = newPopulation;
+        }
+        eliteArchive.sort(null);
+        while (eliteArchive.size() > ARCHIVE_SIZE / 3) {
+            eliteArchive.remove(eliteArchive.size() - 1);
+        }
+        for (EliteSolution solution : currentPopulation) {
+            updateArchive(solution);
+        }
+    }
+
+    private EliteSolution tournamentSelection(List<EliteSolution> population) {
+        EliteSolution best = null;
+        for (int i = 0; i < GA_RESCUE_TOURNAMENT_SIZE; i++) {
+            EliteSolution ind = population.get(random.nextInt(population.size()));
+            if (best == null || ind.score > best.score) {
+                best = ind;
+            }
+        }
+        return best;
+    }
+
+    private double[] crossover(double[] p1, double[] p2) {
+        double[] child = new double[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) {
+            child[i] = random.nextBoolean() ? p1[i] : p2[i];
+        }
+        return child;
+    }
+
+    private void mutate(double[] individual) {
+        for (int i = 0; i < DIMENSIONS; i++) {
+            if (random.nextDouble() < GA_RESCUE_MUTATION_RATE) {
+                individual[i] += random.nextGaussian() * 0.1;
+                individual[i] = Math.max(0, Math.min(1, individual[i]));
+            }
+        }
+    }
+
+    private void updateArchive(EliteSolution newSolution) {
+        for (int i = 0; i < eliteArchive.size(); i++) {
+            if (distance(newSolution.solution, eliteArchive.get(i).solution) < DIVERSITY_THRESHOLD) {
+                if (newSolution.score > eliteArchive.get(i).score) {
+                    eliteArchive.set(i, newSolution);
+                }
+                return;
+            }
+        }
+        if (eliteArchive.size() < ARCHIVE_SIZE) {
+            eliteArchive.add(newSolution);
+        } else {
+            eliteArchive.sort(null);
+            if (newSolution.score > eliteArchive.get(eliteArchive.size() - 1).score) {
+                eliteArchive.set(eliteArchive.size() - 1, newSolution);
+            }
+        }
+    }
+
+    private double distance(double[] s1, double[] s2) {
+        double sum = 0;
+        for (int i = 0; i < DIMENSIONS; i++) {
+            sum += (s1[i] - s2[i]) * (s1[i] - s2[i]);
+        }
+        return Math.sqrt(sum);
+    }
+
+    private double[] generateNeighborSA_Stateless(double[] current, double temperature) {
+        double[] neighbor = current.clone();
+        int k = 1 + (int) Math.round((DIMENSIONS - 1) * Math.min(1.0, temperature / INIT_TEMP));
+        int[] indices = randomSampleIndices(k);
+        double step = 0.02 + (0.4 - 0.02) * Math.min(1.0, temperature / INIT_TEMP);
+        for (int idx : indices) {
+            neighbor[idx] += random.nextGaussian() * step;
+            neighbor[idx] = Math.max(0, Math.min(1, neighbor[idx]));
+        }
+        return neighbor;
+    }
+
+    private int[] randomSampleIndices(int k) {
+        int[] all = new int[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) {
+            all[i] = i;
+        }
+        for (int i = 0; i < k; i++) {
+            int j = i + random.nextInt(DIMENSIONS - i);
+            int tmp = all[i];
+            all[i] = all[j];
+            all[j] = tmp;
+        }
+        return Arrays.copyOf(all, k);
+    }
 }

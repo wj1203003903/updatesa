@@ -27,7 +27,6 @@ public class ACO {
     }
 
     private double evaluate(double[] weights) {
-        baseDM.resetCurrentRunStats();
         return DataTest.score(weights, testData, baseDM);
     }
 

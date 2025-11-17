@@ -21,7 +21,6 @@ public class PSO {
     }
 
     private double evaluate(double[] weights) {
-        baseDM.resetCurrentRunStats();
         return DataTest.score(weights, testData, baseDM);
     }
 

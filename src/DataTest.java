@@ -7,7 +7,7 @@ public class DataTest {
 
     public static double score(double[] weights, DataItem[] dataSet, DataManager dm) {
         // 这个方法现在不进行任何重置操作
-
+        dm.resetCurrentRunStats();
         DataItem.setWeights(weights);
 
         // 重新填充底层数据源，因为缓存可能在 resetCurrentRunStats 中被清空了

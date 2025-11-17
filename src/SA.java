@@ -19,17 +19,20 @@ public class SA {
         this.random = new Random(seed);
     }
 
-    private double evaluate(double[] weights) {
+    private double evaluate(double[] weights, double currentBestScore) {
         baseDM.resetCurrentRunStats();
-        return DataTest.score(weights, testData, baseDM);
+        double score = DataTest.score(weights, testData, baseDM);
+        if (score > currentBestScore) {
+            baseDM.saveBestStats();
+        }
+        return score;
     }
 
     public double run(PrintStream out, double baselineScore) {
         double[] currentSolution = randomWeights();
-        double currentScore = evaluate(currentSolution);
+        double bestScore = evaluate(currentSolution, -Double.MAX_VALUE);
         double[] bestSolution = currentSolution.clone();
-        double bestScore = currentScore;
-        baseDM.saveBestStats();
+        double currentScore = bestScore;
 
         double temperature = INIT_TEMP;
         int generation = 0;
@@ -38,24 +41,16 @@ public class SA {
             generation++;
             for (int i = 0; i < ITERATIONS_PER_TEMP; i++) {
                 double[] neighborSolution = generateNeighbor(currentSolution);
-                double neighborScore = evaluate(neighborSolution);
+                double neighborScore = evaluate(neighborSolution, bestScore);
+
+                if (neighborScore > bestScore) {
+                    bestScore = neighborScore;
+                    bestSolution = neighborSolution.clone();
+                }
 
                 if (acceptanceProbability(currentScore, neighborScore, temperature) > random.nextDouble()) {
                     currentSolution = neighborSolution;
-                    currentScore = neighborScore; // 注意：这里的 score 只是用于比较，不是DM中的状态
-                }
-
-                // 每次都用当前最优解重新评估一次，以更新 bestScore 和 bestStats
-                double updatedBestScore = evaluate(bestSolution);
-                if(updatedBestScore > bestScore){
-                    bestScore = updatedBestScore;
-                    baseDM.saveBestStats();
-                }
-
-                if (currentScore > bestScore) {
-                    bestSolution = currentSolution.clone();
-                    bestScore = currentScore;
-                    baseDM.saveBestStats();
+                    currentScore = neighborScore;
                 }
             }
             double improvement = bestScore - baselineScore;
@@ -72,7 +67,31 @@ public class SA {
         return bestScore;
     }
 
-    private double[] randomWeights() { double[] w = new double[DIMENSIONS]; for(int i=0;i<DIMENSIONS;i++)w[i]=random.nextDouble(); return w; }
-    private double[] generateNeighbor(double[] c) { double[] n=c.clone(); int i=random.nextInt(DIMENSIONS); n[i]+=(random.nextDouble()-0.5)*0.3; if(n[i]<0)n[i]=0; if(n[i]>1)n[i]=1; return n; }
-    private double acceptanceProbability(double cs, double ns, double t) { if (ns > cs) return 1.0; return Math.exp((ns - cs) / t); }
+    private double[] randomWeights() {
+        double[] w = new double[DIMENSIONS];
+        for (int i = 0; i < DIMENSIONS; i++) {
+            w[i] = random.nextDouble();
+        }
+        return w;
+    }
+
+    private double[] generateNeighbor(double[] current) {
+        double[] neighbor = current.clone();
+        int idx = random.nextInt(DIMENSIONS);
+        neighbor[idx] += (random.nextDouble() - 0.5) * 0.3;
+        if (neighbor[idx] < 0) {
+            neighbor[idx] = 0;
+        }
+        if (neighbor[idx] > 1) {
+            neighbor[idx] = 1;
+        }
+        return neighbor;
+    }
+
+    private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
+        if (neighborScore > currentScore) {
+            return 1.0;
+        }
+        return Math.exp((neighborScore - currentScore) / temperature);
+    }
 }

@@ -16,7 +16,6 @@ public class RandomSearch {
     }
 
     private double evaluate(double[] weights) {
-        baseDM.resetCurrentRunStats();
         return DataTest.score(weights, testData, baseDM);
     }
 
@@ -42,6 +41,7 @@ public class RandomSearch {
         double[] finalNormalizedBest = bestWeights.clone();
         baseDM.normalizeL2(finalNormalizedBest);
         out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
+        out.printf("Final Best score = %.4f\n", bestScore);
         baseDM.printStats(out);
         return bestScore;
     }
