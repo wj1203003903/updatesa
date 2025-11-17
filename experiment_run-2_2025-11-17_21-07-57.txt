@@ -1,0 +1,3250 @@
+实验 #2 开始时间: Mon Nov 17 21:07:57 CST 2025
+
+<<<<<<<<<< STARTING EXPERIMENT RUN #2 (Seed: 8000) >>>>>>>>>>
+从 dataset/processed_nasa_log.csv 加载了 10000 条数据。
+
+
+=============== 正在对 [真实数据 (1万行)] 数据集运行完整测试 ===============
+
+--- 1. Running Random Search (to set Baseline) ---
+Running 10 random attempts to find a stable baseline...
+
+=== Single Random Attempt Finished (Baseline) ===
+Final Best Weights (Normalized) = [0.7608341057364646, 0.29690203853045954, 0.4380056024818553, 0.3507518561331614, 0.13455434098646157]
+Final Best score = 940.3331
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.587 (5870 / 10000)
+全局本地缓存命中率: 0.566
+全局边缘云命中率: 0.168
+全局远端访问率: 0.266
+平均任务延迟: 1243.857 ms
+
+--- 2. Running Basic Simulated Annealing (SA) ---
+Gen  1 (Temp 5.00e+02): Improvement = 0.0000
+Gen  2 (Temp 4.50e+02): Improvement = 7.6128
+Gen  3 (Temp 4.05e+02): Improvement = 9.9961
+Gen  4 (Temp 3.65e+02): Improvement = 9.9961
+Gen  5 (Temp 3.28e+02): Improvement = 9.9961
+Gen  6 (Temp 2.95e+02): Improvement = 16.2401
+Gen  7 (Temp 2.66e+02): Improvement = 16.2401
+Gen  8 (Temp 2.39e+02): Improvement = 16.2401
+Gen  9 (Temp 2.15e+02): Improvement = 16.2401
+Gen 10 (Temp 1.94e+02): Improvement = 16.2401
+Gen 11 (Temp 1.74e+02): Improvement = 16.2401
+Gen 12 (Temp 1.57e+02): Improvement = 16.2401
+Gen 13 (Temp 1.41e+02): Improvement = 16.2401
+Gen 14 (Temp 1.27e+02): Improvement = 16.2401
+Gen 15 (Temp 1.14e+02): Improvement = 16.2401
+Gen 16 (Temp 1.03e+02): Improvement = 16.2401
+Gen 17 (Temp 9.27e+01): Improvement = 19.1440
+Gen 18 (Temp 8.34e+01): Improvement = 21.2075
+Gen 19 (Temp 7.50e+01): Improvement = 21.2075
+Gen 20 (Temp 6.75e+01): Improvement = 21.2075
+Gen 21 (Temp 6.08e+01): Improvement = 21.2075
+Gen 22 (Temp 5.47e+01): Improvement = 21.2075
+Gen 23 (Temp 4.92e+01): Improvement = 21.2075
+Gen 24 (Temp 4.43e+01): Improvement = 21.2075
+Gen 25 (Temp 3.99e+01): Improvement = 21.2075
+Gen 26 (Temp 3.59e+01): Improvement = 21.2075
+Gen 27 (Temp 3.23e+01): Improvement = 21.2075
+Gen 28 (Temp 2.91e+01): Improvement = 21.2075
+Gen 29 (Temp 2.62e+01): Improvement = 30.8325
+Gen 30 (Temp 2.36e+01): Improvement = 30.8325
+Gen 31 (Temp 2.12e+01): Improvement = 30.8325
+Gen 32 (Temp 1.91e+01): Improvement = 30.8325
+Gen 33 (Temp 1.72e+01): Improvement = 30.8325
+Gen 34 (Temp 1.55e+01): Improvement = 33.2367
+Gen 35 (Temp 1.39e+01): Improvement = 33.2367
+Gen 36 (Temp 1.25e+01): Improvement = 72.1076
+Gen 37 (Temp 1.13e+01): Improvement = 72.1076
+Gen 38 (Temp 1.01e+01): Improvement = 72.1076
+Gen 39 (Temp 9.12e+00): Improvement = 72.1076
+Gen 40 (Temp 8.21e+00): Improvement = 72.1076
+Gen 41 (Temp 7.39e+00): Improvement = 72.1076
+Gen 42 (Temp 6.65e+00): Improvement = 84.7866
+Gen 43 (Temp 5.99e+00): Improvement = 84.7866
+Gen 44 (Temp 5.39e+00): Improvement = 84.7866
+Gen 45 (Temp 4.85e+00): Improvement = 84.7866
+Gen 46 (Temp 4.36e+00): Improvement = 84.7866
+Gen 47 (Temp 3.93e+00): Improvement = 84.7866
+Gen 48 (Temp 3.53e+00): Improvement = 84.7866
+Gen 49 (Temp 3.18e+00): Improvement = 84.7866
+Gen 50 (Temp 2.86e+00): Improvement = 84.7866
+Gen 51 (Temp 2.58e+00): Improvement = 84.7866
+Gen 52 (Temp 2.32e+00): Improvement = 84.7866
+Gen 53 (Temp 2.09e+00): Improvement = 84.7866
+Gen 54 (Temp 1.88e+00): Improvement = 84.7866
+Gen 55 (Temp 1.69e+00): Improvement = 84.7866
+Gen 56 (Temp 1.52e+00): Improvement = 84.7866
+Gen 57 (Temp 1.37e+00): Improvement = 84.7866
+Gen 58 (Temp 1.23e+00): Improvement = 84.7866
+Gen 59 (Temp 1.11e+00): Improvement = 84.7866
+Gen 60 (Temp 9.98e-01): Improvement = 84.7866
+Gen 61 (Temp 8.99e-01): Improvement = 84.7866
+Gen 62 (Temp 8.09e-01): Improvement = 84.7866
+Gen 63 (Temp 7.28e-01): Improvement = 84.7866
+Gen 64 (Temp 6.55e-01): Improvement = 84.7866
+Gen 65 (Temp 5.90e-01): Improvement = 84.7866
+Gen 66 (Temp 5.31e-01): Improvement = 84.7866
+Gen 67 (Temp 4.78e-01): Improvement = 84.7866
+Gen 68 (Temp 4.30e-01): Improvement = 84.7866
+Gen 69 (Temp 3.87e-01): Improvement = 84.7866
+Gen 70 (Temp 3.48e-01): Improvement = 84.7866
+Gen 71 (Temp 3.13e-01): Improvement = 84.7866
+Gen 72 (Temp 2.82e-01): Improvement = 84.7866
+Gen 73 (Temp 2.54e-01): Improvement = 84.7866
+Gen 74 (Temp 2.28e-01): Improvement = 84.7866
+Gen 75 (Temp 2.06e-01): Improvement = 84.7866
+Gen 76 (Temp 1.85e-01): Improvement = 84.7866
+Gen 77 (Temp 1.66e-01): Improvement = 84.7866
+Gen 78 (Temp 1.50e-01): Improvement = 84.7866
+Gen 79 (Temp 1.35e-01): Improvement = 84.7866
+Gen 80 (Temp 1.21e-01): Improvement = 84.7866
+Gen 81 (Temp 1.09e-01): Improvement = 84.7866
+Gen 82 (Temp 9.83e-02): Improvement = 84.7866
+Gen 83 (Temp 8.85e-02): Improvement = 84.7866
+Gen 84 (Temp 7.96e-02): Improvement = 84.7866
+Gen 85 (Temp 7.17e-02): Improvement = 84.7866
+Gen 86 (Temp 6.45e-02): Improvement = 84.7866
+Gen 87 (Temp 5.81e-02): Improvement = 84.7866
+Gen 88 (Temp 5.22e-02): Improvement = 84.7866
+Gen 89 (Temp 4.70e-02): Improvement = 84.7866
+Gen 90 (Temp 4.23e-02): Improvement = 84.7866
+Gen 91 (Temp 3.81e-02): Improvement = 84.7866
+Gen 92 (Temp 3.43e-02): Improvement = 84.7866
+Gen 93 (Temp 3.09e-02): Improvement = 84.7866
+Gen 94 (Temp 2.78e-02): Improvement = 84.7866
+Gen 95 (Temp 2.50e-02): Improvement = 84.7866
+Gen 96 (Temp 2.25e-02): Improvement = 84.7866
+Gen 97 (Temp 2.02e-02): Improvement = 84.7866
+Gen 98 (Temp 1.82e-02): Improvement = 84.7866
+Gen 99 (Temp 1.64e-02): Improvement = 84.7866
+Gen 100 (Temp 1.48e-02): Improvement = 84.7866
+Gen 101 (Temp 1.33e-02): Improvement = 84.7866
+Gen 102 (Temp 1.20e-02): Improvement = 84.7866
+Gen 103 (Temp 1.08e-02): Improvement = 84.7866
+Gen 104 (Temp 9.68e-03): Improvement = 84.7866
+Gen 105 (Temp 8.71e-03): Improvement = 84.7866
+Gen 106 (Temp 7.84e-03): Improvement = 84.7866
+Gen 107 (Temp 7.06e-03): Improvement = 84.7866
+Gen 108 (Temp 6.35e-03): Improvement = 84.7866
+Gen 109 (Temp 5.72e-03): Improvement = 84.7866
+Gen 110 (Temp 5.15e-03): Improvement = 84.7866
+
+=== SA (Standard Version) Finished ===
+Final Best Weights (Normalized) = [0.3524166520942757, 0.3441274981647972, 0.21064720242573068, 0.8375037857238019, 0.10767512870674013]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.626 (6261 / 10000)
+全局本地缓存命中率: 0.585
+全局边缘云命中率: 0.137
+全局远端访问率: 0.278
+平均任务延迟: 1194.719 ms
+
+--- 3. Running Particle Swarm Optimization (PSO) ---
+Gen  1: Improvement = 0.9948
+Gen  2: Improvement = 0.9948
+Gen  3: Improvement = 20.7995
+Gen  4: Improvement = 20.7995
+Gen  5: Improvement = 20.7995
+Gen  6: Improvement = 20.7995
+Gen  7: Improvement = 20.7995
+Gen  8: Improvement = 20.7995
+Gen  9: Improvement = 20.7995
+Gen 10: Improvement = 20.7995
+Gen 11: Improvement = 20.7995
+Gen 12: Improvement = 20.7995
+Gen 13: Improvement = 20.7995
+Gen 14: Improvement = 20.7995
+Gen 15: Improvement = 20.7995
+Gen 16: Improvement = 20.7995
+Gen 17: Improvement = 20.7995
+Gen 18: Improvement = 20.7995
+Gen 19: Improvement = 20.7995
+Gen 20: Improvement = 20.7995
+Gen 21: Improvement = 20.7995
+Gen 22: Improvement = 20.7995
+Gen 23: Improvement = 20.7995
+Gen 24: Improvement = 20.7995
+Gen 25: Improvement = 20.7995
+Gen 26: Improvement = 20.7995
+Gen 27: Improvement = 20.7995
+Gen 28: Improvement = 20.7995
+Gen 29: Improvement = 20.7995
+Gen 30: Improvement = 20.7995
+Gen 31: Improvement = 20.7995
+Gen 32: Improvement = 20.7995
+Gen 33: Improvement = 20.7995
+Gen 34: Improvement = 20.7995
+Gen 35: Improvement = 20.7995
+Gen 36: Improvement = 20.7995
+Gen 37: Improvement = 20.7995
+Gen 38: Improvement = 20.7995
+Gen 39: Improvement = 20.7995
+Gen 40: Improvement = 20.7995
+Gen 41: Improvement = 20.7995
+Gen 42: Improvement = 20.7995
+Gen 43: Improvement = 20.7995
+Gen 44: Improvement = 20.7995
+Gen 45: Improvement = 20.7995
+Gen 46: Improvement = 20.7995
+Gen 47: Improvement = 20.7995
+Gen 48: Improvement = 20.7995
+Gen 49: Improvement = 20.7995
+Gen 50: Improvement = 20.7995
+Gen 51: Improvement = 20.7995
+Gen 52: Improvement = 20.7995
+Gen 53: Improvement = 20.7995
+Gen 54: Improvement = 20.7995
+Gen 55: Improvement = 20.7995
+Gen 56: Improvement = 20.7995
+Gen 57: Improvement = 20.7995
+Gen 58: Improvement = 20.7995
+Gen 59: Improvement = 20.7995
+Gen 60: Improvement = 20.7995
+Gen 61: Improvement = 20.7995
+Gen 62: Improvement = 20.7995
+Gen 63: Improvement = 20.7995
+Gen 64: Improvement = 20.7995
+Gen 65: Improvement = 20.7995
+Gen 66: Improvement = 20.7995
+Gen 67: Improvement = 20.7995
+Gen 68: Improvement = 20.7995
+Gen 69: Improvement = 20.7995
+Gen 70: Improvement = 20.7995
+Gen 71: Improvement = 20.7995
+Gen 72: Improvement = 20.7995
+Gen 73: Improvement = 20.7995
+Gen 74: Improvement = 20.7995
+Gen 75: Improvement = 20.7995
+Gen 76: Improvement = 20.7995
+Gen 77: Improvement = 20.7995
+Gen 78: Improvement = 20.7995
+Gen 79: Improvement = 20.7995
+Gen 80: Improvement = 20.7995
+Gen 81: Improvement = 20.7995
+Gen 82: Improvement = 20.7995
+Gen 83: Improvement = 20.7995
+Gen 84: Improvement = 20.7995
+Gen 85: Improvement = 20.7995
+Gen 86: Improvement = 20.7995
+Gen 87: Improvement = 20.7995
+Gen 88: Improvement = 20.7995
+Gen 89: Improvement = 20.7995
+Gen 90: Improvement = 20.7995
+Gen 91: Improvement = 20.7995
+Gen 92: Improvement = 20.7995
+Gen 93: Improvement = 20.7995
+Gen 94: Improvement = 20.7995
+Gen 95: Improvement = 20.7995
+Gen 96: Improvement = 20.7995
+Gen 97: Improvement = 20.7995
+Gen 98: Improvement = 20.7995
+Gen 99: Improvement = 20.7995
+Gen 100: Improvement = 20.7995
+
+=== PSO Finished ===
+Final Best Weights (Normalized) = [0.3885063059636859, 0.31452647810514717, 0.5811889633683832, 0.27248614468397986, 0.5814693754715451]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.615 (6152 / 10000)
+全局本地缓存命中率: 0.548
+全局边缘云命中率: 0.172
+全局远端访问率: 0.280
+平均任务延迟: 1227.822 ms
+
+--- 4. Running Genetic Algorithm (GA) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 45.7736
+Gen  8: Improvement = 45.7736
+Gen  9: Improvement = 45.7736
+Gen 10: Improvement = 45.7736
+Gen 11: Improvement = 45.7736
+Gen 12: Improvement = 45.7736
+Gen 13: Improvement = 45.7736
+Gen 14: Improvement = 45.7736
+Gen 15: Improvement = 45.7736
+Gen 16: Improvement = 45.7736
+Gen 17: Improvement = 45.7736
+Gen 18: Improvement = 45.7736
+Gen 19: Improvement = 45.7736
+Gen 20: Improvement = 45.7736
+Gen 21: Improvement = 45.7736
+Gen 22: Improvement = 45.7736
+Gen 23: Improvement = 45.7736
+Gen 24: Improvement = 45.7736
+Gen 25: Improvement = 45.7736
+Gen 26: Improvement = 45.7736
+Gen 27: Improvement = 45.7736
+Gen 28: Improvement = 48.8263
+Gen 29: Improvement = 48.8263
+Gen 30: Improvement = 48.8263
+Gen 31: Improvement = 48.8263
+Gen 32: Improvement = 48.8263
+Gen 33: Improvement = 50.3755
+Gen 34: Improvement = 50.3755
+Gen 35: Improvement = 50.3755
+Gen 36: Improvement = 50.3755
+Gen 37: Improvement = 50.3755
+Gen 38: Improvement = 50.3755
+Gen 39: Improvement = 50.3755
+Gen 40: Improvement = 50.3755
+Gen 41: Improvement = 61.2003
+Gen 42: Improvement = 61.2003
+Gen 43: Improvement = 61.2003
+Gen 44: Improvement = 61.2003
+Gen 45: Improvement = 61.2003
+Gen 46: Improvement = 61.2003
+Gen 47: Improvement = 61.2003
+Gen 48: Improvement = 61.2003
+Gen 49: Improvement = 61.2003
+Gen 50: Improvement = 61.2003
+Gen 51: Improvement = 61.2003
+Gen 52: Improvement = 61.2003
+Gen 53: Improvement = 61.2003
+Gen 54: Improvement = 61.2003
+Gen 55: Improvement = 61.2003
+Gen 56: Improvement = 61.2003
+Gen 57: Improvement = 61.2003
+Gen 58: Improvement = 61.2003
+Gen 59: Improvement = 61.2003
+Gen 60: Improvement = 61.2003
+Gen 61: Improvement = 61.2003
+Gen 62: Improvement = 61.2003
+Gen 63: Improvement = 61.2003
+Gen 64: Improvement = 61.2003
+Gen 65: Improvement = 61.2003
+Gen 66: Improvement = 61.2003
+Gen 67: Improvement = 61.2003
+Gen 68: Improvement = 61.2003
+Gen 69: Improvement = 61.2003
+Gen 70: Improvement = 61.2003
+Gen 71: Improvement = 61.2003
+Gen 72: Improvement = 61.2003
+Gen 73: Improvement = 61.2003
+Gen 74: Improvement = 61.2003
+Gen 75: Improvement = 61.2003
+Gen 76: Improvement = 61.2003
+Gen 77: Improvement = 61.2003
+Gen 78: Improvement = 61.2003
+Gen 79: Improvement = 61.2003
+Gen 80: Improvement = 61.2003
+Gen 81: Improvement = 61.2003
+Gen 82: Improvement = 61.2003
+Gen 83: Improvement = 61.2003
+Gen 84: Improvement = 61.2003
+Gen 85: Improvement = 61.2003
+Gen 86: Improvement = 61.2003
+Gen 87: Improvement = 61.2003
+Gen 88: Improvement = 61.2003
+Gen 89: Improvement = 61.2003
+Gen 90: Improvement = 61.2003
+Gen 91: Improvement = 61.2003
+Gen 92: Improvement = 61.2003
+Gen 93: Improvement = 61.2003
+Gen 94: Improvement = 61.2003
+Gen 95: Improvement = 61.2003
+Gen 96: Improvement = 61.2003
+Gen 97: Improvement = 61.2003
+Gen 98: Improvement = 61.2003
+Gen 99: Improvement = 61.2003
+Gen 100: Improvement = 61.2003
+
+=== GA Finished ===
+Final Best Weights (Normalized) = [0.3767370151573968, 0.26858548583403635, 0.5164744157410831, 0.19795990547718795, 0.6928182387307364]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.621 (6205 / 10000)
+全局本地缓存命中率: 0.597
+全局边缘云命中率: 0.149
+全局远端访问率: 0.254
+平均任务延迟: 1230.813 ms
+
+--- 5. Running Ant Colony Optimization (ACO) ---
+ACO Initializing (Granularity: 41)...
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 0.0000
+Gen  8: Improvement = 0.0000
+Gen  9: Improvement = 0.0000
+Gen 10: Improvement = 5.0264
+Gen 11: Improvement = 5.0264
+Gen 12: Improvement = 5.0264
+Gen 13: Improvement = 5.0264
+Gen 14: Improvement = 5.0264
+Gen 15: Improvement = 5.0264
+Gen 16: Improvement = 5.0264
+Gen 17: Improvement = 5.0264
+Gen 18: Improvement = 5.0264
+Gen 19: Improvement = 14.7533
+Gen 20: Improvement = 14.7533
+Gen 21: Improvement = 14.7533
+Gen 22: Improvement = 14.7533
+Gen 23: Improvement = 14.7533
+Gen 24: Improvement = 14.7533
+Gen 25: Improvement = 14.7533
+Gen 26: Improvement = 18.1935
+Gen 27: Improvement = 18.1935
+Gen 28: Improvement = 18.1935
+Gen 29: Improvement = 18.1935
+Gen 30: Improvement = 18.1935
+Gen 31: Improvement = 18.1935
+Gen 32: Improvement = 18.1935
+Gen 33: Improvement = 18.1935
+Gen 34: Improvement = 18.1935
+Gen 35: Improvement = 18.1935
+Gen 36: Improvement = 18.1935
+Gen 37: Improvement = 18.1935
+Gen 38: Improvement = 18.1935
+Gen 39: Improvement = 18.1935
+Gen 40: Improvement = 18.1935
+Gen 41: Improvement = 18.1935
+Gen 42: Improvement = 18.1935
+Gen 43: Improvement = 18.1935
+Gen 44: Improvement = 18.1935
+Gen 45: Improvement = 18.1935
+Gen 46: Improvement = 18.1935
+Gen 47: Improvement = 18.1935
+Gen 48: Improvement = 18.1935
+Gen 49: Improvement = 18.1935
+Gen 50: Improvement = 18.1935
+Gen 51: Improvement = 18.1935
+Gen 52: Improvement = 18.1935
+Gen 53: Improvement = 18.1935
+Gen 54: Improvement = 21.1196
+Gen 55: Improvement = 21.1196
+Gen 56: Improvement = 21.1196
+Gen 57: Improvement = 21.1196
+Gen 58: Improvement = 21.1196
+Gen 59: Improvement = 21.1196
+Gen 60: Improvement = 21.1196
+Gen 61: Improvement = 21.1196
+Gen 62: Improvement = 21.1196
+Gen 63: Improvement = 21.1196
+Gen 64: Improvement = 21.1196
+Gen 65: Improvement = 21.1196
+Gen 66: Improvement = 21.1196
+Gen 67: Improvement = 21.1196
+Gen 68: Improvement = 21.1196
+Gen 69: Improvement = 21.1196
+Gen 70: Improvement = 21.1196
+Gen 71: Improvement = 21.1196
+Gen 72: Improvement = 21.1196
+Gen 73: Improvement = 21.1196
+Gen 74: Improvement = 21.1196
+Gen 75: Improvement = 21.1196
+Gen 76: Improvement = 21.1196
+Gen 77: Improvement = 21.1196
+Gen 78: Improvement = 21.1196
+Gen 79: Improvement = 21.1196
+Gen 80: Improvement = 21.1196
+Gen 81: Improvement = 21.1196
+Gen 82: Improvement = 21.1196
+Gen 83: Improvement = 21.1196
+Gen 84: Improvement = 21.1196
+Gen 85: Improvement = 21.1196
+Gen 86: Improvement = 21.1196
+Gen 87: Improvement = 21.1196
+Gen 88: Improvement = 21.1196
+Gen 89: Improvement = 21.1196
+Gen 90: Improvement = 21.1196
+Gen 91: Improvement = 21.1196
+Gen 92: Improvement = 21.1196
+Gen 93: Improvement = 21.1196
+Gen 94: Improvement = 21.1196
+Gen 95: Improvement = 21.1196
+Gen 96: Improvement = 21.1196
+Gen 97: Improvement = 21.1196
+Gen 98: Improvement = 21.1196
+Gen 99: Improvement = 21.1196
+Gen 100: Improvement = 21.1196
+
+=== ACO Finished ===
+Final Best Weights (Normalized) = [0.6321629317256102, 0.052680244310467514, 0.5092423616678526, 0.2809613029891601, 0.5092423616678526]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.606 (6056 / 10000)
+全局本地缓存命中率: 0.558
+全局边缘云命中率: 0.170
+全局远端访问率: 0.273
+平均任务延迟: 1227.601 ms
+
+--- 6. Running Advanced Simulated Annealing (UpdateSA) ---
+--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---
+--- Pre-seeding finished. Elite archive size: 6 ---
+Gen  1 (Temp 5.00e+02): Improvement = 43.0098
+Gen  2 (Temp 4.50e+02): Improvement = 43.0098
+Gen  3 (Temp 4.05e+02): Improvement = 43.0098
+Gen  4 (Temp 3.65e+02): Improvement = 43.0098
+Gen  5 (Temp 3.28e+02): Improvement = 43.0098
+Gen  6 (Temp 2.95e+02): Improvement = 43.0098
+Gen  7 (Temp 2.66e+02): Improvement = 43.0098
+Gen  8 (Temp 2.39e+02): Improvement = 45.3081
+Gen  9 (Temp 2.15e+02): Improvement = 45.3081
+Gen 10 (Temp 1.94e+02): Improvement = 45.3081
+Gen 11 (Temp 1.74e+02): Improvement = 45.3081
+Gen 12 (Temp 1.57e+02): Improvement = 45.3081
+Gen 13 (Temp 1.41e+02): Improvement = 45.3081
+Gen 14 (Temp 1.27e+02): Improvement = 45.3081
+Gen 15 (Temp 1.14e+02): Improvement = 45.3081
+Gen 16 (Temp 1.03e+02): Improvement = 45.3081
+Gen 17 (Temp 9.27e+01): Improvement = 45.3081
+Gen 18 (Temp 8.34e+01): Improvement = 45.3081
+Gen 19 (Temp 7.50e+01): Improvement = 45.3081
+Gen 20 (Temp 6.75e+01): Improvement = 45.3081
+Gen 21 (Temp 6.08e+01): Improvement = 45.3081
+Gen 22 (Temp 5.47e+01): Improvement = 45.3081
+Gen 23 (Temp 4.92e+01): Improvement = 45.3081
+Gen 24 (Temp 4.43e+01): Improvement = 45.3081
+Gen 25 (Temp 3.99e+01): Improvement = 45.3081
+Gen 26 (Temp 3.59e+01): Improvement = 45.3081
+Gen 27 (Temp 3.23e+01): Improvement = 45.3081
+Gen 28 (Temp 2.91e+01): Improvement = 45.3081
+Gen 29 (Temp 2.62e+01): Improvement = 45.3081
+Gen 30 (Temp 2.36e+01): Improvement = 45.3081
+Gen 31 (Temp 2.12e+01): Improvement = 45.3081
+Gen 32 (Temp 1.91e+01): Improvement = 45.3081
+Gen 33 (Temp 1.72e+01): Improvement = 45.3081
+--- Stagnation detected. Triggering GA Rescue #1 ---
+Gen 34 (Temp 2.58e+01): Improvement = 45.3081
+Gen 35 (Temp 2.32e+01): Improvement = 45.3081
+Gen 36 (Temp 2.09e+01): Improvement = 45.3081
+Gen 37 (Temp 1.88e+01): Improvement = 45.3081
+Gen 38 (Temp 1.69e+01): Improvement = 45.3081
+Gen 39 (Temp 1.52e+01): Improvement = 45.3081
+Gen 40 (Temp 1.37e+01): Improvement = 45.3081
+Gen 41 (Temp 1.23e+01): Improvement = 45.3081
+Gen 42 (Temp 1.11e+01): Improvement = 45.3081
+Gen 43 (Temp 9.98e+00): Improvement = 45.3081
+Gen 44 (Temp 8.98e+00): Improvement = 45.3081
+Gen 45 (Temp 8.08e+00): Improvement = 45.3081
+Gen 46 (Temp 7.27e+00): Improvement = 49.8159
+Gen 47 (Temp 6.55e+00): Improvement = 49.8159
+Gen 48 (Temp 5.89e+00): Improvement = 49.8159
+Gen 49 (Temp 5.30e+00): Improvement = 49.8159
+Gen 50 (Temp 4.77e+00): Improvement = 49.8159
+Gen 51 (Temp 4.29e+00): Improvement = 49.8159
+Gen 52 (Temp 3.87e+00): Improvement = 49.8159
+Gen 53 (Temp 3.48e+00): Improvement = 49.8159
+Gen 54 (Temp 3.13e+00): Improvement = 49.8159
+Gen 55 (Temp 2.82e+00): Improvement = 49.8159
+Gen 56 (Temp 2.54e+00): Improvement = 49.8159
+Gen 57 (Temp 2.28e+00): Improvement = 49.8159
+Gen 58 (Temp 2.05e+00): Improvement = 49.8159
+Gen 59 (Temp 1.85e+00): Improvement = 49.8159
+Gen 60 (Temp 1.66e+00): Improvement = 65.9412
+Gen 61 (Temp 1.50e+00): Improvement = 67.9134
+Gen 62 (Temp 1.35e+00): Improvement = 77.1099
+Gen 63 (Temp 1.21e+00): Improvement = 77.1099
+Gen 64 (Temp 1.09e+00): Improvement = 89.0995
+Gen 65 (Temp 9.83e-01): Improvement = 89.0995
+Gen 66 (Temp 8.84e-01): Improvement = 91.1464
+Gen 67 (Temp 7.96e-01): Improvement = 101.6059
+Gen 68 (Temp 7.16e-01): Improvement = 101.6059
+Gen 69 (Temp 6.45e-01): Improvement = 101.6059
+Gen 70 (Temp 5.80e-01): Improvement = 101.6059
+Gen 71 (Temp 5.22e-01): Improvement = 101.6059
+Gen 72 (Temp 4.70e-01): Improvement = 101.6059
+Gen 73 (Temp 4.23e-01): Improvement = 101.6059
+Gen 74 (Temp 3.81e-01): Improvement = 101.6059
+Gen 75 (Temp 3.43e-01): Improvement = 101.6059
+Gen 76 (Temp 3.08e-01): Improvement = 101.6059
+Gen 77 (Temp 2.77e-01): Improvement = 101.6059
+Gen 78 (Temp 2.50e-01): Improvement = 101.6059
+Gen 79 (Temp 2.25e-01): Improvement = 101.6059
+Gen 80 (Temp 2.02e-01): Improvement = 101.6059
+Gen 81 (Temp 1.82e-01): Improvement = 101.6059
+Gen 82 (Temp 1.64e-01): Improvement = 101.6059
+Gen 83 (Temp 1.47e-01): Improvement = 101.6059
+Gen 84 (Temp 1.33e-01): Improvement = 101.6059
+Gen 85 (Temp 1.19e-01): Improvement = 101.6059
+Gen 86 (Temp 1.08e-01): Improvement = 101.6059
+Gen 87 (Temp 9.68e-02): Improvement = 101.6059
+Gen 88 (Temp 8.71e-02): Improvement = 101.6059
+Gen 89 (Temp 7.84e-02): Improvement = 101.6059
+Gen 90 (Temp 7.05e-02): Improvement = 101.6059
+Gen 91 (Temp 6.35e-02): Improvement = 101.6059
+Gen 92 (Temp 5.71e-02): Improvement = 101.6059
+--- Stagnation detected. Triggering GA Rescue #2 ---
+Gen 93 (Temp 8.57e-02): Improvement = 101.6059
+Gen 94 (Temp 7.71e-02): Improvement = 101.6059
+Gen 95 (Temp 6.94e-02): Improvement = 101.6059
+Gen 96 (Temp 6.25e-02): Improvement = 101.6059
+Gen 97 (Temp 5.62e-02): Improvement = 101.6059
+Gen 98 (Temp 5.06e-02): Improvement = 101.6059
+Gen 99 (Temp 4.55e-02): Improvement = 128.3985
+Gen 100 (Temp 4.10e-02): Improvement = 128.3985
+Gen 101 (Temp 3.69e-02): Improvement = 128.3985
+Gen 102 (Temp 3.32e-02): Improvement = 128.3985
+Gen 103 (Temp 2.99e-02): Improvement = 128.3985
+Gen 104 (Temp 2.69e-02): Improvement = 128.3985
+Gen 105 (Temp 2.42e-02): Improvement = 128.3985
+Gen 106 (Temp 2.18e-02): Improvement = 128.3985
+Gen 107 (Temp 1.96e-02): Improvement = 128.3985
+Gen 108 (Temp 1.76e-02): Improvement = 128.3985
+Gen 109 (Temp 1.59e-02): Improvement = 128.3985
+Gen 110 (Temp 1.43e-02): Improvement = 128.3985
+Gen 111 (Temp 1.29e-02): Improvement = 128.3985
+Gen 112 (Temp 1.16e-02): Improvement = 128.3985
+Gen 113 (Temp 1.04e-02): Improvement = 128.3985
+Gen 114 (Temp 9.38e-03): Improvement = 128.3985
+Gen 115 (Temp 8.44e-03): Improvement = 128.3985
+Gen 116 (Temp 7.60e-03): Improvement = 128.3985
+Gen 117 (Temp 6.84e-03): Improvement = 128.3985
+Gen 118 (Temp 6.15e-03): Improvement = 128.3985
+Gen 119 (Temp 5.54e-03): Improvement = 128.3985
+Gen 120 (Temp 4.98e-03): Improvement = 128.3985
+Gen 121 (Temp 4.49e-03): Improvement = 128.3985
+Gen 122 (Temp 4.04e-03): Improvement = 128.3985
+Gen 123 (Temp 3.63e-03): Improvement = 128.3985
+Gen 124 (Temp 3.27e-03): Improvement = 128.3985
+--- Stagnation detected. Triggering GA Rescue #3 ---
+Gen 125 (Temp 4.90e-03): Improvement = 128.3985
+Gen 126 (Temp 4.41e-03): Improvement = 128.3985
+Gen 127 (Temp 3.97e-03): Improvement = 128.3985
+Gen 128 (Temp 3.58e-03): Improvement = 128.3985
+Gen 129 (Temp 3.22e-03): Improvement = 128.3985
+Gen 130 (Temp 2.90e-03): Improvement = 128.3985
+Gen 131 (Temp 2.61e-03): Improvement = 128.3985
+Gen 132 (Temp 2.35e-03): Improvement = 128.3985
+Gen 133 (Temp 2.11e-03): Improvement = 128.3985
+Gen 134 (Temp 1.90e-03): Improvement = 128.3985
+Gen 135 (Temp 1.71e-03): Improvement = 128.3985
+Gen 136 (Temp 1.54e-03): Improvement = 128.3985
+Gen 137 (Temp 1.39e-03): Improvement = 128.3985
+Gen 138 (Temp 1.25e-03): Improvement = 128.3985
+Gen 139 (Temp 1.12e-03): Improvement = 128.3985
+Gen 140 (Temp 1.01e-03): Improvement = 128.3985
+
+=== SA with GA-Rescue Finished ===
+Final Best Weights (Normalized) = [0.19315770258670456, 0.05108337187761033, 0.4355820920274008, 0.7960732913546955, 0.369616215750574]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 10000
+任务完成率: 0.630 (6299 / 10000)
+全局本地缓存命中率: 0.606
+全局边缘云命中率: 0.167
+全局远端访问率: 0.228
+平均任务延迟: 1171.566 ms
+
+==========================================================
+=== Final Score Summary for: [真实数据 (1万行)          ] ===
+==========================================================
+Algorithm                      | Best Score      | Improvement vs Baseline
+----------------------------------------------------------------------
+Random Search (Baseline)       | 940.3331        | N/A                 
+Simulated Annealing (SA)       | 1025.1197       | 84.7866             
+Particle Swarm (PSO)           | 961.1326        | 20.7995             
+Genetic Algorithm (GA)         | 1001.5334       | 61.2003             
+Ant Colony (ACO)               | 961.4527        | 21.1196             
+Advanced SA (UpdateSA)         | 1068.7316       | 128.3985            
+==========================================================
+从 dataset/processed_nasa_log.csv 加载了 20000 条数据。
+
+
+=============== 正在对 [真实数据 (1.5万行)] 数据集运行完整测试 ===============
+
+--- 1. Running Random Search (to set Baseline) ---
+Running 10 random attempts to find a stable baseline...
+
+=== Single Random Attempt Finished (Baseline) ===
+Final Best Weights (Normalized) = [0.5117624157983685, 0.1966860932503246, 0.7413137850730133, 0.2964058517835, 0.24902058868166413]
+Final Best score = 1020.7787
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.654 (9816 / 15000)
+全局本地缓存命中率: 0.594
+全局边缘云命中率: 0.165
+全局远端访问率: 0.241
+平均任务延迟: 1239.074 ms
+
+--- 2. Running Basic Simulated Annealing (SA) ---
+Gen  1 (Temp 5.00e+02): Improvement = 0.0000
+Gen  2 (Temp 4.50e+02): Improvement = 0.0000
+Gen  3 (Temp 4.05e+02): Improvement = 0.0000
+Gen  4 (Temp 3.65e+02): Improvement = 24.9797
+Gen  5 (Temp 3.28e+02): Improvement = 27.4523
+Gen  6 (Temp 2.95e+02): Improvement = 27.4523
+Gen  7 (Temp 2.66e+02): Improvement = 27.4523
+Gen  8 (Temp 2.39e+02): Improvement = 27.4523
+Gen  9 (Temp 2.15e+02): Improvement = 27.4523
+Gen 10 (Temp 1.94e+02): Improvement = 27.4523
+Gen 11 (Temp 1.74e+02): Improvement = 27.4523
+Gen 12 (Temp 1.57e+02): Improvement = 27.4523
+Gen 13 (Temp 1.41e+02): Improvement = 27.4523
+Gen 14 (Temp 1.27e+02): Improvement = 27.4523
+Gen 15 (Temp 1.14e+02): Improvement = 27.4523
+Gen 16 (Temp 1.03e+02): Improvement = 27.4523
+Gen 17 (Temp 9.27e+01): Improvement = 27.4523
+Gen 18 (Temp 8.34e+01): Improvement = 27.4523
+Gen 19 (Temp 7.50e+01): Improvement = 27.4523
+Gen 20 (Temp 6.75e+01): Improvement = 27.4523
+Gen 21 (Temp 6.08e+01): Improvement = 27.4523
+Gen 22 (Temp 5.47e+01): Improvement = 27.4523
+Gen 23 (Temp 4.92e+01): Improvement = 27.4523
+Gen 24 (Temp 4.43e+01): Improvement = 27.4523
+Gen 25 (Temp 3.99e+01): Improvement = 27.4523
+Gen 26 (Temp 3.59e+01): Improvement = 27.4523
+Gen 27 (Temp 3.23e+01): Improvement = 27.4523
+Gen 28 (Temp 2.91e+01): Improvement = 27.4523
+Gen 29 (Temp 2.62e+01): Improvement = 27.4523
+Gen 30 (Temp 2.36e+01): Improvement = 27.4523
+Gen 31 (Temp 2.12e+01): Improvement = 27.4523
+Gen 32 (Temp 1.91e+01): Improvement = 27.4523
+Gen 33 (Temp 1.72e+01): Improvement = 27.4523
+Gen 34 (Temp 1.55e+01): Improvement = 27.4523
+Gen 35 (Temp 1.39e+01): Improvement = 27.4523
+Gen 36 (Temp 1.25e+01): Improvement = 27.4523
+Gen 37 (Temp 1.13e+01): Improvement = 27.4523
+Gen 38 (Temp 1.01e+01): Improvement = 27.4523
+Gen 39 (Temp 9.12e+00): Improvement = 27.4523
+Gen 40 (Temp 8.21e+00): Improvement = 27.4523
+Gen 41 (Temp 7.39e+00): Improvement = 27.4523
+Gen 42 (Temp 6.65e+00): Improvement = 27.4523
+Gen 43 (Temp 5.99e+00): Improvement = 27.4523
+Gen 44 (Temp 5.39e+00): Improvement = 27.4523
+Gen 45 (Temp 4.85e+00): Improvement = 27.4523
+Gen 46 (Temp 4.36e+00): Improvement = 27.4523
+Gen 47 (Temp 3.93e+00): Improvement = 27.4523
+Gen 48 (Temp 3.53e+00): Improvement = 27.4523
+Gen 49 (Temp 3.18e+00): Improvement = 27.4523
+Gen 50 (Temp 2.86e+00): Improvement = 27.4523
+Gen 51 (Temp 2.58e+00): Improvement = 27.4523
+Gen 52 (Temp 2.32e+00): Improvement = 27.4523
+Gen 53 (Temp 2.09e+00): Improvement = 27.4523
+Gen 54 (Temp 1.88e+00): Improvement = 27.4523
+Gen 55 (Temp 1.69e+00): Improvement = 27.4523
+Gen 56 (Temp 1.52e+00): Improvement = 27.4523
+Gen 57 (Temp 1.37e+00): Improvement = 27.4523
+Gen 58 (Temp 1.23e+00): Improvement = 27.4523
+Gen 59 (Temp 1.11e+00): Improvement = 27.4523
+Gen 60 (Temp 9.98e-01): Improvement = 27.4523
+Gen 61 (Temp 8.99e-01): Improvement = 27.4523
+Gen 62 (Temp 8.09e-01): Improvement = 27.4523
+Gen 63 (Temp 7.28e-01): Improvement = 27.4523
+Gen 64 (Temp 6.55e-01): Improvement = 27.4523
+Gen 65 (Temp 5.90e-01): Improvement = 27.4523
+Gen 66 (Temp 5.31e-01): Improvement = 27.4523
+Gen 67 (Temp 4.78e-01): Improvement = 27.4523
+Gen 68 (Temp 4.30e-01): Improvement = 27.4523
+Gen 69 (Temp 3.87e-01): Improvement = 27.4523
+Gen 70 (Temp 3.48e-01): Improvement = 27.4523
+Gen 71 (Temp 3.13e-01): Improvement = 27.4523
+Gen 72 (Temp 2.82e-01): Improvement = 27.4523
+Gen 73 (Temp 2.54e-01): Improvement = 27.4523
+Gen 74 (Temp 2.28e-01): Improvement = 27.4523
+Gen 75 (Temp 2.06e-01): Improvement = 27.4523
+Gen 76 (Temp 1.85e-01): Improvement = 27.4523
+Gen 77 (Temp 1.66e-01): Improvement = 27.4523
+Gen 78 (Temp 1.50e-01): Improvement = 27.4523
+Gen 79 (Temp 1.35e-01): Improvement = 27.4523
+Gen 80 (Temp 1.21e-01): Improvement = 27.4523
+Gen 81 (Temp 1.09e-01): Improvement = 27.4523
+Gen 82 (Temp 9.83e-02): Improvement = 27.4523
+Gen 83 (Temp 8.85e-02): Improvement = 27.4523
+Gen 84 (Temp 7.96e-02): Improvement = 27.4523
+Gen 85 (Temp 7.17e-02): Improvement = 27.4523
+Gen 86 (Temp 6.45e-02): Improvement = 27.4523
+Gen 87 (Temp 5.81e-02): Improvement = 27.4523
+Gen 88 (Temp 5.22e-02): Improvement = 27.4523
+Gen 89 (Temp 4.70e-02): Improvement = 27.4523
+Gen 90 (Temp 4.23e-02): Improvement = 27.4523
+Gen 91 (Temp 3.81e-02): Improvement = 27.4523
+Gen 92 (Temp 3.43e-02): Improvement = 27.4523
+Gen 93 (Temp 3.09e-02): Improvement = 27.4523
+Gen 94 (Temp 2.78e-02): Improvement = 27.4523
+Gen 95 (Temp 2.50e-02): Improvement = 27.4523
+Gen 96 (Temp 2.25e-02): Improvement = 27.4523
+Gen 97 (Temp 2.02e-02): Improvement = 27.4523
+Gen 98 (Temp 1.82e-02): Improvement = 27.4523
+Gen 99 (Temp 1.64e-02): Improvement = 27.4523
+Gen 100 (Temp 1.48e-02): Improvement = 27.4523
+Gen 101 (Temp 1.33e-02): Improvement = 27.4523
+Gen 102 (Temp 1.20e-02): Improvement = 27.4523
+Gen 103 (Temp 1.08e-02): Improvement = 27.4523
+Gen 104 (Temp 9.68e-03): Improvement = 27.4523
+Gen 105 (Temp 8.71e-03): Improvement = 27.4523
+Gen 106 (Temp 7.84e-03): Improvement = 27.4523
+Gen 107 (Temp 7.06e-03): Improvement = 27.4523
+Gen 108 (Temp 6.35e-03): Improvement = 27.4523
+Gen 109 (Temp 5.72e-03): Improvement = 27.4523
+Gen 110 (Temp 5.15e-03): Improvement = 27.4523
+
+=== SA (Standard Version) Finished ===
+Final Best Weights (Normalized) = [0.3414046572070407, 0.5691946396392272, 0.6097211517197499, 0.4153309657982865, 0.12329082787424951]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.668 (10025 / 15000)
+全局本地缓存命中率: 0.572
+全局边缘云命中率: 0.154
+全局远端访问率: 0.274
+平均任务延迟: 1198.203 ms
+
+--- 3. Running Particle Swarm Optimization (PSO) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 0.0000
+Gen  8: Improvement = 0.0000
+Gen  9: Improvement = 0.0000
+Gen 10: Improvement = 0.0000
+Gen 11: Improvement = 0.0000
+Gen 12: Improvement = 0.0000
+Gen 13: Improvement = 0.0000
+Gen 14: Improvement = 0.0000
+Gen 15: Improvement = 0.0000
+Gen 16: Improvement = 0.0000
+Gen 17: Improvement = 0.0000
+Gen 18: Improvement = 0.0000
+Gen 19: Improvement = 0.0000
+Gen 20: Improvement = 0.0000
+Gen 21: Improvement = 0.0000
+Gen 22: Improvement = 0.0000
+Gen 23: Improvement = 0.0000
+Gen 24: Improvement = 0.0000
+Gen 25: Improvement = 0.0000
+Gen 26: Improvement = 0.0000
+Gen 27: Improvement = 0.0000
+Gen 28: Improvement = 0.0000
+Gen 29: Improvement = 0.0000
+Gen 30: Improvement = 0.0000
+Gen 31: Improvement = 0.0000
+Gen 32: Improvement = 0.0000
+Gen 33: Improvement = 0.0000
+Gen 34: Improvement = 5.6695
+Gen 35: Improvement = 5.6695
+Gen 36: Improvement = 5.6695
+Gen 37: Improvement = 8.4838
+Gen 38: Improvement = 8.4838
+Gen 39: Improvement = 8.4838
+Gen 40: Improvement = 8.4838
+Gen 41: Improvement = 8.4838
+Gen 42: Improvement = 8.4838
+Gen 43: Improvement = 8.4838
+Gen 44: Improvement = 8.4838
+Gen 45: Improvement = 14.3360
+Gen 46: Improvement = 14.3360
+Gen 47: Improvement = 14.3360
+Gen 48: Improvement = 14.3360
+Gen 49: Improvement = 14.3360
+Gen 50: Improvement = 14.3360
+Gen 51: Improvement = 14.3360
+Gen 52: Improvement = 14.3360
+Gen 53: Improvement = 14.3360
+Gen 54: Improvement = 14.3360
+Gen 55: Improvement = 14.3360
+Gen 56: Improvement = 14.3360
+Gen 57: Improvement = 14.3360
+Gen 58: Improvement = 14.3360
+Gen 59: Improvement = 14.3360
+Gen 60: Improvement = 14.3360
+Gen 61: Improvement = 14.3360
+Gen 62: Improvement = 14.3360
+Gen 63: Improvement = 14.3360
+Gen 64: Improvement = 14.3360
+Gen 65: Improvement = 14.3360
+Gen 66: Improvement = 14.3360
+Gen 67: Improvement = 14.3360
+Gen 68: Improvement = 14.3360
+Gen 69: Improvement = 14.3360
+Gen 70: Improvement = 14.3360
+Gen 71: Improvement = 14.3360
+Gen 72: Improvement = 14.3360
+Gen 73: Improvement = 14.3360
+Gen 74: Improvement = 14.3360
+Gen 75: Improvement = 14.3360
+Gen 76: Improvement = 14.3360
+Gen 77: Improvement = 14.3360
+Gen 78: Improvement = 14.3360
+Gen 79: Improvement = 14.3360
+Gen 80: Improvement = 14.3360
+Gen 81: Improvement = 42.7490
+Gen 82: Improvement = 42.7490
+Gen 83: Improvement = 42.7490
+Gen 84: Improvement = 42.7490
+Gen 85: Improvement = 42.7490
+Gen 86: Improvement = 42.7490
+Gen 87: Improvement = 42.7490
+Gen 88: Improvement = 42.7490
+Gen 89: Improvement = 42.7490
+Gen 90: Improvement = 42.7490
+Gen 91: Improvement = 42.7490
+Gen 92: Improvement = 42.7490
+Gen 93: Improvement = 42.7490
+Gen 94: Improvement = 42.7490
+Gen 95: Improvement = 42.7490
+Gen 96: Improvement = 42.7490
+Gen 97: Improvement = 42.7490
+Gen 98: Improvement = 42.7490
+Gen 99: Improvement = 42.7490
+Gen 100: Improvement = 42.7490
+
+=== PSO Finished ===
+Final Best Weights (Normalized) = [0.4759377503656522, 0.41114400191139727, 0.429128967178928, 0.19868781303136188, 0.6171023820646977]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.658 (9865 / 15000)
+全局本地缓存命中率: 0.602
+全局边缘云命中率: 0.162
+全局远端访问率: 0.236
+平均任务延迟: 1199.430 ms
+
+--- 4. Running Genetic Algorithm (GA) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 0.0000
+Gen  8: Improvement = 0.0000
+Gen  9: Improvement = 0.0000
+Gen 10: Improvement = 0.0000
+Gen 11: Improvement = 0.0000
+Gen 12: Improvement = 0.0000
+Gen 13: Improvement = 0.0000
+Gen 14: Improvement = 0.0000
+Gen 15: Improvement = 0.0000
+Gen 16: Improvement = 0.0000
+Gen 17: Improvement = 0.0000
+Gen 18: Improvement = 0.0000
+Gen 19: Improvement = 0.0000
+Gen 20: Improvement = 0.0000
+Gen 21: Improvement = 0.0000
+Gen 22: Improvement = 47.9216
+Gen 23: Improvement = 47.9216
+Gen 24: Improvement = 47.9216
+Gen 25: Improvement = 47.9216
+Gen 26: Improvement = 47.9216
+Gen 27: Improvement = 47.9216
+Gen 28: Improvement = 47.9216
+Gen 29: Improvement = 47.9216
+Gen 30: Improvement = 47.9216
+Gen 31: Improvement = 47.9216
+Gen 32: Improvement = 47.9216
+Gen 33: Improvement = 47.9216
+Gen 34: Improvement = 47.9216
+Gen 35: Improvement = 47.9216
+Gen 36: Improvement = 47.9216
+Gen 37: Improvement = 47.9216
+Gen 38: Improvement = 47.9216
+Gen 39: Improvement = 47.9216
+Gen 40: Improvement = 47.9216
+Gen 41: Improvement = 47.9216
+Gen 42: Improvement = 47.9216
+Gen 43: Improvement = 47.9216
+Gen 44: Improvement = 47.9216
+Gen 45: Improvement = 47.9216
+Gen 46: Improvement = 47.9216
+Gen 47: Improvement = 47.9216
+Gen 48: Improvement = 47.9216
+Gen 49: Improvement = 47.9216
+Gen 50: Improvement = 47.9216
+Gen 51: Improvement = 47.9216
+Gen 52: Improvement = 47.9216
+Gen 53: Improvement = 47.9216
+Gen 54: Improvement = 47.9216
+Gen 55: Improvement = 47.9216
+Gen 56: Improvement = 47.9216
+Gen 57: Improvement = 47.9216
+Gen 58: Improvement = 47.9216
+Gen 59: Improvement = 47.9216
+Gen 60: Improvement = 47.9216
+Gen 61: Improvement = 47.9216
+Gen 62: Improvement = 47.9216
+Gen 63: Improvement = 47.9216
+Gen 64: Improvement = 47.9216
+Gen 65: Improvement = 47.9216
+Gen 66: Improvement = 47.9216
+Gen 67: Improvement = 47.9216
+Gen 68: Improvement = 47.9216
+Gen 69: Improvement = 47.9216
+Gen 70: Improvement = 47.9216
+Gen 71: Improvement = 47.9216
+Gen 72: Improvement = 55.1706
+Gen 73: Improvement = 55.1706
+Gen 74: Improvement = 55.1706
+Gen 75: Improvement = 55.1706
+Gen 76: Improvement = 55.1706
+Gen 77: Improvement = 55.1706
+Gen 78: Improvement = 55.1706
+Gen 79: Improvement = 55.1706
+Gen 80: Improvement = 55.1706
+Gen 81: Improvement = 55.1706
+Gen 82: Improvement = 55.1706
+Gen 83: Improvement = 64.9255
+Gen 84: Improvement = 64.9255
+Gen 85: Improvement = 64.9255
+Gen 86: Improvement = 64.9255
+Gen 87: Improvement = 64.9255
+Gen 88: Improvement = 64.9255
+Gen 89: Improvement = 64.9255
+Gen 90: Improvement = 64.9255
+Gen 91: Improvement = 64.9255
+Gen 92: Improvement = 64.9255
+Gen 93: Improvement = 64.9255
+Gen 94: Improvement = 64.9255
+Gen 95: Improvement = 91.7949
+Gen 96: Improvement = 91.7949
+Gen 97: Improvement = 91.7949
+Gen 98: Improvement = 91.7949
+Gen 99: Improvement = 91.7949
+Gen 100: Improvement = 91.7949
+
+=== GA Finished ===
+Final Best Weights (Normalized) = [0.30530179944703545, 0.024255229914030594, 0.27114042594434273, 0.4572601365036041, 0.7896825514468744]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.696 (10441 / 15000)
+全局本地缓存命中率: 0.593
+全局边缘云命中率: 0.116
+全局远端访问率: 0.291
+平均任务延迟: 1169.271 ms
+
+--- 5. Running Ant Colony Optimization (ACO) ---
+ACO Initializing (Granularity: 41)...
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 9.3171
+Gen  8: Improvement = 9.3171
+Gen  9: Improvement = 9.3171
+Gen 10: Improvement = 9.3171
+Gen 11: Improvement = 9.3171
+Gen 12: Improvement = 9.3171
+Gen 13: Improvement = 9.3171
+Gen 14: Improvement = 9.3171
+Gen 15: Improvement = 18.0114
+Gen 16: Improvement = 18.0114
+Gen 17: Improvement = 18.0114
+Gen 18: Improvement = 18.0114
+Gen 19: Improvement = 18.0114
+Gen 20: Improvement = 18.0114
+Gen 21: Improvement = 18.0114
+Gen 22: Improvement = 18.0114
+Gen 23: Improvement = 24.5611
+Gen 24: Improvement = 24.5611
+Gen 25: Improvement = 24.5611
+Gen 26: Improvement = 24.5611
+Gen 27: Improvement = 24.5611
+Gen 28: Improvement = 24.5611
+Gen 29: Improvement = 24.5611
+Gen 30: Improvement = 24.5611
+Gen 31: Improvement = 24.5611
+Gen 32: Improvement = 24.5611
+Gen 33: Improvement = 24.5611
+Gen 34: Improvement = 24.5611
+Gen 35: Improvement = 24.5611
+Gen 36: Improvement = 24.5611
+Gen 37: Improvement = 24.5611
+Gen 38: Improvement = 24.5611
+Gen 39: Improvement = 24.5611
+Gen 40: Improvement = 24.5611
+Gen 41: Improvement = 24.5611
+Gen 42: Improvement = 24.5611
+Gen 43: Improvement = 24.5611
+Gen 44: Improvement = 24.5611
+Gen 45: Improvement = 24.5611
+Gen 46: Improvement = 24.5611
+Gen 47: Improvement = 24.5611
+Gen 48: Improvement = 24.5611
+Gen 49: Improvement = 24.5611
+Gen 50: Improvement = 24.5611
+Gen 51: Improvement = 24.5611
+Gen 52: Improvement = 24.5611
+Gen 53: Improvement = 24.5611
+Gen 54: Improvement = 24.5611
+Gen 55: Improvement = 24.5611
+Gen 56: Improvement = 24.5611
+Gen 57: Improvement = 24.5611
+Gen 58: Improvement = 24.5611
+Gen 59: Improvement = 24.5611
+Gen 60: Improvement = 24.5611
+Gen 61: Improvement = 24.5611
+Gen 62: Improvement = 24.5611
+Gen 63: Improvement = 24.5611
+Gen 64: Improvement = 24.5611
+Gen 65: Improvement = 24.5611
+Gen 66: Improvement = 24.5611
+Gen 67: Improvement = 24.5611
+Gen 68: Improvement = 24.5611
+Gen 69: Improvement = 24.5611
+Gen 70: Improvement = 24.5611
+Gen 71: Improvement = 24.5611
+Gen 72: Improvement = 24.5611
+Gen 73: Improvement = 24.5611
+Gen 74: Improvement = 24.5611
+Gen 75: Improvement = 24.5611
+Gen 76: Improvement = 24.5611
+Gen 77: Improvement = 24.5611
+Gen 78: Improvement = 24.5611
+Gen 79: Improvement = 24.5611
+Gen 80: Improvement = 24.5611
+Gen 81: Improvement = 24.5611
+Gen 82: Improvement = 24.5611
+Gen 83: Improvement = 24.5611
+Gen 84: Improvement = 24.5611
+Gen 85: Improvement = 24.5611
+Gen 86: Improvement = 24.5611
+Gen 87: Improvement = 24.5611
+Gen 88: Improvement = 24.5611
+Gen 89: Improvement = 24.5611
+Gen 90: Improvement = 24.5611
+Gen 91: Improvement = 24.5611
+Gen 92: Improvement = 24.5611
+Gen 93: Improvement = 24.5611
+Gen 94: Improvement = 24.5611
+Gen 95: Improvement = 24.5611
+Gen 96: Improvement = 24.5611
+Gen 97: Improvement = 24.5611
+Gen 98: Improvement = 24.5611
+Gen 99: Improvement = 24.5611
+Gen 100: Improvement = 24.5611
+
+=== ACO Finished ===
+Final Best Weights (Normalized) = [0.2930492494367113, 0.4884154157278522, 0.3125858660658254, 0.3321224826949395, 0.6837815820189931]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.681 (10217 / 15000)
+全局本地缓存命中率: 0.567
+全局边缘云命中率: 0.149
+全局远端访问率: 0.284
+平均任务延迟: 1208.589 ms
+
+--- 6. Running Advanced Simulated Annealing (UpdateSA) ---
+--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---
+--- Pre-seeding finished. Elite archive size: 6 ---
+Gen  1 (Temp 5.00e+02): Improvement = 96.1297
+Gen  2 (Temp 4.50e+02): Improvement = 96.1297
+Gen  3 (Temp 4.05e+02): Improvement = 96.1297
+Gen  4 (Temp 3.65e+02): Improvement = 96.1297
+Gen  5 (Temp 3.28e+02): Improvement = 96.1297
+Gen  6 (Temp 2.95e+02): Improvement = 96.1297
+Gen  7 (Temp 2.66e+02): Improvement = 96.1297
+Gen  8 (Temp 2.39e+02): Improvement = 96.1297
+Gen  9 (Temp 2.15e+02): Improvement = 96.1297
+Gen 10 (Temp 1.94e+02): Improvement = 96.1297
+Gen 11 (Temp 1.74e+02): Improvement = 96.1297
+Gen 12 (Temp 1.57e+02): Improvement = 96.1297
+Gen 13 (Temp 1.41e+02): Improvement = 96.1297
+Gen 14 (Temp 1.27e+02): Improvement = 96.1297
+Gen 15 (Temp 1.14e+02): Improvement = 96.1297
+Gen 16 (Temp 1.03e+02): Improvement = 96.1297
+Gen 17 (Temp 9.27e+01): Improvement = 96.1297
+Gen 18 (Temp 8.34e+01): Improvement = 96.1297
+Gen 19 (Temp 7.50e+01): Improvement = 96.1297
+Gen 20 (Temp 6.75e+01): Improvement = 96.1297
+Gen 21 (Temp 6.08e+01): Improvement = 96.1297
+Gen 22 (Temp 5.47e+01): Improvement = 96.1297
+Gen 23 (Temp 4.92e+01): Improvement = 96.1297
+Gen 24 (Temp 4.43e+01): Improvement = 96.1297
+Gen 25 (Temp 3.99e+01): Improvement = 96.1297
+--- Stagnation detected. Triggering GA Rescue #1 ---
+Gen 26 (Temp 5.98e+01): Improvement = 96.1297
+Gen 27 (Temp 5.38e+01): Improvement = 96.1297
+Gen 28 (Temp 4.85e+01): Improvement = 96.1297
+Gen 29 (Temp 4.36e+01): Improvement = 96.1297
+Gen 30 (Temp 3.93e+01): Improvement = 96.1297
+Gen 31 (Temp 3.53e+01): Improvement = 96.1297
+Gen 32 (Temp 3.18e+01): Improvement = 96.1297
+Gen 33 (Temp 2.86e+01): Improvement = 96.1297
+Gen 34 (Temp 2.58e+01): Improvement = 96.1297
+Gen 35 (Temp 2.32e+01): Improvement = 96.1297
+Gen 36 (Temp 2.09e+01): Improvement = 96.1297
+Gen 37 (Temp 1.88e+01): Improvement = 96.1297
+Gen 38 (Temp 1.69e+01): Improvement = 96.1297
+Gen 39 (Temp 1.52e+01): Improvement = 96.1297
+Gen 40 (Temp 1.37e+01): Improvement = 96.1297
+Gen 41 (Temp 1.23e+01): Improvement = 96.1297
+Gen 42 (Temp 1.11e+01): Improvement = 96.1297
+Gen 43 (Temp 9.98e+00): Improvement = 96.1297
+Gen 44 (Temp 8.98e+00): Improvement = 96.1297
+Gen 45 (Temp 8.08e+00): Improvement = 96.1297
+Gen 46 (Temp 7.27e+00): Improvement = 96.1297
+Gen 47 (Temp 6.55e+00): Improvement = 96.1297
+Gen 48 (Temp 5.89e+00): Improvement = 96.1297
+Gen 49 (Temp 5.30e+00): Improvement = 96.1297
+Gen 50 (Temp 4.77e+00): Improvement = 96.1297
+--- Stagnation detected. Triggering GA Rescue #2 ---
+Gen 51 (Temp 7.16e+00): Improvement = 96.1297
+Gen 52 (Temp 6.44e+00): Improvement = 96.1297
+Gen 53 (Temp 5.80e+00): Improvement = 96.1297
+Gen 54 (Temp 5.22e+00): Improvement = 96.1297
+Gen 55 (Temp 4.70e+00): Improvement = 96.1297
+Gen 56 (Temp 4.23e+00): Improvement = 96.1297
+Gen 57 (Temp 3.80e+00): Improvement = 96.1297
+Gen 58 (Temp 3.42e+00): Improvement = 96.1297
+Gen 59 (Temp 3.08e+00): Improvement = 96.1297
+Gen 60 (Temp 2.77e+00): Improvement = 96.1297
+Gen 61 (Temp 2.50e+00): Improvement = 96.1297
+Gen 62 (Temp 2.25e+00): Improvement = 96.1297
+Gen 63 (Temp 2.02e+00): Improvement = 96.1297
+Gen 64 (Temp 1.82e+00): Improvement = 96.1297
+Gen 65 (Temp 1.64e+00): Improvement = 96.1297
+Gen 66 (Temp 1.47e+00): Improvement = 96.1297
+Gen 67 (Temp 1.33e+00): Improvement = 96.1297
+Gen 68 (Temp 1.19e+00): Improvement = 96.1297
+Gen 69 (Temp 1.07e+00): Improvement = 96.1297
+Gen 70 (Temp 9.67e-01): Improvement = 100.8286
+Gen 71 (Temp 8.70e-01): Improvement = 100.8286
+Gen 72 (Temp 7.83e-01): Improvement = 100.8286
+Gen 73 (Temp 7.05e-01): Improvement = 100.8286
+Gen 74 (Temp 6.34e-01): Improvement = 100.8286
+Gen 75 (Temp 5.71e-01): Improvement = 100.8286
+Gen 76 (Temp 5.14e-01): Improvement = 100.8286
+Gen 77 (Temp 4.62e-01): Improvement = 100.8286
+Gen 78 (Temp 4.16e-01): Improvement = 100.8286
+Gen 79 (Temp 3.75e-01): Improvement = 100.8286
+Gen 80 (Temp 3.37e-01): Improvement = 100.8286
+Gen 81 (Temp 3.03e-01): Improvement = 100.8286
+Gen 82 (Temp 2.73e-01): Improvement = 100.8286
+Gen 83 (Temp 2.46e-01): Improvement = 100.8286
+Gen 84 (Temp 2.21e-01): Improvement = 100.8286
+Gen 85 (Temp 1.99e-01): Improvement = 100.8286
+Gen 86 (Temp 1.79e-01): Improvement = 100.8286
+Gen 87 (Temp 1.61e-01): Improvement = 100.8286
+Gen 88 (Temp 1.45e-01): Improvement = 100.8286
+Gen 89 (Temp 1.31e-01): Improvement = 100.8286
+Gen 90 (Temp 1.18e-01): Improvement = 100.8286
+Gen 91 (Temp 1.06e-01): Improvement = 100.8286
+Gen 92 (Temp 9.52e-02): Improvement = 100.8286
+Gen 93 (Temp 8.57e-02): Improvement = 100.8286
+Gen 94 (Temp 7.71e-02): Improvement = 100.8286
+Gen 95 (Temp 6.94e-02): Improvement = 100.8286
+--- Stagnation detected. Triggering GA Rescue #3 ---
+Gen 96 (Temp 1.04e-01): Improvement = 100.8286
+Gen 97 (Temp 9.37e-02): Improvement = 100.8286
+Gen 98 (Temp 8.43e-02): Improvement = 100.8286
+Gen 99 (Temp 7.59e-02): Improvement = 100.8286
+Gen 100 (Temp 6.83e-02): Improvement = 100.8286
+Gen 101 (Temp 6.15e-02): Improvement = 100.8286
+Gen 102 (Temp 5.53e-02): Improvement = 100.8286
+Gen 103 (Temp 4.98e-02): Improvement = 100.8286
+Gen 104 (Temp 4.48e-02): Improvement = 100.8286
+Gen 105 (Temp 4.03e-02): Improvement = 100.8286
+Gen 106 (Temp 3.63e-02): Improvement = 100.8286
+Gen 107 (Temp 3.27e-02): Improvement = 100.8286
+Gen 108 (Temp 2.94e-02): Improvement = 100.8286
+Gen 109 (Temp 2.65e-02): Improvement = 100.8286
+Gen 110 (Temp 2.38e-02): Improvement = 100.8286
+Gen 111 (Temp 2.14e-02): Improvement = 100.8286
+Gen 112 (Temp 1.93e-02): Improvement = 100.8286
+Gen 113 (Temp 1.74e-02): Improvement = 100.8286
+Gen 114 (Temp 1.56e-02): Improvement = 100.8286
+Gen 115 (Temp 1.41e-02): Improvement = 100.8286
+Gen 116 (Temp 1.27e-02): Improvement = 100.8286
+Gen 117 (Temp 1.14e-02): Improvement = 100.8286
+Gen 118 (Temp 1.03e-02): Improvement = 100.8286
+Gen 119 (Temp 9.23e-03): Improvement = 100.8286
+Gen 120 (Temp 8.31e-03): Improvement = 100.8286
+--- Stagnation detected. Triggering GA Rescue #4 ---
+Gen 121 (Temp 1.25e-02): Improvement = 100.8286
+Gen 122 (Temp 1.12e-02): Improvement = 100.8286
+Gen 123 (Temp 1.01e-02): Improvement = 100.8286
+Gen 124 (Temp 9.08e-03): Improvement = 100.8286
+Gen 125 (Temp 8.17e-03): Improvement = 100.8286
+Gen 126 (Temp 7.36e-03): Improvement = 100.8286
+Gen 127 (Temp 6.62e-03): Improvement = 100.8286
+Gen 128 (Temp 5.96e-03): Improvement = 100.8286
+Gen 129 (Temp 5.36e-03): Improvement = 100.8286
+Gen 130 (Temp 4.83e-03): Improvement = 100.8286
+Gen 131 (Temp 4.34e-03): Improvement = 100.8286
+Gen 132 (Temp 3.91e-03): Improvement = 100.8286
+Gen 133 (Temp 3.52e-03): Improvement = 100.8286
+Gen 134 (Temp 3.17e-03): Improvement = 100.8286
+Gen 135 (Temp 2.85e-03): Improvement = 100.8286
+Gen 136 (Temp 2.57e-03): Improvement = 100.8286
+Gen 137 (Temp 2.31e-03): Improvement = 100.8286
+Gen 138 (Temp 2.08e-03): Improvement = 100.8286
+Gen 139 (Temp 1.87e-03): Improvement = 100.8286
+Gen 140 (Temp 1.68e-03): Improvement = 100.8286
+Gen 141 (Temp 1.51e-03): Improvement = 100.8286
+Gen 142 (Temp 1.36e-03): Improvement = 100.8286
+Gen 143 (Temp 1.23e-03): Improvement = 100.8286
+Gen 144 (Temp 1.10e-03): Improvement = 100.8286
+
+=== SA with GA-Rescue Finished ===
+Final Best Weights (Normalized) = [0.4239276274108476, 0.0, 0.29725651383259194, 0.2444282685229334, 0.8198650823451286]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.687 (10306 / 15000)
+全局本地缓存命中率: 0.595
+全局边缘云命中率: 0.140
+全局远端访问率: 0.265
+平均任务延迟: 1155.621 ms
+
+==========================================================
+=== Final Score Summary for: [真实数据 (1.5万行)        ] ===
+==========================================================
+Algorithm                      | Best Score      | Improvement vs Baseline
+----------------------------------------------------------------------
+Random Search (Baseline)       | 1020.7787       | N/A                 
+Simulated Annealing (SA)       | 1048.2310       | 27.4523             
+Particle Swarm (PSO)           | 1063.5277       | 42.7490             
+Genetic Algorithm (GA)         | 1112.5736       | 91.7949             
+Ant Colony (ACO)               | 1045.3398       | 24.5611             
+Advanced SA (UpdateSA)         | 1121.6072       | 100.8286            
+==========================================================
+从 dataset/processed_nasa_log.csv 加载了 40000 条数据。
+
+
+=============== 正在对 [真实数据 (2万行)] 数据集运行完整测试 ===============
+
+--- 1. Running Random Search (to set Baseline) ---
+Running 10 random attempts to find a stable baseline...
+
+=== Single Random Attempt Finished (Baseline) ===
+Final Best Weights (Normalized) = [0.16391840788111267, 0.43529531697314555, 0.21365271039737455, 0.6174018130747858, 0.5973409940149703]
+Final Best score = 970.0398
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.657 (13138 / 20000)
+全局本地缓存命中率: 0.548
+全局边缘云命中率: 0.164
+全局远端访问率: 0.288
+平均任务延迟: 1258.768 ms
+
+--- 2. Running Basic Simulated Annealing (SA) ---
+Gen  1 (Temp 5.00e+02): Improvement = 69.1496
+Gen  2 (Temp 4.50e+02): Improvement = 69.1496
+Gen  3 (Temp 4.05e+02): Improvement = 113.5389
+Gen  4 (Temp 3.65e+02): Improvement = 113.5389
+Gen  5 (Temp 3.28e+02): Improvement = 113.5389
+Gen  6 (Temp 2.95e+02): Improvement = 113.5389
+Gen  7 (Temp 2.66e+02): Improvement = 113.5389
+Gen  8 (Temp 2.39e+02): Improvement = 113.5389
+Gen  9 (Temp 2.15e+02): Improvement = 113.5389
+Gen 10 (Temp 1.94e+02): Improvement = 113.5389
+Gen 11 (Temp 1.74e+02): Improvement = 113.5389
+Gen 12 (Temp 1.57e+02): Improvement = 113.5389
+Gen 13 (Temp 1.41e+02): Improvement = 113.5389
+Gen 14 (Temp 1.27e+02): Improvement = 115.5079
+Gen 15 (Temp 1.14e+02): Improvement = 115.5079
+Gen 16 (Temp 1.03e+02): Improvement = 115.5079
+Gen 17 (Temp 9.27e+01): Improvement = 115.5079
+Gen 18 (Temp 8.34e+01): Improvement = 115.5079
+Gen 19 (Temp 7.50e+01): Improvement = 115.5079
+Gen 20 (Temp 6.75e+01): Improvement = 115.5079
+Gen 21 (Temp 6.08e+01): Improvement = 115.5079
+Gen 22 (Temp 5.47e+01): Improvement = 115.5079
+Gen 23 (Temp 4.92e+01): Improvement = 115.5079
+Gen 24 (Temp 4.43e+01): Improvement = 115.5079
+Gen 25 (Temp 3.99e+01): Improvement = 115.5079
+Gen 26 (Temp 3.59e+01): Improvement = 115.5079
+Gen 27 (Temp 3.23e+01): Improvement = 115.5079
+Gen 28 (Temp 2.91e+01): Improvement = 115.5079
+Gen 29 (Temp 2.62e+01): Improvement = 115.5079
+Gen 30 (Temp 2.36e+01): Improvement = 115.5079
+Gen 31 (Temp 2.12e+01): Improvement = 115.5079
+Gen 32 (Temp 1.91e+01): Improvement = 115.5079
+Gen 33 (Temp 1.72e+01): Improvement = 115.5079
+Gen 34 (Temp 1.55e+01): Improvement = 115.5079
+Gen 35 (Temp 1.39e+01): Improvement = 115.5079
+Gen 36 (Temp 1.25e+01): Improvement = 115.5079
+Gen 37 (Temp 1.13e+01): Improvement = 115.5079
+Gen 38 (Temp 1.01e+01): Improvement = 115.5079
+Gen 39 (Temp 9.12e+00): Improvement = 120.4304
+Gen 40 (Temp 8.21e+00): Improvement = 120.4304
+Gen 41 (Temp 7.39e+00): Improvement = 120.4304
+Gen 42 (Temp 6.65e+00): Improvement = 120.4304
+Gen 43 (Temp 5.99e+00): Improvement = 120.4304
+Gen 44 (Temp 5.39e+00): Improvement = 120.4304
+Gen 45 (Temp 4.85e+00): Improvement = 120.4304
+Gen 46 (Temp 4.36e+00): Improvement = 120.4304
+Gen 47 (Temp 3.93e+00): Improvement = 120.4304
+Gen 48 (Temp 3.53e+00): Improvement = 120.4304
+Gen 49 (Temp 3.18e+00): Improvement = 120.4304
+Gen 50 (Temp 2.86e+00): Improvement = 120.4304
+Gen 51 (Temp 2.58e+00): Improvement = 120.4304
+Gen 52 (Temp 2.32e+00): Improvement = 120.4304
+Gen 53 (Temp 2.09e+00): Improvement = 120.4304
+Gen 54 (Temp 1.88e+00): Improvement = 120.4304
+Gen 55 (Temp 1.69e+00): Improvement = 120.4304
+Gen 56 (Temp 1.52e+00): Improvement = 120.4304
+Gen 57 (Temp 1.37e+00): Improvement = 120.4304
+Gen 58 (Temp 1.23e+00): Improvement = 120.4304
+Gen 59 (Temp 1.11e+00): Improvement = 120.4304
+Gen 60 (Temp 9.98e-01): Improvement = 120.4304
+Gen 61 (Temp 8.99e-01): Improvement = 120.4304
+Gen 62 (Temp 8.09e-01): Improvement = 120.4304
+Gen 63 (Temp 7.28e-01): Improvement = 120.4304
+Gen 64 (Temp 6.55e-01): Improvement = 120.4304
+Gen 65 (Temp 5.90e-01): Improvement = 120.4304
+Gen 66 (Temp 5.31e-01): Improvement = 120.4304
+Gen 67 (Temp 4.78e-01): Improvement = 120.4304
+Gen 68 (Temp 4.30e-01): Improvement = 120.4304
+Gen 69 (Temp 3.87e-01): Improvement = 120.4304
+Gen 70 (Temp 3.48e-01): Improvement = 120.4304
+Gen 71 (Temp 3.13e-01): Improvement = 120.4304
+Gen 72 (Temp 2.82e-01): Improvement = 120.4304
+Gen 73 (Temp 2.54e-01): Improvement = 120.4304
+Gen 74 (Temp 2.28e-01): Improvement = 120.4304
+Gen 75 (Temp 2.06e-01): Improvement = 120.4304
+Gen 76 (Temp 1.85e-01): Improvement = 120.4304
+Gen 77 (Temp 1.66e-01): Improvement = 120.4304
+Gen 78 (Temp 1.50e-01): Improvement = 120.4304
+Gen 79 (Temp 1.35e-01): Improvement = 120.4304
+Gen 80 (Temp 1.21e-01): Improvement = 120.4304
+Gen 81 (Temp 1.09e-01): Improvement = 120.4304
+Gen 82 (Temp 9.83e-02): Improvement = 120.4304
+Gen 83 (Temp 8.85e-02): Improvement = 120.4304
+Gen 84 (Temp 7.96e-02): Improvement = 120.4304
+Gen 85 (Temp 7.17e-02): Improvement = 120.4304
+Gen 86 (Temp 6.45e-02): Improvement = 120.4304
+Gen 87 (Temp 5.81e-02): Improvement = 120.4304
+Gen 88 (Temp 5.22e-02): Improvement = 120.4304
+Gen 89 (Temp 4.70e-02): Improvement = 120.4304
+Gen 90 (Temp 4.23e-02): Improvement = 120.4304
+Gen 91 (Temp 3.81e-02): Improvement = 120.4304
+Gen 92 (Temp 3.43e-02): Improvement = 120.4304
+Gen 93 (Temp 3.09e-02): Improvement = 120.4304
+Gen 94 (Temp 2.78e-02): Improvement = 120.4304
+Gen 95 (Temp 2.50e-02): Improvement = 120.4304
+Gen 96 (Temp 2.25e-02): Improvement = 120.4304
+Gen 97 (Temp 2.02e-02): Improvement = 120.4304
+Gen 98 (Temp 1.82e-02): Improvement = 120.4304
+Gen 99 (Temp 1.64e-02): Improvement = 120.4304
+Gen 100 (Temp 1.48e-02): Improvement = 120.4304
+Gen 101 (Temp 1.33e-02): Improvement = 120.4304
+Gen 102 (Temp 1.20e-02): Improvement = 120.4304
+Gen 103 (Temp 1.08e-02): Improvement = 120.4304
+Gen 104 (Temp 9.68e-03): Improvement = 120.4304
+Gen 105 (Temp 8.71e-03): Improvement = 120.4304
+Gen 106 (Temp 7.84e-03): Improvement = 120.4304
+Gen 107 (Temp 7.06e-03): Improvement = 120.4304
+Gen 108 (Temp 6.35e-03): Improvement = 120.4304
+Gen 109 (Temp 5.72e-03): Improvement = 120.4304
+Gen 110 (Temp 5.15e-03): Improvement = 120.4304
+
+=== SA (Standard Version) Finished ===
+Final Best Weights (Normalized) = [0.3386031451552167, 0.48549867599041907, 0.39020402083598427, 0.5855252391717362, 0.39311571085223374]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.695 (13890 / 20000)
+全局本地缓存命中率: 0.589
+全局边缘云命中率: 0.124
+全局远端访问率: 0.287
+平均任务延迟: 1188.153 ms
+
+--- 3. Running Particle Swarm Optimization (PSO) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 6.3178
+Gen  6: Improvement = 6.3178
+Gen  7: Improvement = 6.3178
+Gen  8: Improvement = 6.3178
+Gen  9: Improvement = 6.3178
+Gen 10: Improvement = 6.3178
+Gen 11: Improvement = 6.3178
+Gen 12: Improvement = 6.3178
+Gen 13: Improvement = 6.3178
+Gen 14: Improvement = 6.3178
+Gen 15: Improvement = 6.3178
+Gen 16: Improvement = 6.3178
+Gen 17: Improvement = 6.3178
+Gen 18: Improvement = 6.3178
+Gen 19: Improvement = 6.3178
+Gen 20: Improvement = 6.3178
+Gen 21: Improvement = 6.3178
+Gen 22: Improvement = 6.3178
+Gen 23: Improvement = 6.3178
+Gen 24: Improvement = 6.3178
+Gen 25: Improvement = 6.3178
+Gen 26: Improvement = 6.3178
+Gen 27: Improvement = 6.3178
+Gen 28: Improvement = 29.5840
+Gen 29: Improvement = 29.5840
+Gen 30: Improvement = 29.5840
+Gen 31: Improvement = 29.5840
+Gen 32: Improvement = 29.5840
+Gen 33: Improvement = 29.5840
+Gen 34: Improvement = 29.5840
+Gen 35: Improvement = 29.5840
+Gen 36: Improvement = 29.5840
+Gen 37: Improvement = 29.5840
+Gen 38: Improvement = 29.5840
+Gen 39: Improvement = 29.5840
+Gen 40: Improvement = 29.5840
+Gen 41: Improvement = 29.5840
+Gen 42: Improvement = 29.5840
+Gen 43: Improvement = 29.5840
+Gen 44: Improvement = 29.5840
+Gen 45: Improvement = 29.5840
+Gen 46: Improvement = 29.5840
+Gen 47: Improvement = 29.5840
+Gen 48: Improvement = 29.5840
+Gen 49: Improvement = 29.5840
+Gen 50: Improvement = 29.5840
+Gen 51: Improvement = 29.5840
+Gen 52: Improvement = 29.5840
+Gen 53: Improvement = 29.5840
+Gen 54: Improvement = 29.5840
+Gen 55: Improvement = 29.5840
+Gen 56: Improvement = 29.5840
+Gen 57: Improvement = 29.5840
+Gen 58: Improvement = 29.5840
+Gen 59: Improvement = 29.5840
+Gen 60: Improvement = 29.5840
+Gen 61: Improvement = 29.5840
+Gen 62: Improvement = 29.5840
+Gen 63: Improvement = 29.5840
+Gen 64: Improvement = 29.5840
+Gen 65: Improvement = 29.5840
+Gen 66: Improvement = 52.2027
+Gen 67: Improvement = 52.2027
+Gen 68: Improvement = 52.2027
+Gen 69: Improvement = 52.2027
+Gen 70: Improvement = 52.2027
+Gen 71: Improvement = 52.2027
+Gen 72: Improvement = 52.2027
+Gen 73: Improvement = 52.2027
+Gen 74: Improvement = 52.2027
+Gen 75: Improvement = 52.2027
+Gen 76: Improvement = 52.2027
+Gen 77: Improvement = 52.2027
+Gen 78: Improvement = 52.2027
+Gen 79: Improvement = 52.2027
+Gen 80: Improvement = 52.2027
+Gen 81: Improvement = 52.2027
+Gen 82: Improvement = 52.2027
+Gen 83: Improvement = 52.2027
+Gen 84: Improvement = 52.2027
+Gen 85: Improvement = 52.2027
+Gen 86: Improvement = 52.2027
+Gen 87: Improvement = 52.2027
+Gen 88: Improvement = 52.2027
+Gen 89: Improvement = 52.2027
+Gen 90: Improvement = 52.2027
+Gen 91: Improvement = 52.2027
+Gen 92: Improvement = 52.2027
+Gen 93: Improvement = 52.2027
+Gen 94: Improvement = 52.2027
+Gen 95: Improvement = 52.2027
+Gen 96: Improvement = 52.2027
+Gen 97: Improvement = 52.4141
+Gen 98: Improvement = 52.4141
+Gen 99: Improvement = 52.4141
+Gen 100: Improvement = 52.4141
+
+=== PSO Finished ===
+Final Best Weights (Normalized) = [0.2594696594250622, 0.436207129035098, 0.36524263515560296, 0.45635941147419734, 0.6330345499578319]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.658 (13152 / 20000)
+全局本地缓存命中率: 0.582
+全局边缘云命中率: 0.163
+全局远端访问率: 0.255
+平均任务延迟: 1228.036 ms
+
+--- 4. Running Genetic Algorithm (GA) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 0.0000
+Gen  8: Improvement = 14.0982
+Gen  9: Improvement = 14.0982
+Gen 10: Improvement = 14.0982
+Gen 11: Improvement = 14.0982
+Gen 12: Improvement = 14.0982
+Gen 13: Improvement = 14.0982
+Gen 14: Improvement = 14.0982
+Gen 15: Improvement = 23.6918
+Gen 16: Improvement = 23.6918
+Gen 17: Improvement = 23.6918
+Gen 18: Improvement = 23.6918
+Gen 19: Improvement = 23.6918
+Gen 20: Improvement = 30.9548
+Gen 21: Improvement = 30.9548
+Gen 22: Improvement = 30.9548
+Gen 23: Improvement = 30.9548
+Gen 24: Improvement = 30.9548
+Gen 25: Improvement = 30.9548
+Gen 26: Improvement = 30.9548
+Gen 27: Improvement = 30.9548
+Gen 28: Improvement = 30.9548
+Gen 29: Improvement = 30.9548
+Gen 30: Improvement = 30.9548
+Gen 31: Improvement = 30.9548
+Gen 32: Improvement = 30.9548
+Gen 33: Improvement = 30.9548
+Gen 34: Improvement = 30.9548
+Gen 35: Improvement = 30.9548
+Gen 36: Improvement = 30.9548
+Gen 37: Improvement = 30.9548
+Gen 38: Improvement = 30.9548
+Gen 39: Improvement = 30.9548
+Gen 40: Improvement = 30.9548
+Gen 41: Improvement = 30.9548
+Gen 42: Improvement = 30.9548
+Gen 43: Improvement = 30.9548
+Gen 44: Improvement = 30.9548
+Gen 45: Improvement = 30.9548
+Gen 46: Improvement = 30.9548
+Gen 47: Improvement = 30.9548
+Gen 48: Improvement = 30.9548
+Gen 49: Improvement = 30.9548
+Gen 50: Improvement = 30.9548
+Gen 51: Improvement = 30.9548
+Gen 52: Improvement = 30.9548
+Gen 53: Improvement = 30.9548
+Gen 54: Improvement = 30.9548
+Gen 55: Improvement = 30.9548
+Gen 56: Improvement = 30.9548
+Gen 57: Improvement = 30.9548
+Gen 58: Improvement = 30.9548
+Gen 59: Improvement = 30.9548
+Gen 60: Improvement = 30.9548
+Gen 61: Improvement = 30.9548
+Gen 62: Improvement = 30.9548
+Gen 63: Improvement = 30.9548
+Gen 64: Improvement = 30.9548
+Gen 65: Improvement = 30.9548
+Gen 66: Improvement = 30.9548
+Gen 67: Improvement = 30.9548
+Gen 68: Improvement = 30.9548
+Gen 69: Improvement = 30.9548
+Gen 70: Improvement = 30.9548
+Gen 71: Improvement = 30.9548
+Gen 72: Improvement = 30.9548
+Gen 73: Improvement = 30.9548
+Gen 74: Improvement = 30.9548
+Gen 75: Improvement = 30.9548
+Gen 76: Improvement = 30.9548
+Gen 77: Improvement = 30.9548
+Gen 78: Improvement = 30.9548
+Gen 79: Improvement = 30.9548
+Gen 80: Improvement = 30.9548
+Gen 81: Improvement = 30.9548
+Gen 82: Improvement = 30.9548
+Gen 83: Improvement = 30.9548
+Gen 84: Improvement = 30.9548
+Gen 85: Improvement = 30.9548
+Gen 86: Improvement = 30.9548
+Gen 87: Improvement = 30.9548
+Gen 88: Improvement = 30.9548
+Gen 89: Improvement = 30.9548
+Gen 90: Improvement = 30.9548
+Gen 91: Improvement = 30.9548
+Gen 92: Improvement = 30.9548
+Gen 93: Improvement = 89.4531
+Gen 94: Improvement = 89.4531
+Gen 95: Improvement = 89.4531
+Gen 96: Improvement = 89.4531
+Gen 97: Improvement = 89.4531
+Gen 98: Improvement = 89.4531
+Gen 99: Improvement = 89.4531
+Gen 100: Improvement = 89.4531
+
+=== GA Finished ===
+Final Best Weights (Normalized) = [0.0, 0.0, 0.5420396266810366, 0.1737677954324257, 0.8221908515533588]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.689 (13773 / 20000)
+全局本地缓存命中率: 0.571
+全局边缘云命中率: 0.123
+全局远端访问率: 0.306
+平均任务延迟: 1200.272 ms
+
+--- 5. Running Ant Colony Optimization (ACO) ---
+ACO Initializing (Granularity: 41)...
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 2.1382
+Gen  3: Improvement = 2.1382
+Gen  4: Improvement = 2.1382
+Gen  5: Improvement = 2.1382
+Gen  6: Improvement = 2.1382
+Gen  7: Improvement = 2.1382
+Gen  8: Improvement = 2.1382
+Gen  9: Improvement = 2.1382
+Gen 10: Improvement = 2.1382
+Gen 11: Improvement = 2.1382
+Gen 12: Improvement = 2.1382
+Gen 13: Improvement = 2.1382
+Gen 14: Improvement = 2.1382
+Gen 15: Improvement = 2.1382
+Gen 16: Improvement = 2.1382
+Gen 17: Improvement = 2.1382
+Gen 18: Improvement = 2.1382
+Gen 19: Improvement = 2.1382
+Gen 20: Improvement = 2.1382
+Gen 21: Improvement = 2.1382
+Gen 22: Improvement = 2.1382
+Gen 23: Improvement = 2.1382
+Gen 24: Improvement = 15.1252
+Gen 25: Improvement = 15.1252
+Gen 26: Improvement = 15.1252
+Gen 27: Improvement = 15.1252
+Gen 28: Improvement = 15.1252
+Gen 29: Improvement = 15.1252
+Gen 30: Improvement = 15.1252
+Gen 31: Improvement = 15.1252
+Gen 32: Improvement = 15.1252
+Gen 33: Improvement = 15.1252
+Gen 34: Improvement = 15.1252
+Gen 35: Improvement = 15.1252
+Gen 36: Improvement = 15.1252
+Gen 37: Improvement = 15.1252
+Gen 38: Improvement = 15.1252
+Gen 39: Improvement = 15.1252
+Gen 40: Improvement = 15.1252
+Gen 41: Improvement = 15.1252
+Gen 42: Improvement = 15.1252
+Gen 43: Improvement = 15.1252
+Gen 44: Improvement = 15.1252
+Gen 45: Improvement = 15.1252
+Gen 46: Improvement = 15.1252
+Gen 47: Improvement = 15.1252
+Gen 48: Improvement = 15.1252
+Gen 49: Improvement = 15.1252
+Gen 50: Improvement = 15.1252
+Gen 51: Improvement = 15.1252
+Gen 52: Improvement = 15.1252
+Gen 53: Improvement = 32.8446
+Gen 54: Improvement = 32.8446
+Gen 55: Improvement = 32.8446
+Gen 56: Improvement = 32.8446
+Gen 57: Improvement = 32.8446
+Gen 58: Improvement = 32.8446
+Gen 59: Improvement = 32.8446
+Gen 60: Improvement = 32.8446
+Gen 61: Improvement = 32.8446
+Gen 62: Improvement = 32.8446
+Gen 63: Improvement = 32.8446
+Gen 64: Improvement = 32.8446
+Gen 65: Improvement = 32.8446
+Gen 66: Improvement = 32.8446
+Gen 67: Improvement = 32.8446
+Gen 68: Improvement = 32.8446
+Gen 69: Improvement = 32.8446
+Gen 70: Improvement = 32.8446
+Gen 71: Improvement = 32.8446
+Gen 72: Improvement = 32.8446
+Gen 73: Improvement = 32.8446
+Gen 74: Improvement = 32.8446
+Gen 75: Improvement = 32.8446
+Gen 76: Improvement = 32.8446
+Gen 77: Improvement = 32.8446
+Gen 78: Improvement = 32.8446
+Gen 79: Improvement = 32.8446
+Gen 80: Improvement = 32.8446
+Gen 81: Improvement = 32.8446
+Gen 82: Improvement = 32.8446
+Gen 83: Improvement = 32.8446
+Gen 84: Improvement = 32.8446
+Gen 85: Improvement = 32.8446
+Gen 86: Improvement = 32.8446
+Gen 87: Improvement = 32.8446
+Gen 88: Improvement = 32.8446
+Gen 89: Improvement = 32.8446
+Gen 90: Improvement = 32.8446
+Gen 91: Improvement = 32.8446
+Gen 92: Improvement = 32.8446
+Gen 93: Improvement = 32.8446
+Gen 94: Improvement = 32.8446
+Gen 95: Improvement = 32.8446
+Gen 96: Improvement = 32.8446
+Gen 97: Improvement = 32.8446
+Gen 98: Improvement = 32.8446
+Gen 99: Improvement = 32.8446
+Gen 100: Improvement = 32.8446
+
+=== ACO Finished ===
+Final Best Weights (Normalized) = [0.35749916211232075, 0.21124950488455316, 0.6012485908252667, 0.536248743168481, 0.4224990097691063]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.661 (13217 / 20000)
+全局本地缓存命中率: 0.584
+全局边缘云命中率: 0.158
+全局远端访问率: 0.258
+平均任务延迟: 1257.069 ms
+
+--- 6. Running Advanced Simulated Annealing (UpdateSA) ---
+--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---
+--- Pre-seeding finished. Elite archive size: 6 ---
+Gen  1 (Temp 5.00e+02): Improvement = 0.0000
+Gen  2 (Temp 4.50e+02): Improvement = 0.0000
+Gen  3 (Temp 4.05e+02): Improvement = 17.2069
+Gen  4 (Temp 3.65e+02): Improvement = 17.2069
+Gen  5 (Temp 3.28e+02): Improvement = 17.2069
+Gen  6 (Temp 2.95e+02): Improvement = 17.2069
+Gen  7 (Temp 2.66e+02): Improvement = 17.2069
+Gen  8 (Temp 2.39e+02): Improvement = 17.2069
+Gen  9 (Temp 2.15e+02): Improvement = 21.7021
+Gen 10 (Temp 1.94e+02): Improvement = 21.7021
+Gen 11 (Temp 1.74e+02): Improvement = 21.7021
+Gen 12 (Temp 1.57e+02): Improvement = 21.7021
+Gen 13 (Temp 1.41e+02): Improvement = 21.7021
+Gen 14 (Temp 1.27e+02): Improvement = 21.7021
+Gen 15 (Temp 1.14e+02): Improvement = 21.7021
+Gen 16 (Temp 1.03e+02): Improvement = 21.7021
+Gen 17 (Temp 9.27e+01): Improvement = 30.3964
+Gen 18 (Temp 8.34e+01): Improvement = 50.2899
+Gen 19 (Temp 7.50e+01): Improvement = 50.2899
+Gen 20 (Temp 6.75e+01): Improvement = 50.2899
+Gen 21 (Temp 6.08e+01): Improvement = 50.2899
+Gen 22 (Temp 5.47e+01): Improvement = 50.2899
+Gen 23 (Temp 4.92e+01): Improvement = 50.2899
+Gen 24 (Temp 4.43e+01): Improvement = 50.2899
+Gen 25 (Temp 3.99e+01): Improvement = 50.2899
+Gen 26 (Temp 3.59e+01): Improvement = 50.2899
+Gen 27 (Temp 3.23e+01): Improvement = 50.2899
+Gen 28 (Temp 2.91e+01): Improvement = 50.2899
+Gen 29 (Temp 2.62e+01): Improvement = 50.2899
+Gen 30 (Temp 2.36e+01): Improvement = 50.2899
+Gen 31 (Temp 2.12e+01): Improvement = 50.2899
+Gen 32 (Temp 1.91e+01): Improvement = 50.2899
+Gen 33 (Temp 1.72e+01): Improvement = 50.2899
+Gen 34 (Temp 1.55e+01): Improvement = 50.2899
+Gen 35 (Temp 1.39e+01): Improvement = 68.1022
+Gen 36 (Temp 1.25e+01): Improvement = 129.1047
+Gen 37 (Temp 1.13e+01): Improvement = 129.1047
+Gen 38 (Temp 1.01e+01): Improvement = 129.1047
+Gen 39 (Temp 9.12e+00): Improvement = 129.1047
+Gen 40 (Temp 8.21e+00): Improvement = 129.1047
+Gen 41 (Temp 7.39e+00): Improvement = 129.1047
+Gen 42 (Temp 6.65e+00): Improvement = 129.1047
+Gen 43 (Temp 5.99e+00): Improvement = 129.1047
+Gen 44 (Temp 5.39e+00): Improvement = 129.1047
+Gen 45 (Temp 4.85e+00): Improvement = 129.1047
+Gen 46 (Temp 4.36e+00): Improvement = 129.1047
+Gen 47 (Temp 3.93e+00): Improvement = 129.1047
+Gen 48 (Temp 3.53e+00): Improvement = 129.1047
+Gen 49 (Temp 3.18e+00): Improvement = 129.1047
+Gen 50 (Temp 2.86e+00): Improvement = 129.1047
+Gen 51 (Temp 2.58e+00): Improvement = 129.1047
+Gen 52 (Temp 2.32e+00): Improvement = 129.1047
+Gen 53 (Temp 2.09e+00): Improvement = 129.1047
+Gen 54 (Temp 1.88e+00): Improvement = 129.1047
+Gen 55 (Temp 1.69e+00): Improvement = 129.1047
+Gen 56 (Temp 1.52e+00): Improvement = 129.1047
+Gen 57 (Temp 1.37e+00): Improvement = 129.1047
+Gen 58 (Temp 1.23e+00): Improvement = 129.1047
+Gen 59 (Temp 1.11e+00): Improvement = 129.1047
+Gen 60 (Temp 9.98e-01): Improvement = 129.1047
+Gen 61 (Temp 8.99e-01): Improvement = 129.1047
+--- Stagnation detected. Triggering GA Rescue #1 ---
+Gen 62 (Temp 1.35e+00): Improvement = 129.1047
+Gen 63 (Temp 1.21e+00): Improvement = 129.1047
+Gen 64 (Temp 1.09e+00): Improvement = 129.1047
+Gen 65 (Temp 9.83e-01): Improvement = 129.1047
+Gen 66 (Temp 8.84e-01): Improvement = 129.1047
+Gen 67 (Temp 7.96e-01): Improvement = 129.1047
+Gen 68 (Temp 7.16e-01): Improvement = 129.1047
+Gen 69 (Temp 6.45e-01): Improvement = 129.1047
+Gen 70 (Temp 5.80e-01): Improvement = 129.1047
+Gen 71 (Temp 5.22e-01): Improvement = 129.1047
+Gen 72 (Temp 4.70e-01): Improvement = 129.1047
+Gen 73 (Temp 4.23e-01): Improvement = 129.1047
+Gen 74 (Temp 3.81e-01): Improvement = 129.1047
+Gen 75 (Temp 3.43e-01): Improvement = 129.1047
+Gen 76 (Temp 3.08e-01): Improvement = 129.1047
+Gen 77 (Temp 2.77e-01): Improvement = 129.1047
+Gen 78 (Temp 2.50e-01): Improvement = 129.1047
+Gen 79 (Temp 2.25e-01): Improvement = 129.1047
+Gen 80 (Temp 2.02e-01): Improvement = 129.1047
+Gen 81 (Temp 1.82e-01): Improvement = 129.1047
+Gen 82 (Temp 1.64e-01): Improvement = 129.1047
+Gen 83 (Temp 1.47e-01): Improvement = 129.1047
+Gen 84 (Temp 1.33e-01): Improvement = 129.1047
+Gen 85 (Temp 1.19e-01): Improvement = 129.1047
+Gen 86 (Temp 1.08e-01): Improvement = 129.1047
+--- Stagnation detected. Triggering GA Rescue #2 ---
+Gen 87 (Temp 1.61e-01): Improvement = 129.1047
+Gen 88 (Temp 1.45e-01): Improvement = 129.1047
+Gen 89 (Temp 1.31e-01): Improvement = 129.1047
+Gen 90 (Temp 1.18e-01): Improvement = 129.1047
+Gen 91 (Temp 1.06e-01): Improvement = 129.1047
+Gen 92 (Temp 9.52e-02): Improvement = 129.1047
+Gen 93 (Temp 8.57e-02): Improvement = 129.1047
+Gen 94 (Temp 7.71e-02): Improvement = 129.1047
+Gen 95 (Temp 6.94e-02): Improvement = 129.1047
+Gen 96 (Temp 6.25e-02): Improvement = 129.1047
+Gen 97 (Temp 5.62e-02): Improvement = 129.1047
+Gen 98 (Temp 5.06e-02): Improvement = 129.1047
+Gen 99 (Temp 4.55e-02): Improvement = 129.1047
+Gen 100 (Temp 4.10e-02): Improvement = 129.1047
+Gen 101 (Temp 3.69e-02): Improvement = 129.1047
+Gen 102 (Temp 3.32e-02): Improvement = 129.1047
+Gen 103 (Temp 2.99e-02): Improvement = 129.1047
+Gen 104 (Temp 2.69e-02): Improvement = 129.1047
+Gen 105 (Temp 2.42e-02): Improvement = 129.1047
+Gen 106 (Temp 2.18e-02): Improvement = 129.1047
+Gen 107 (Temp 1.96e-02): Improvement = 129.1047
+Gen 108 (Temp 1.76e-02): Improvement = 129.1047
+Gen 109 (Temp 1.59e-02): Improvement = 129.1047
+Gen 110 (Temp 1.43e-02): Improvement = 129.1047
+Gen 111 (Temp 1.29e-02): Improvement = 129.1047
+--- Stagnation detected. Triggering GA Rescue #3 ---
+Gen 112 (Temp 1.93e-02): Improvement = 129.1047
+Gen 113 (Temp 1.74e-02): Improvement = 129.1047
+Gen 114 (Temp 1.56e-02): Improvement = 129.1047
+Gen 115 (Temp 1.41e-02): Improvement = 129.1047
+Gen 116 (Temp 1.27e-02): Improvement = 129.1047
+Gen 117 (Temp 1.14e-02): Improvement = 129.1047
+Gen 118 (Temp 1.03e-02): Improvement = 129.1047
+Gen 119 (Temp 9.23e-03): Improvement = 129.1047
+Gen 120 (Temp 8.31e-03): Improvement = 129.1047
+Gen 121 (Temp 7.48e-03): Improvement = 129.1047
+Gen 122 (Temp 6.73e-03): Improvement = 129.1047
+Gen 123 (Temp 6.05e-03): Improvement = 129.1047
+Gen 124 (Temp 5.45e-03): Improvement = 129.1047
+Gen 125 (Temp 4.90e-03): Improvement = 129.1047
+Gen 126 (Temp 4.41e-03): Improvement = 129.1047
+Gen 127 (Temp 3.97e-03): Improvement = 129.1047
+Gen 128 (Temp 3.58e-03): Improvement = 129.1047
+Gen 129 (Temp 3.22e-03): Improvement = 129.1047
+Gen 130 (Temp 2.90e-03): Improvement = 129.1047
+Gen 131 (Temp 2.61e-03): Improvement = 129.1047
+Gen 132 (Temp 2.35e-03): Improvement = 129.1047
+Gen 133 (Temp 2.11e-03): Improvement = 129.1047
+Gen 134 (Temp 1.90e-03): Improvement = 129.1047
+Gen 135 (Temp 1.71e-03): Improvement = 129.1047
+Gen 136 (Temp 1.54e-03): Improvement = 129.1047
+--- Stagnation detected. Triggering GA Rescue #4 ---
+Gen 137 (Temp 2.31e-03): Improvement = 129.1047
+Gen 138 (Temp 2.08e-03): Improvement = 129.1047
+Gen 139 (Temp 1.87e-03): Improvement = 129.1047
+Gen 140 (Temp 1.68e-03): Improvement = 129.1047
+Gen 141 (Temp 1.51e-03): Improvement = 129.1047
+Gen 142 (Temp 1.36e-03): Improvement = 129.1047
+Gen 143 (Temp 1.23e-03): Improvement = 129.1047
+Gen 144 (Temp 1.10e-03): Improvement = 129.1047
+
+=== SA with GA-Rescue Finished ===
+Final Best Weights (Normalized) = [0.4391447378089419, 0.35042015626167466, 0.7927063224503765, 0.23658888327108465, 0.0]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 20000
+任务完成率: 0.699 (13977 / 20000)
+全局本地缓存命中率: 0.584
+全局边缘云命中率: 0.129
+全局远端访问率: 0.288
+平均任务延迟: 1178.653 ms
+
+==========================================================
+=== Final Score Summary for: [真实数据 (2万行)          ] ===
+==========================================================
+Algorithm                      | Best Score      | Improvement vs Baseline
+----------------------------------------------------------------------
+Random Search (Baseline)       | 970.0398        | N/A                 
+Simulated Annealing (SA)       | 1090.4702       | 120.4304            
+Particle Swarm (PSO)           | 1022.4539       | 52.4141             
+Genetic Algorithm (GA)         | 1059.4929       | 89.4531             
+Ant Colony (ACO)               | 1002.8845       | 32.8446             
+Advanced SA (UpdateSA)         | 1099.1445       | 129.1047            
+==========================================================
+
+
+=============== 正在对 [合成数据-正态分布 (1.5万行, 1000 ID)] 数据集运行完整测试 ===============
+
+--- 1. Running Random Search (to set Baseline) ---
+Running 10 random attempts to find a stable baseline...
+
+=== Single Random Attempt Finished (Baseline) ===
+Final Best Weights (Normalized) = [0.5342345957302254, 0.647985327591051, 0.31226865005587784, 0.3850658782607639, 0.2211808570903623]
+Final Best score = 4287.1237
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.923 (13845 / 15000)
+全局本地缓存命中率: 0.249
+全局边缘云命中率: 0.519
+全局远端访问率: 0.231
+平均任务延迟: 285.565 ms
+
+--- 2. Running Basic Simulated Annealing (SA) ---
+Gen  1 (Temp 5.00e+02): Improvement = 354.1977
+Gen  2 (Temp 4.50e+02): Improvement = 465.2699
+Gen  3 (Temp 4.05e+02): Improvement = 465.2699
+Gen  4 (Temp 3.65e+02): Improvement = 632.9709
+Gen  5 (Temp 3.28e+02): Improvement = 632.9709
+Gen  6 (Temp 2.95e+02): Improvement = 688.9984
+Gen  7 (Temp 2.66e+02): Improvement = 688.9984
+Gen  8 (Temp 2.39e+02): Improvement = 688.9984
+Gen  9 (Temp 2.15e+02): Improvement = 1155.3486
+Gen 10 (Temp 1.94e+02): Improvement = 1155.3486
+Gen 11 (Temp 1.74e+02): Improvement = 1155.3486
+Gen 12 (Temp 1.57e+02): Improvement = 1155.3486
+Gen 13 (Temp 1.41e+02): Improvement = 1155.3486
+Gen 14 (Temp 1.27e+02): Improvement = 1155.3486
+Gen 15 (Temp 1.14e+02): Improvement = 1155.3486
+Gen 16 (Temp 1.03e+02): Improvement = 1155.3486
+Gen 17 (Temp 9.27e+01): Improvement = 1155.3486
+Gen 18 (Temp 8.34e+01): Improvement = 1155.3486
+Gen 19 (Temp 7.50e+01): Improvement = 1155.3486
+Gen 20 (Temp 6.75e+01): Improvement = 1155.3486
+Gen 21 (Temp 6.08e+01): Improvement = 1155.3486
+Gen 22 (Temp 5.47e+01): Improvement = 1155.3486
+Gen 23 (Temp 4.92e+01): Improvement = 1155.3486
+Gen 24 (Temp 4.43e+01): Improvement = 1155.3486
+Gen 25 (Temp 3.99e+01): Improvement = 1155.3486
+Gen 26 (Temp 3.59e+01): Improvement = 1155.3486
+Gen 27 (Temp 3.23e+01): Improvement = 1155.3486
+Gen 28 (Temp 2.91e+01): Improvement = 1155.3486
+Gen 29 (Temp 2.62e+01): Improvement = 1155.3486
+Gen 30 (Temp 2.36e+01): Improvement = 1155.3486
+Gen 31 (Temp 2.12e+01): Improvement = 1155.3486
+Gen 32 (Temp 1.91e+01): Improvement = 1155.3486
+Gen 33 (Temp 1.72e+01): Improvement = 1155.3486
+Gen 34 (Temp 1.55e+01): Improvement = 1155.3486
+Gen 35 (Temp 1.39e+01): Improvement = 1155.3486
+Gen 36 (Temp 1.25e+01): Improvement = 1155.3486
+Gen 37 (Temp 1.13e+01): Improvement = 1155.3486
+Gen 38 (Temp 1.01e+01): Improvement = 1155.3486
+Gen 39 (Temp 9.12e+00): Improvement = 1155.3486
+Gen 40 (Temp 8.21e+00): Improvement = 1155.3486
+Gen 41 (Temp 7.39e+00): Improvement = 1155.3486
+Gen 42 (Temp 6.65e+00): Improvement = 1155.3486
+Gen 43 (Temp 5.99e+00): Improvement = 1155.3486
+Gen 44 (Temp 5.39e+00): Improvement = 1155.3486
+Gen 45 (Temp 4.85e+00): Improvement = 1155.3486
+Gen 46 (Temp 4.36e+00): Improvement = 1155.3486
+Gen 47 (Temp 3.93e+00): Improvement = 1155.3486
+Gen 48 (Temp 3.53e+00): Improvement = 1155.3486
+Gen 49 (Temp 3.18e+00): Improvement = 1155.3486
+Gen 50 (Temp 2.86e+00): Improvement = 1155.3486
+Gen 51 (Temp 2.58e+00): Improvement = 1155.3486
+Gen 52 (Temp 2.32e+00): Improvement = 1155.3486
+Gen 53 (Temp 2.09e+00): Improvement = 1155.3486
+Gen 54 (Temp 1.88e+00): Improvement = 1155.3486
+Gen 55 (Temp 1.69e+00): Improvement = 1155.3486
+Gen 56 (Temp 1.52e+00): Improvement = 1155.3486
+Gen 57 (Temp 1.37e+00): Improvement = 1155.3486
+Gen 58 (Temp 1.23e+00): Improvement = 1155.3486
+Gen 59 (Temp 1.11e+00): Improvement = 1155.3486
+Gen 60 (Temp 9.98e-01): Improvement = 1155.3486
+Gen 61 (Temp 8.99e-01): Improvement = 1155.3486
+Gen 62 (Temp 8.09e-01): Improvement = 1155.3486
+Gen 63 (Temp 7.28e-01): Improvement = 1155.3486
+Gen 64 (Temp 6.55e-01): Improvement = 1155.3486
+Gen 65 (Temp 5.90e-01): Improvement = 1155.3486
+Gen 66 (Temp 5.31e-01): Improvement = 1155.3486
+Gen 67 (Temp 4.78e-01): Improvement = 1155.3486
+Gen 68 (Temp 4.30e-01): Improvement = 1155.3486
+Gen 69 (Temp 3.87e-01): Improvement = 1155.3486
+Gen 70 (Temp 3.48e-01): Improvement = 1155.3486
+Gen 71 (Temp 3.13e-01): Improvement = 1155.3486
+Gen 72 (Temp 2.82e-01): Improvement = 1155.3486
+Gen 73 (Temp 2.54e-01): Improvement = 1155.3486
+Gen 74 (Temp 2.28e-01): Improvement = 1155.3486
+Gen 75 (Temp 2.06e-01): Improvement = 1155.3486
+Gen 76 (Temp 1.85e-01): Improvement = 1155.3486
+Gen 77 (Temp 1.66e-01): Improvement = 1155.3486
+Gen 78 (Temp 1.50e-01): Improvement = 1155.3486
+Gen 79 (Temp 1.35e-01): Improvement = 1155.3486
+Gen 80 (Temp 1.21e-01): Improvement = 1155.3486
+Gen 81 (Temp 1.09e-01): Improvement = 1155.3486
+Gen 82 (Temp 9.83e-02): Improvement = 1155.3486
+Gen 83 (Temp 8.85e-02): Improvement = 1155.3486
+Gen 84 (Temp 7.96e-02): Improvement = 1155.3486
+Gen 85 (Temp 7.17e-02): Improvement = 1155.3486
+Gen 86 (Temp 6.45e-02): Improvement = 1155.3486
+Gen 87 (Temp 5.81e-02): Improvement = 1155.3486
+Gen 88 (Temp 5.22e-02): Improvement = 1155.3486
+Gen 89 (Temp 4.70e-02): Improvement = 1155.3486
+Gen 90 (Temp 4.23e-02): Improvement = 1155.3486
+Gen 91 (Temp 3.81e-02): Improvement = 1155.3486
+Gen 92 (Temp 3.43e-02): Improvement = 1155.3486
+Gen 93 (Temp 3.09e-02): Improvement = 1155.3486
+Gen 94 (Temp 2.78e-02): Improvement = 1155.3486
+Gen 95 (Temp 2.50e-02): Improvement = 1155.3486
+Gen 96 (Temp 2.25e-02): Improvement = 1155.3486
+Gen 97 (Temp 2.02e-02): Improvement = 1155.3486
+Gen 98 (Temp 1.82e-02): Improvement = 1155.3486
+Gen 99 (Temp 1.64e-02): Improvement = 1155.3486
+Gen 100 (Temp 1.48e-02): Improvement = 1155.3486
+Gen 101 (Temp 1.33e-02): Improvement = 1155.3486
+Gen 102 (Temp 1.20e-02): Improvement = 1155.3486
+Gen 103 (Temp 1.08e-02): Improvement = 1155.3486
+Gen 104 (Temp 9.68e-03): Improvement = 1155.3486
+Gen 105 (Temp 8.71e-03): Improvement = 1155.3486
+Gen 106 (Temp 7.84e-03): Improvement = 1155.3486
+Gen 107 (Temp 7.06e-03): Improvement = 1155.3486
+Gen 108 (Temp 6.35e-03): Improvement = 1155.3486
+Gen 109 (Temp 5.72e-03): Improvement = 1155.3486
+Gen 110 (Temp 5.15e-03): Improvement = 1155.3486
+
+=== SA (Standard Version) Finished ===
+Final Best Weights (Normalized) = [0.3577318649635478, 0.5189496030558158, 0.517250665801193, 0.2566364753778132, 0.5189496030558158]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.949 (14229 / 15000)
+全局本地缓存命中率: 0.326
+全局边缘云命中率: 0.505
+全局远端访问率: 0.169
+平均任务延迟: 243.490 ms
+
+--- 3. Running Particle Swarm Optimization (PSO) ---
+Gen  1: Improvement = 597.9484
+Gen  2: Improvement = 597.9484
+Gen  3: Improvement = 597.9484
+Gen  4: Improvement = 761.4040
+Gen  5: Improvement = 761.4040
+Gen  6: Improvement = 761.4040
+Gen  7: Improvement = 761.4040
+Gen  8: Improvement = 761.4040
+Gen  9: Improvement = 761.4040
+Gen 10: Improvement = 761.4040
+Gen 11: Improvement = 761.4040
+Gen 12: Improvement = 761.4040
+Gen 13: Improvement = 761.4040
+Gen 14: Improvement = 761.4040
+Gen 15: Improvement = 761.4040
+Gen 16: Improvement = 761.4040
+Gen 17: Improvement = 761.4040
+Gen 18: Improvement = 761.4040
+Gen 19: Improvement = 761.4040
+Gen 20: Improvement = 761.4040
+Gen 21: Improvement = 761.4040
+Gen 22: Improvement = 761.4040
+Gen 23: Improvement = 761.4040
+Gen 24: Improvement = 761.4040
+Gen 25: Improvement = 761.4040
+Gen 26: Improvement = 761.4040
+Gen 27: Improvement = 761.4040
+Gen 28: Improvement = 761.4040
+Gen 29: Improvement = 761.4040
+Gen 30: Improvement = 761.4040
+Gen 31: Improvement = 761.4040
+Gen 32: Improvement = 761.4040
+Gen 33: Improvement = 761.4040
+Gen 34: Improvement = 761.4040
+Gen 35: Improvement = 761.4040
+Gen 36: Improvement = 761.4040
+Gen 37: Improvement = 761.4040
+Gen 38: Improvement = 761.4040
+Gen 39: Improvement = 761.4040
+Gen 40: Improvement = 761.4040
+Gen 41: Improvement = 761.4040
+Gen 42: Improvement = 761.4040
+Gen 43: Improvement = 761.4040
+Gen 44: Improvement = 761.4040
+Gen 45: Improvement = 761.4040
+Gen 46: Improvement = 761.4040
+Gen 47: Improvement = 761.4040
+Gen 48: Improvement = 761.4040
+Gen 49: Improvement = 761.4040
+Gen 50: Improvement = 761.4040
+Gen 51: Improvement = 761.4040
+Gen 52: Improvement = 761.4040
+Gen 53: Improvement = 761.4040
+Gen 54: Improvement = 761.4040
+Gen 55: Improvement = 761.4040
+Gen 56: Improvement = 761.4040
+Gen 57: Improvement = 761.4040
+Gen 58: Improvement = 761.4040
+Gen 59: Improvement = 761.4040
+Gen 60: Improvement = 776.0110
+Gen 61: Improvement = 995.0689
+Gen 62: Improvement = 995.0689
+Gen 63: Improvement = 995.0689
+Gen 64: Improvement = 995.0689
+Gen 65: Improvement = 995.0689
+Gen 66: Improvement = 995.0689
+Gen 67: Improvement = 995.0689
+Gen 68: Improvement = 995.0689
+Gen 69: Improvement = 995.0689
+Gen 70: Improvement = 995.0689
+Gen 71: Improvement = 995.0689
+Gen 72: Improvement = 995.0689
+Gen 73: Improvement = 995.0689
+Gen 74: Improvement = 995.0689
+Gen 75: Improvement = 995.0689
+Gen 76: Improvement = 995.0689
+Gen 77: Improvement = 995.0689
+Gen 78: Improvement = 995.0689
+Gen 79: Improvement = 995.0689
+Gen 80: Improvement = 995.0689
+Gen 81: Improvement = 995.0689
+Gen 82: Improvement = 995.0689
+Gen 83: Improvement = 995.0689
+Gen 84: Improvement = 995.0689
+Gen 85: Improvement = 995.0689
+Gen 86: Improvement = 995.0689
+Gen 87: Improvement = 995.0689
+Gen 88: Improvement = 995.0689
+Gen 89: Improvement = 995.0689
+Gen 90: Improvement = 995.0689
+Gen 91: Improvement = 995.0689
+Gen 92: Improvement = 995.0689
+Gen 93: Improvement = 995.0689
+Gen 94: Improvement = 995.0689
+Gen 95: Improvement = 995.0689
+Gen 96: Improvement = 995.0689
+Gen 97: Improvement = 995.0689
+Gen 98: Improvement = 995.0689
+Gen 99: Improvement = 995.0689
+Gen 100: Improvement = 995.0689
+
+=== PSO Finished ===
+Final Best Weights (Normalized) = [0.3671867947776035, 0.6834144787717322, 0.13832952482593971, 0.539855681751536, 0.2958703996484368]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.941 (14117 / 15000)
+全局本地缓存命中率: 0.321
+全局边缘云命中率: 0.506
+全局远端访问率: 0.173
+平均任务延迟: 248.532 ms
+
+--- 4. Running Genetic Algorithm (GA) ---
+Gen  1: Improvement = 193.2916
+Gen  2: Improvement = 193.2916
+Gen  3: Improvement = 436.9139
+Gen  4: Improvement = 436.9139
+Gen  5: Improvement = 516.4622
+Gen  6: Improvement = 516.4622
+Gen  7: Improvement = 516.4622
+Gen  8: Improvement = 516.4622
+Gen  9: Improvement = 516.4622
+Gen 10: Improvement = 516.4622
+Gen 11: Improvement = 516.4622
+Gen 12: Improvement = 516.4622
+Gen 13: Improvement = 516.4622
+Gen 14: Improvement = 516.4622
+Gen 15: Improvement = 516.4622
+Gen 16: Improvement = 516.4622
+Gen 17: Improvement = 1453.7500
+Gen 18: Improvement = 1453.7500
+Gen 19: Improvement = 1453.7500
+Gen 20: Improvement = 1453.7500
+Gen 21: Improvement = 1453.7500
+Gen 22: Improvement = 1453.7500
+Gen 23: Improvement = 1453.7500
+Gen 24: Improvement = 1453.7500
+Gen 25: Improvement = 1453.7500
+Gen 26: Improvement = 1453.7500
+Gen 27: Improvement = 1453.7500
+Gen 28: Improvement = 1453.7500
+Gen 29: Improvement = 1453.7500
+Gen 30: Improvement = 1453.7500
+Gen 31: Improvement = 1453.7500
+Gen 32: Improvement = 1453.7500
+Gen 33: Improvement = 1453.7500
+Gen 34: Improvement = 1453.7500
+Gen 35: Improvement = 1453.7500
+Gen 36: Improvement = 1453.7500
+Gen 37: Improvement = 1453.7500
+Gen 38: Improvement = 1453.7500
+Gen 39: Improvement = 1453.7500
+Gen 40: Improvement = 1453.7500
+Gen 41: Improvement = 1453.7500
+Gen 42: Improvement = 1453.7500
+Gen 43: Improvement = 1453.7500
+Gen 44: Improvement = 1453.7500
+Gen 45: Improvement = 1453.7500
+Gen 46: Improvement = 1453.7500
+Gen 47: Improvement = 1453.7500
+Gen 48: Improvement = 1453.7500
+Gen 49: Improvement = 1453.7500
+Gen 50: Improvement = 1453.7500
+Gen 51: Improvement = 1453.7500
+Gen 52: Improvement = 1453.7500
+Gen 53: Improvement = 1453.7500
+Gen 54: Improvement = 1453.7500
+Gen 55: Improvement = 1453.7500
+Gen 56: Improvement = 1453.7500
+Gen 57: Improvement = 1453.7500
+Gen 58: Improvement = 1453.7500
+Gen 59: Improvement = 1453.7500
+Gen 60: Improvement = 1453.7500
+Gen 61: Improvement = 1453.7500
+Gen 62: Improvement = 1453.7500
+Gen 63: Improvement = 1453.7500
+Gen 64: Improvement = 1453.7500
+Gen 65: Improvement = 1453.7500
+Gen 66: Improvement = 1453.7500
+Gen 67: Improvement = 1453.7500
+Gen 68: Improvement = 1453.7500
+Gen 69: Improvement = 1453.7500
+Gen 70: Improvement = 1453.7500
+Gen 71: Improvement = 1453.7500
+Gen 72: Improvement = 1453.7500
+Gen 73: Improvement = 1453.7500
+Gen 74: Improvement = 1453.7500
+Gen 75: Improvement = 1453.7500
+Gen 76: Improvement = 1453.7500
+Gen 77: Improvement = 1453.7500
+Gen 78: Improvement = 1453.7500
+Gen 79: Improvement = 1453.7500
+Gen 80: Improvement = 1453.7500
+Gen 81: Improvement = 1453.7500
+Gen 82: Improvement = 1453.7500
+Gen 83: Improvement = 1453.7500
+Gen 84: Improvement = 1453.7500
+Gen 85: Improvement = 1453.7500
+Gen 86: Improvement = 1453.7500
+Gen 87: Improvement = 1453.7500
+Gen 88: Improvement = 1453.7500
+Gen 89: Improvement = 1453.7500
+Gen 90: Improvement = 1453.7500
+Gen 91: Improvement = 1453.7500
+Gen 92: Improvement = 1453.7500
+Gen 93: Improvement = 1453.7500
+Gen 94: Improvement = 1453.7500
+Gen 95: Improvement = 1453.7500
+Gen 96: Improvement = 1453.7500
+Gen 97: Improvement = 1453.7500
+Gen 98: Improvement = 1453.7500
+Gen 99: Improvement = 1453.7500
+Gen 100: Improvement = 1453.7500
+
+=== GA Finished ===
+Final Best Weights (Normalized) = [0.7988592696844458, 0.10387150418950394, 0.5332082557208184, 0.22434748890620235, 0.1280302234212196]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.949 (14233 / 15000)
+全局本地缓存命中率: 0.359
+全局边缘云命中率: 0.489
+全局远端访问率: 0.151
+平均任务延迟: 236.424 ms
+
+--- 5. Running Ant Colony Optimization (ACO) ---
+ACO Initializing (Granularity: 41)...
+Gen  1: Improvement = 373.1967
+Gen  2: Improvement = 373.1967
+Gen  3: Improvement = 672.1968
+Gen  4: Improvement = 672.1968
+Gen  5: Improvement = 672.1968
+Gen  6: Improvement = 672.1968
+Gen  7: Improvement = 672.1968
+Gen  8: Improvement = 672.1968
+Gen  9: Improvement = 672.1968
+Gen 10: Improvement = 672.1968
+Gen 11: Improvement = 672.1968
+Gen 12: Improvement = 672.1968
+Gen 13: Improvement = 672.1968
+Gen 14: Improvement = 838.3307
+Gen 15: Improvement = 838.3307
+Gen 16: Improvement = 838.3307
+Gen 17: Improvement = 838.3307
+Gen 18: Improvement = 838.3307
+Gen 19: Improvement = 838.3307
+Gen 20: Improvement = 838.3307
+Gen 21: Improvement = 838.3307
+Gen 22: Improvement = 838.3307
+Gen 23: Improvement = 838.3307
+Gen 24: Improvement = 838.3307
+Gen 25: Improvement = 838.3307
+Gen 26: Improvement = 838.3307
+Gen 27: Improvement = 838.3307
+Gen 28: Improvement = 838.3307
+Gen 29: Improvement = 838.3307
+Gen 30: Improvement = 838.3307
+Gen 31: Improvement = 838.3307
+Gen 32: Improvement = 838.3307
+Gen 33: Improvement = 838.3307
+Gen 34: Improvement = 838.3307
+Gen 35: Improvement = 838.3307
+Gen 36: Improvement = 838.3307
+Gen 37: Improvement = 838.3307
+Gen 38: Improvement = 838.3307
+Gen 39: Improvement = 838.3307
+Gen 40: Improvement = 838.3307
+Gen 41: Improvement = 838.3307
+Gen 42: Improvement = 838.3307
+Gen 43: Improvement = 838.3307
+Gen 44: Improvement = 838.3307
+Gen 45: Improvement = 838.3307
+Gen 46: Improvement = 838.3307
+Gen 47: Improvement = 838.3307
+Gen 48: Improvement = 883.9845
+Gen 49: Improvement = 883.9845
+Gen 50: Improvement = 883.9845
+Gen 51: Improvement = 883.9845
+Gen 52: Improvement = 883.9845
+Gen 53: Improvement = 883.9845
+Gen 54: Improvement = 883.9845
+Gen 55: Improvement = 883.9845
+Gen 56: Improvement = 883.9845
+Gen 57: Improvement = 883.9845
+Gen 58: Improvement = 1045.2394
+Gen 59: Improvement = 1045.2394
+Gen 60: Improvement = 1045.2394
+Gen 61: Improvement = 1045.2394
+Gen 62: Improvement = 1045.2394
+Gen 63: Improvement = 1045.2394
+Gen 64: Improvement = 1045.2394
+Gen 65: Improvement = 1045.2394
+Gen 66: Improvement = 1045.2394
+Gen 67: Improvement = 1045.2394
+Gen 68: Improvement = 1045.2394
+Gen 69: Improvement = 1045.2394
+Gen 70: Improvement = 1045.2394
+Gen 71: Improvement = 1045.2394
+Gen 72: Improvement = 1045.2394
+Gen 73: Improvement = 1045.2394
+Gen 74: Improvement = 1045.2394
+Gen 75: Improvement = 1045.2394
+Gen 76: Improvement = 1045.2394
+Gen 77: Improvement = 1045.2394
+Gen 78: Improvement = 1045.2394
+Gen 79: Improvement = 1045.2394
+Gen 80: Improvement = 1045.2394
+Gen 81: Improvement = 1045.2394
+Gen 82: Improvement = 1045.2394
+Gen 83: Improvement = 1045.2394
+Gen 84: Improvement = 1045.2394
+Gen 85: Improvement = 1045.2394
+Gen 86: Improvement = 1045.2394
+Gen 87: Improvement = 1045.2394
+Gen 88: Improvement = 1045.2394
+Gen 89: Improvement = 1045.2394
+Gen 90: Improvement = 1045.2394
+Gen 91: Improvement = 1045.2394
+Gen 92: Improvement = 1045.2394
+Gen 93: Improvement = 1045.2394
+Gen 94: Improvement = 1045.2394
+Gen 95: Improvement = 1045.2394
+Gen 96: Improvement = 1045.2394
+Gen 97: Improvement = 1045.2394
+Gen 98: Improvement = 1045.2394
+Gen 99: Improvement = 1045.2394
+Gen 100: Improvement = 1045.2394
+
+=== ACO Finished ===
+Final Best Weights (Normalized) = [0.17189401703741602, 0.38676153833418603, 0.42973504259354, 0.36527478620450904, 0.709062820279341]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.939 (14088 / 15000)
+全局本地缓存命中率: 0.343
+全局边缘云命中率: 0.486
+全局远端访问率: 0.171
+平均任务延迟: 249.540 ms
+
+--- 6. Running Advanced Simulated Annealing (UpdateSA) ---
+--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---
+--- Pre-seeding finished. Elite archive size: 6 ---
+Gen  1 (Temp 5.00e+02): Improvement = 470.3065
+Gen  2 (Temp 4.50e+02): Improvement = 683.7365
+Gen  3 (Temp 4.05e+02): Improvement = 683.7365
+Gen  4 (Temp 3.65e+02): Improvement = 683.7365
+Gen  5 (Temp 3.28e+02): Improvement = 683.7365
+Gen  6 (Temp 2.95e+02): Improvement = 683.7365
+Gen  7 (Temp 2.66e+02): Improvement = 683.7365
+Gen  8 (Temp 2.39e+02): Improvement = 683.7365
+Gen  9 (Temp 2.15e+02): Improvement = 683.7365
+Gen 10 (Temp 1.94e+02): Improvement = 683.7365
+Gen 11 (Temp 1.74e+02): Improvement = 683.7365
+Gen 12 (Temp 1.57e+02): Improvement = 683.7365
+Gen 13 (Temp 1.41e+02): Improvement = 839.0253
+Gen 14 (Temp 1.27e+02): Improvement = 839.0253
+Gen 15 (Temp 1.14e+02): Improvement = 839.0253
+Gen 16 (Temp 1.03e+02): Improvement = 839.0253
+Gen 17 (Temp 9.27e+01): Improvement = 839.0253
+Gen 18 (Temp 8.34e+01): Improvement = 839.0253
+Gen 19 (Temp 7.50e+01): Improvement = 905.7032
+Gen 20 (Temp 6.75e+01): Improvement = 1118.2277
+Gen 21 (Temp 6.08e+01): Improvement = 1118.2277
+Gen 22 (Temp 5.47e+01): Improvement = 1118.2277
+Gen 23 (Temp 4.92e+01): Improvement = 1118.2277
+Gen 24 (Temp 4.43e+01): Improvement = 1118.2277
+Gen 25 (Temp 3.99e+01): Improvement = 1118.2277
+Gen 26 (Temp 3.59e+01): Improvement = 1118.2277
+Gen 27 (Temp 3.23e+01): Improvement = 1118.2277
+Gen 28 (Temp 2.91e+01): Improvement = 1118.2277
+Gen 29 (Temp 2.62e+01): Improvement = 1118.2277
+Gen 30 (Temp 2.36e+01): Improvement = 1118.2277
+Gen 31 (Temp 2.12e+01): Improvement = 1118.2277
+Gen 32 (Temp 1.91e+01): Improvement = 1118.2277
+Gen 33 (Temp 1.72e+01): Improvement = 1118.2277
+Gen 34 (Temp 1.55e+01): Improvement = 1118.2277
+Gen 35 (Temp 1.39e+01): Improvement = 1118.2277
+Gen 36 (Temp 1.25e+01): Improvement = 1118.2277
+Gen 37 (Temp 1.13e+01): Improvement = 1118.2277
+Gen 38 (Temp 1.01e+01): Improvement = 1118.2277
+Gen 39 (Temp 9.12e+00): Improvement = 1118.2277
+Gen 40 (Temp 8.21e+00): Improvement = 1118.2277
+Gen 41 (Temp 7.39e+00): Improvement = 1118.2277
+Gen 42 (Temp 6.65e+00): Improvement = 1118.2277
+Gen 43 (Temp 5.99e+00): Improvement = 1287.8585
+Gen 44 (Temp 5.39e+00): Improvement = 1287.8585
+Gen 45 (Temp 4.85e+00): Improvement = 1287.8585
+Gen 46 (Temp 4.36e+00): Improvement = 1287.8585
+Gen 47 (Temp 3.93e+00): Improvement = 1287.8585
+Gen 48 (Temp 3.53e+00): Improvement = 1287.8585
+Gen 49 (Temp 3.18e+00): Improvement = 1287.8585
+Gen 50 (Temp 2.86e+00): Improvement = 1287.8585
+Gen 51 (Temp 2.58e+00): Improvement = 1287.8585
+Gen 52 (Temp 2.32e+00): Improvement = 1287.8585
+Gen 53 (Temp 2.09e+00): Improvement = 1287.8585
+Gen 54 (Temp 1.88e+00): Improvement = 1287.8585
+Gen 55 (Temp 1.69e+00): Improvement = 1287.8585
+Gen 56 (Temp 1.52e+00): Improvement = 1287.8585
+Gen 57 (Temp 1.37e+00): Improvement = 1287.8585
+Gen 58 (Temp 1.23e+00): Improvement = 1287.8585
+Gen 59 (Temp 1.11e+00): Improvement = 1287.8585
+Gen 60 (Temp 9.98e-01): Improvement = 1287.8585
+Gen 61 (Temp 8.99e-01): Improvement = 1287.8585
+Gen 62 (Temp 8.09e-01): Improvement = 1287.8585
+Gen 63 (Temp 7.28e-01): Improvement = 1287.8585
+Gen 64 (Temp 6.55e-01): Improvement = 1287.8585
+Gen 65 (Temp 5.90e-01): Improvement = 1287.8585
+Gen 66 (Temp 5.31e-01): Improvement = 1287.8585
+Gen 67 (Temp 4.78e-01): Improvement = 1287.8585
+Gen 68 (Temp 4.30e-01): Improvement = 1287.8585
+--- Stagnation detected. Triggering GA Rescue #1 ---
+Gen 69 (Temp 6.45e-01): Improvement = 1502.8065
+Gen 70 (Temp 5.80e-01): Improvement = 1502.8065
+Gen 71 (Temp 5.22e-01): Improvement = 1502.8065
+Gen 72 (Temp 4.70e-01): Improvement = 1502.8065
+Gen 73 (Temp 4.23e-01): Improvement = 1502.8065
+Gen 74 (Temp 3.81e-01): Improvement = 1502.8065
+Gen 75 (Temp 3.43e-01): Improvement = 1502.8065
+Gen 76 (Temp 3.08e-01): Improvement = 1502.8065
+Gen 77 (Temp 2.77e-01): Improvement = 1502.8065
+Gen 78 (Temp 2.50e-01): Improvement = 1502.8065
+Gen 79 (Temp 2.25e-01): Improvement = 1502.8065
+Gen 80 (Temp 2.02e-01): Improvement = 1593.6484
+Gen 81 (Temp 1.82e-01): Improvement = 1593.6484
+Gen 82 (Temp 1.64e-01): Improvement = 1593.6484
+Gen 83 (Temp 1.47e-01): Improvement = 1697.0851
+Gen 84 (Temp 1.33e-01): Improvement = 1697.0851
+Gen 85 (Temp 1.19e-01): Improvement = 1697.0851
+Gen 86 (Temp 1.08e-01): Improvement = 1697.0851
+Gen 87 (Temp 9.68e-02): Improvement = 1697.0851
+Gen 88 (Temp 8.71e-02): Improvement = 1697.0851
+Gen 89 (Temp 7.84e-02): Improvement = 1697.0851
+Gen 90 (Temp 7.05e-02): Improvement = 1697.0851
+Gen 91 (Temp 6.35e-02): Improvement = 1697.0851
+Gen 92 (Temp 5.71e-02): Improvement = 1697.0851
+Gen 93 (Temp 5.14e-02): Improvement = 1697.0851
+Gen 94 (Temp 4.63e-02): Improvement = 1697.0851
+Gen 95 (Temp 4.16e-02): Improvement = 1697.0851
+Gen 96 (Temp 3.75e-02): Improvement = 1697.0851
+Gen 97 (Temp 3.37e-02): Improvement = 1697.0851
+Gen 98 (Temp 3.04e-02): Improvement = 1697.0851
+Gen 99 (Temp 2.73e-02): Improvement = 1697.0851
+Gen 100 (Temp 2.46e-02): Improvement = 1697.0851
+Gen 101 (Temp 2.21e-02): Improvement = 1697.0851
+Gen 102 (Temp 1.99e-02): Improvement = 1697.0851
+Gen 103 (Temp 1.79e-02): Improvement = 1697.0851
+Gen 104 (Temp 1.61e-02): Improvement = 1697.0851
+Gen 105 (Temp 1.45e-02): Improvement = 1697.0851
+Gen 106 (Temp 1.31e-02): Improvement = 1697.0851
+Gen 107 (Temp 1.18e-02): Improvement = 1697.0851
+Gen 108 (Temp 1.06e-02): Improvement = 1697.0851
+--- Stagnation detected. Triggering GA Rescue #2 ---
+Gen 109 (Temp 1.59e-02): Improvement = 1697.0851
+Gen 110 (Temp 1.43e-02): Improvement = 1697.0851
+Gen 111 (Temp 1.29e-02): Improvement = 1697.0851
+Gen 112 (Temp 1.16e-02): Improvement = 1697.0851
+Gen 113 (Temp 1.04e-02): Improvement = 1697.0851
+Gen 114 (Temp 9.38e-03): Improvement = 1697.0851
+Gen 115 (Temp 8.44e-03): Improvement = 1697.0851
+Gen 116 (Temp 7.60e-03): Improvement = 1697.0851
+Gen 117 (Temp 6.84e-03): Improvement = 1697.0851
+Gen 118 (Temp 6.15e-03): Improvement = 1697.0851
+Gen 119 (Temp 5.54e-03): Improvement = 1697.0851
+Gen 120 (Temp 4.98e-03): Improvement = 1697.0851
+Gen 121 (Temp 4.49e-03): Improvement = 1697.0851
+Gen 122 (Temp 4.04e-03): Improvement = 1697.0851
+Gen 123 (Temp 3.63e-03): Improvement = 1697.0851
+Gen 124 (Temp 3.27e-03): Improvement = 1697.0851
+Gen 125 (Temp 2.94e-03): Improvement = 1697.0851
+Gen 126 (Temp 2.65e-03): Improvement = 1697.0851
+Gen 127 (Temp 2.38e-03): Improvement = 1697.0851
+Gen 128 (Temp 2.15e-03): Improvement = 1697.0851
+Gen 129 (Temp 1.93e-03): Improvement = 1697.0851
+Gen 130 (Temp 1.74e-03): Improvement = 1697.0851
+Gen 131 (Temp 1.56e-03): Improvement = 1697.0851
+Gen 132 (Temp 1.41e-03): Improvement = 1697.0851
+Gen 133 (Temp 1.27e-03): Improvement = 1697.0851
+--- Stagnation detected. Triggering GA Rescue #3 ---
+Gen 134 (Temp 1.90e-03): Improvement = 1697.0851
+Gen 135 (Temp 1.71e-03): Improvement = 1697.0851
+Gen 136 (Temp 1.54e-03): Improvement = 1697.0851
+Gen 137 (Temp 1.39e-03): Improvement = 1697.0851
+Gen 138 (Temp 1.25e-03): Improvement = 1697.0851
+Gen 139 (Temp 1.12e-03): Improvement = 1697.0851
+Gen 140 (Temp 1.01e-03): Improvement = 1697.0851
+
+=== SA with GA-Rescue Finished ===
+Final Best Weights (Normalized) = [0.5624721597913915, 0.4181111927771665, 0.3706098296859947, 0.4138273929647061, 0.44744088202377647]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.950 (14255 / 15000)
+全局本地缓存命中率: 0.387
+全局边缘云命中率: 0.467
+全局远端访问率: 0.146
+平均任务延迟: 231.325 ms
+
+==========================================================
+=== Final Score Summary for: [合成数据-正态分布 (1.5万行, 1000 ID)] ===
+==========================================================
+Algorithm                      | Best Score      | Improvement vs Baseline
+----------------------------------------------------------------------
+Random Search (Baseline)       | 4287.1237       | N/A                 
+Simulated Annealing (SA)       | 5442.4723       | 1155.3486           
+Particle Swarm (PSO)           | 5282.1927       | 995.0689            
+Genetic Algorithm (GA)         | 5740.8738       | 1453.7500           
+Ant Colony (ACO)               | 5332.3631       | 1045.2394           
+Advanced SA (UpdateSA)         | 5984.2088       | 1697.0851           
+==========================================================
+
+
+=============== 正在对 [合成数据-指数分布 (1.5万行, 1000 ID)] 数据集运行完整测试 ===============
+
+--- 1. Running Random Search (to set Baseline) ---
+Running 10 random attempts to find a stable baseline...
+
+=== Single Random Attempt Finished (Baseline) ===
+Final Best Weights (Normalized) = [0.5117624157983685, 0.1966860932503246, 0.7413137850730133, 0.2964058517835, 0.24902058868166413]
+Final Best score = 6948.6147
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.978 (14670 / 15000)
+全局本地缓存命中率: 0.359
+全局边缘云命中率: 0.573
+全局远端访问率: 0.068
+平均任务延迟: 200.627 ms
+
+--- 2. Running Basic Simulated Annealing (SA) ---
+Gen  1 (Temp 5.00e+02): Improvement = 36.5204
+Gen  2 (Temp 4.50e+02): Improvement = 150.9908
+Gen  3 (Temp 4.05e+02): Improvement = 150.9908
+Gen  4 (Temp 3.65e+02): Improvement = 172.3795
+Gen  5 (Temp 3.28e+02): Improvement = 172.3795
+Gen  6 (Temp 2.95e+02): Improvement = 320.8612
+Gen  7 (Temp 2.66e+02): Improvement = 320.8612
+Gen  8 (Temp 2.39e+02): Improvement = 320.8612
+Gen  9 (Temp 2.15e+02): Improvement = 320.8612
+Gen 10 (Temp 1.94e+02): Improvement = 320.8612
+Gen 11 (Temp 1.74e+02): Improvement = 320.8612
+Gen 12 (Temp 1.57e+02): Improvement = 320.8612
+Gen 13 (Temp 1.41e+02): Improvement = 353.9443
+Gen 14 (Temp 1.27e+02): Improvement = 353.9443
+Gen 15 (Temp 1.14e+02): Improvement = 353.9443
+Gen 16 (Temp 1.03e+02): Improvement = 353.9443
+Gen 17 (Temp 9.27e+01): Improvement = 353.9443
+Gen 18 (Temp 8.34e+01): Improvement = 353.9443
+Gen 19 (Temp 7.50e+01): Improvement = 353.9443
+Gen 20 (Temp 6.75e+01): Improvement = 353.9443
+Gen 21 (Temp 6.08e+01): Improvement = 353.9443
+Gen 22 (Temp 5.47e+01): Improvement = 353.9443
+Gen 23 (Temp 4.92e+01): Improvement = 353.9443
+Gen 24 (Temp 4.43e+01): Improvement = 353.9443
+Gen 25 (Temp 3.99e+01): Improvement = 353.9443
+Gen 26 (Temp 3.59e+01): Improvement = 353.9443
+Gen 27 (Temp 3.23e+01): Improvement = 353.9443
+Gen 28 (Temp 2.91e+01): Improvement = 353.9443
+Gen 29 (Temp 2.62e+01): Improvement = 353.9443
+Gen 30 (Temp 2.36e+01): Improvement = 353.9443
+Gen 31 (Temp 2.12e+01): Improvement = 353.9443
+Gen 32 (Temp 1.91e+01): Improvement = 353.9443
+Gen 33 (Temp 1.72e+01): Improvement = 353.9443
+Gen 34 (Temp 1.55e+01): Improvement = 353.9443
+Gen 35 (Temp 1.39e+01): Improvement = 353.9443
+Gen 36 (Temp 1.25e+01): Improvement = 353.9443
+Gen 37 (Temp 1.13e+01): Improvement = 353.9443
+Gen 38 (Temp 1.01e+01): Improvement = 353.9443
+Gen 39 (Temp 9.12e+00): Improvement = 353.9443
+Gen 40 (Temp 8.21e+00): Improvement = 353.9443
+Gen 41 (Temp 7.39e+00): Improvement = 353.9443
+Gen 42 (Temp 6.65e+00): Improvement = 353.9443
+Gen 43 (Temp 5.99e+00): Improvement = 353.9443
+Gen 44 (Temp 5.39e+00): Improvement = 353.9443
+Gen 45 (Temp 4.85e+00): Improvement = 353.9443
+Gen 46 (Temp 4.36e+00): Improvement = 353.9443
+Gen 47 (Temp 3.93e+00): Improvement = 353.9443
+Gen 48 (Temp 3.53e+00): Improvement = 353.9443
+Gen 49 (Temp 3.18e+00): Improvement = 353.9443
+Gen 50 (Temp 2.86e+00): Improvement = 353.9443
+Gen 51 (Temp 2.58e+00): Improvement = 353.9443
+Gen 52 (Temp 2.32e+00): Improvement = 353.9443
+Gen 53 (Temp 2.09e+00): Improvement = 353.9443
+Gen 54 (Temp 1.88e+00): Improvement = 353.9443
+Gen 55 (Temp 1.69e+00): Improvement = 353.9443
+Gen 56 (Temp 1.52e+00): Improvement = 353.9443
+Gen 57 (Temp 1.37e+00): Improvement = 353.9443
+Gen 58 (Temp 1.23e+00): Improvement = 353.9443
+Gen 59 (Temp 1.11e+00): Improvement = 353.9443
+Gen 60 (Temp 9.98e-01): Improvement = 353.9443
+Gen 61 (Temp 8.99e-01): Improvement = 353.9443
+Gen 62 (Temp 8.09e-01): Improvement = 353.9443
+Gen 63 (Temp 7.28e-01): Improvement = 353.9443
+Gen 64 (Temp 6.55e-01): Improvement = 353.9443
+Gen 65 (Temp 5.90e-01): Improvement = 353.9443
+Gen 66 (Temp 5.31e-01): Improvement = 353.9443
+Gen 67 (Temp 4.78e-01): Improvement = 353.9443
+Gen 68 (Temp 4.30e-01): Improvement = 353.9443
+Gen 69 (Temp 3.87e-01): Improvement = 353.9443
+Gen 70 (Temp 3.48e-01): Improvement = 353.9443
+Gen 71 (Temp 3.13e-01): Improvement = 353.9443
+Gen 72 (Temp 2.82e-01): Improvement = 353.9443
+Gen 73 (Temp 2.54e-01): Improvement = 353.9443
+Gen 74 (Temp 2.28e-01): Improvement = 353.9443
+Gen 75 (Temp 2.06e-01): Improvement = 353.9443
+Gen 76 (Temp 1.85e-01): Improvement = 353.9443
+Gen 77 (Temp 1.66e-01): Improvement = 353.9443
+Gen 78 (Temp 1.50e-01): Improvement = 353.9443
+Gen 79 (Temp 1.35e-01): Improvement = 353.9443
+Gen 80 (Temp 1.21e-01): Improvement = 353.9443
+Gen 81 (Temp 1.09e-01): Improvement = 353.9443
+Gen 82 (Temp 9.83e-02): Improvement = 353.9443
+Gen 83 (Temp 8.85e-02): Improvement = 353.9443
+Gen 84 (Temp 7.96e-02): Improvement = 353.9443
+Gen 85 (Temp 7.17e-02): Improvement = 353.9443
+Gen 86 (Temp 6.45e-02): Improvement = 353.9443
+Gen 87 (Temp 5.81e-02): Improvement = 353.9443
+Gen 88 (Temp 5.22e-02): Improvement = 353.9443
+Gen 89 (Temp 4.70e-02): Improvement = 353.9443
+Gen 90 (Temp 4.23e-02): Improvement = 353.9443
+Gen 91 (Temp 3.81e-02): Improvement = 353.9443
+Gen 92 (Temp 3.43e-02): Improvement = 353.9443
+Gen 93 (Temp 3.09e-02): Improvement = 353.9443
+Gen 94 (Temp 2.78e-02): Improvement = 353.9443
+Gen 95 (Temp 2.50e-02): Improvement = 353.9443
+Gen 96 (Temp 2.25e-02): Improvement = 353.9443
+Gen 97 (Temp 2.02e-02): Improvement = 353.9443
+Gen 98 (Temp 1.82e-02): Improvement = 353.9443
+Gen 99 (Temp 1.64e-02): Improvement = 353.9443
+Gen 100 (Temp 1.48e-02): Improvement = 353.9443
+Gen 101 (Temp 1.33e-02): Improvement = 353.9443
+Gen 102 (Temp 1.20e-02): Improvement = 353.9443
+Gen 103 (Temp 1.08e-02): Improvement = 353.9443
+Gen 104 (Temp 9.68e-03): Improvement = 353.9443
+Gen 105 (Temp 8.71e-03): Improvement = 353.9443
+Gen 106 (Temp 7.84e-03): Improvement = 353.9443
+Gen 107 (Temp 7.06e-03): Improvement = 353.9443
+Gen 108 (Temp 6.35e-03): Improvement = 353.9443
+Gen 109 (Temp 5.72e-03): Improvement = 353.9443
+Gen 110 (Temp 5.15e-03): Improvement = 353.9443
+
+=== SA (Standard Version) Finished ===
+Final Best Weights (Normalized) = [0.356845546625781, 0.6064620999646192, 0.6974521077494894, 0.0, 0.13574068865173222]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.980 (14701 / 15000)
+全局本地缓存命中率: 0.396
+全局边缘云命中率: 0.536
+全局远端访问率: 0.068
+平均任务延迟: 195.790 ms
+
+--- 3. Running Particle Swarm Optimization (PSO) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 99.7706
+Gen  8: Improvement = 99.7706
+Gen  9: Improvement = 99.7706
+Gen 10: Improvement = 99.7706
+Gen 11: Improvement = 99.7706
+Gen 12: Improvement = 99.7706
+Gen 13: Improvement = 99.7706
+Gen 14: Improvement = 99.7706
+Gen 15: Improvement = 99.7706
+Gen 16: Improvement = 99.7706
+Gen 17: Improvement = 99.7706
+Gen 18: Improvement = 99.7706
+Gen 19: Improvement = 99.7706
+Gen 20: Improvement = 99.7706
+Gen 21: Improvement = 99.7706
+Gen 22: Improvement = 99.7706
+Gen 23: Improvement = 99.7706
+Gen 24: Improvement = 99.7706
+Gen 25: Improvement = 99.7706
+Gen 26: Improvement = 113.9244
+Gen 27: Improvement = 113.9244
+Gen 28: Improvement = 113.9244
+Gen 29: Improvement = 113.9244
+Gen 30: Improvement = 113.9244
+Gen 31: Improvement = 113.9244
+Gen 32: Improvement = 113.9244
+Gen 33: Improvement = 113.9244
+Gen 34: Improvement = 113.9244
+Gen 35: Improvement = 113.9244
+Gen 36: Improvement = 113.9244
+Gen 37: Improvement = 113.9244
+Gen 38: Improvement = 113.9244
+Gen 39: Improvement = 113.9244
+Gen 40: Improvement = 113.9244
+Gen 41: Improvement = 113.9244
+Gen 42: Improvement = 113.9244
+Gen 43: Improvement = 113.9244
+Gen 44: Improvement = 113.9244
+Gen 45: Improvement = 113.9244
+Gen 46: Improvement = 113.9244
+Gen 47: Improvement = 113.9244
+Gen 48: Improvement = 113.9244
+Gen 49: Improvement = 113.9244
+Gen 50: Improvement = 113.9244
+Gen 51: Improvement = 113.9244
+Gen 52: Improvement = 113.9244
+Gen 53: Improvement = 113.9244
+Gen 54: Improvement = 113.9244
+Gen 55: Improvement = 113.9244
+Gen 56: Improvement = 113.9244
+Gen 57: Improvement = 113.9244
+Gen 58: Improvement = 113.9244
+Gen 59: Improvement = 113.9244
+Gen 60: Improvement = 113.9244
+Gen 61: Improvement = 113.9244
+Gen 62: Improvement = 113.9244
+Gen 63: Improvement = 113.9244
+Gen 64: Improvement = 113.9244
+Gen 65: Improvement = 113.9244
+Gen 66: Improvement = 113.9244
+Gen 67: Improvement = 113.9244
+Gen 68: Improvement = 113.9244
+Gen 69: Improvement = 113.9244
+Gen 70: Improvement = 113.9244
+Gen 71: Improvement = 113.9244
+Gen 72: Improvement = 113.9244
+Gen 73: Improvement = 113.9244
+Gen 74: Improvement = 113.9244
+Gen 75: Improvement = 113.9244
+Gen 76: Improvement = 113.9244
+Gen 77: Improvement = 113.9244
+Gen 78: Improvement = 113.9244
+Gen 79: Improvement = 113.9244
+Gen 80: Improvement = 113.9244
+Gen 81: Improvement = 113.9244
+Gen 82: Improvement = 113.9244
+Gen 83: Improvement = 113.9244
+Gen 84: Improvement = 113.9244
+Gen 85: Improvement = 113.9244
+Gen 86: Improvement = 113.9244
+Gen 87: Improvement = 113.9244
+Gen 88: Improvement = 113.9244
+Gen 89: Improvement = 113.9244
+Gen 90: Improvement = 113.9244
+Gen 91: Improvement = 113.9244
+Gen 92: Improvement = 113.9244
+Gen 93: Improvement = 113.9244
+Gen 94: Improvement = 113.9244
+Gen 95: Improvement = 113.9244
+Gen 96: Improvement = 113.9244
+Gen 97: Improvement = 113.9244
+Gen 98: Improvement = 113.9244
+Gen 99: Improvement = 113.9244
+Gen 100: Improvement = 113.9244
+
+=== PSO Finished ===
+Final Best Weights (Normalized) = [0.7375609684665557, 0.4774870754494311, 0.1709702242132032, 0.22494192755074718, 0.3849418426667428]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.978 (14668 / 15000)
+全局本地缓存命中率: 0.371
+全局边缘云命中率: 0.561
+全局远端访问率: 0.069
+平均任务延迟: 198.870 ms
+
+--- 4. Running Genetic Algorithm (GA) ---
+Gen  1: Improvement = 0.0000
+Gen  2: Improvement = 0.0000
+Gen  3: Improvement = 0.0000
+Gen  4: Improvement = 0.0000
+Gen  5: Improvement = 0.0000
+Gen  6: Improvement = 0.0000
+Gen  7: Improvement = 0.0000
+Gen  8: Improvement = 0.0000
+Gen  9: Improvement = 0.0000
+Gen 10: Improvement = 0.0000
+Gen 11: Improvement = 0.0000
+Gen 12: Improvement = 0.0000
+Gen 13: Improvement = 0.0000
+Gen 14: Improvement = 0.0000
+Gen 15: Improvement = 0.0000
+Gen 16: Improvement = 0.0000
+Gen 17: Improvement = 0.0000
+Gen 18: Improvement = 0.0000
+Gen 19: Improvement = 42.5761
+Gen 20: Improvement = 42.5761
+Gen 21: Improvement = 42.5761
+Gen 22: Improvement = 42.5761
+Gen 23: Improvement = 42.5761
+Gen 24: Improvement = 42.5761
+Gen 25: Improvement = 42.5761
+Gen 26: Improvement = 42.5761
+Gen 27: Improvement = 42.5761
+Gen 28: Improvement = 42.5761
+Gen 29: Improvement = 42.5761
+Gen 30: Improvement = 42.5761
+Gen 31: Improvement = 42.5761
+Gen 32: Improvement = 42.5761
+Gen 33: Improvement = 42.5761
+Gen 34: Improvement = 42.5761
+Gen 35: Improvement = 42.5761
+Gen 36: Improvement = 91.5262
+Gen 37: Improvement = 91.5262
+Gen 38: Improvement = 91.5262
+Gen 39: Improvement = 91.5262
+Gen 40: Improvement = 91.5262
+Gen 41: Improvement = 91.5262
+Gen 42: Improvement = 91.5262
+Gen 43: Improvement = 91.5262
+Gen 44: Improvement = 91.5262
+Gen 45: Improvement = 91.5262
+Gen 46: Improvement = 91.5262
+Gen 47: Improvement = 91.5262
+Gen 48: Improvement = 91.5262
+Gen 49: Improvement = 91.5262
+Gen 50: Improvement = 91.5262
+Gen 51: Improvement = 91.5262
+Gen 52: Improvement = 91.5262
+Gen 53: Improvement = 91.5262
+Gen 54: Improvement = 91.5262
+Gen 55: Improvement = 91.5262
+Gen 56: Improvement = 91.5262
+Gen 57: Improvement = 91.5262
+Gen 58: Improvement = 91.5262
+Gen 59: Improvement = 91.5262
+Gen 60: Improvement = 91.5262
+Gen 61: Improvement = 91.5262
+Gen 62: Improvement = 91.5262
+Gen 63: Improvement = 91.5262
+Gen 64: Improvement = 91.5262
+Gen 65: Improvement = 91.5262
+Gen 66: Improvement = 91.5262
+Gen 67: Improvement = 91.5262
+Gen 68: Improvement = 91.5262
+Gen 69: Improvement = 91.5262
+Gen 70: Improvement = 91.5262
+Gen 71: Improvement = 91.5262
+Gen 72: Improvement = 91.5262
+Gen 73: Improvement = 91.5262
+Gen 74: Improvement = 91.5262
+Gen 75: Improvement = 91.5262
+Gen 76: Improvement = 91.5262
+Gen 77: Improvement = 91.5262
+Gen 78: Improvement = 91.5262
+Gen 79: Improvement = 91.5262
+Gen 80: Improvement = 91.5262
+Gen 81: Improvement = 91.5262
+Gen 82: Improvement = 126.7698
+Gen 83: Improvement = 126.7698
+Gen 84: Improvement = 126.7698
+Gen 85: Improvement = 126.7698
+Gen 86: Improvement = 131.6562
+Gen 87: Improvement = 159.6162
+Gen 88: Improvement = 159.6162
+Gen 89: Improvement = 169.3552
+Gen 90: Improvement = 169.3552
+Gen 91: Improvement = 169.3552
+Gen 92: Improvement = 169.3552
+Gen 93: Improvement = 169.3552
+Gen 94: Improvement = 228.6880
+Gen 95: Improvement = 228.6880
+Gen 96: Improvement = 254.1124
+Gen 97: Improvement = 258.5011
+Gen 98: Improvement = 258.5011
+Gen 99: Improvement = 313.1698
+Gen 100: Improvement = 313.1698
+
+=== GA Finished ===
+Final Best Weights (Normalized) = [0.15703173605416088, 0.13140618720152233, 0.5783243170783366, 0.0, 0.7896926187529236]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.978 (14673 / 15000)
+全局本地缓存命中率: 0.395
+全局边缘云命中率: 0.534
+全局远端访问率: 0.070
+平均任务延迟: 196.477 ms
+
+--- 5. Running Ant Colony Optimization (ACO) ---
+ACO Initializing (Granularity: 41)...
+Gen  1: Improvement = 138.9952
+Gen  2: Improvement = 138.9952
+Gen  3: Improvement = 138.9952
+Gen  4: Improvement = 138.9952
+Gen  5: Improvement = 138.9952
+Gen  6: Improvement = 149.2037
+Gen  7: Improvement = 165.4298
+Gen  8: Improvement = 165.4298
+Gen  9: Improvement = 373.3355
+Gen 10: Improvement = 373.3355
+Gen 11: Improvement = 373.3355
+Gen 12: Improvement = 373.3355
+Gen 13: Improvement = 373.3355
+Gen 14: Improvement = 373.3355
+Gen 15: Improvement = 373.3355
+Gen 16: Improvement = 373.3355
+Gen 17: Improvement = 373.3355
+Gen 18: Improvement = 373.3355
+Gen 19: Improvement = 373.3355
+Gen 20: Improvement = 443.8040
+Gen 21: Improvement = 443.8040
+Gen 22: Improvement = 443.8040
+Gen 23: Improvement = 443.8040
+Gen 24: Improvement = 443.8040
+Gen 25: Improvement = 443.8040
+Gen 26: Improvement = 443.8040
+Gen 27: Improvement = 443.8040
+Gen 28: Improvement = 443.8040
+Gen 29: Improvement = 443.8040
+Gen 30: Improvement = 443.8040
+Gen 31: Improvement = 443.8040
+Gen 32: Improvement = 443.8040
+Gen 33: Improvement = 443.8040
+Gen 34: Improvement = 443.8040
+Gen 35: Improvement = 443.8040
+Gen 36: Improvement = 443.8040
+Gen 37: Improvement = 443.8040
+Gen 38: Improvement = 443.8040
+Gen 39: Improvement = 443.8040
+Gen 40: Improvement = 443.8040
+Gen 41: Improvement = 443.8040
+Gen 42: Improvement = 443.8040
+Gen 43: Improvement = 443.8040
+Gen 44: Improvement = 443.8040
+Gen 45: Improvement = 443.8040
+Gen 46: Improvement = 443.8040
+Gen 47: Improvement = 443.8040
+Gen 48: Improvement = 443.8040
+Gen 49: Improvement = 443.8040
+Gen 50: Improvement = 443.8040
+Gen 51: Improvement = 443.8040
+Gen 52: Improvement = 443.8040
+Gen 53: Improvement = 443.8040
+Gen 54: Improvement = 443.8040
+Gen 55: Improvement = 443.8040
+Gen 56: Improvement = 443.8040
+Gen 57: Improvement = 443.8040
+Gen 58: Improvement = 443.8040
+Gen 59: Improvement = 443.8040
+Gen 60: Improvement = 443.8040
+Gen 61: Improvement = 443.8040
+Gen 62: Improvement = 443.8040
+Gen 63: Improvement = 443.8040
+Gen 64: Improvement = 443.8040
+Gen 65: Improvement = 443.8040
+Gen 66: Improvement = 443.8040
+Gen 67: Improvement = 443.8040
+Gen 68: Improvement = 443.8040
+Gen 69: Improvement = 443.8040
+Gen 70: Improvement = 443.8040
+Gen 71: Improvement = 443.8040
+Gen 72: Improvement = 443.8040
+Gen 73: Improvement = 443.8040
+Gen 74: Improvement = 443.8040
+Gen 75: Improvement = 443.8040
+Gen 76: Improvement = 443.8040
+Gen 77: Improvement = 443.8040
+Gen 78: Improvement = 443.8040
+Gen 79: Improvement = 443.8040
+Gen 80: Improvement = 443.8040
+Gen 81: Improvement = 443.8040
+Gen 82: Improvement = 443.8040
+Gen 83: Improvement = 443.8040
+Gen 84: Improvement = 443.8040
+Gen 85: Improvement = 443.8040
+Gen 86: Improvement = 443.8040
+Gen 87: Improvement = 443.8040
+Gen 88: Improvement = 443.8040
+Gen 89: Improvement = 443.8040
+Gen 90: Improvement = 443.8040
+Gen 91: Improvement = 443.8040
+Gen 92: Improvement = 443.8040
+Gen 93: Improvement = 443.8040
+Gen 94: Improvement = 443.8040
+Gen 95: Improvement = 443.8040
+Gen 96: Improvement = 443.8040
+Gen 97: Improvement = 443.8040
+Gen 98: Improvement = 443.8040
+Gen 99: Improvement = 443.8040
+Gen 100: Improvement = 443.8040
+
+=== ACO Finished ===
+Final Best Weights (Normalized) = [0.5473485212776957, 0.6328717277273357, 0.03420928257985598, 0.5131392386978397, 0.1881510541892079]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.978 (14677 / 15000)
+全局本地缓存命中率: 0.407
+全局边缘云命中率: 0.526
+全局远端访问率: 0.067
+平均任务延迟: 194.555 ms
+
+--- 6. Running Advanced Simulated Annealing (UpdateSA) ---
+--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---
+--- Pre-seeding finished. Elite archive size: 6 ---
+Gen  1 (Temp 5.00e+02): Improvement = 181.3380
+Gen  2 (Temp 4.50e+02): Improvement = 360.7681
+Gen  3 (Temp 4.05e+02): Improvement = 360.7681
+Gen  4 (Temp 3.65e+02): Improvement = 360.7681
+Gen  5 (Temp 3.28e+02): Improvement = 362.8567
+Gen  6 (Temp 2.95e+02): Improvement = 362.8567
+Gen  7 (Temp 2.66e+02): Improvement = 362.8567
+Gen  8 (Temp 2.39e+02): Improvement = 362.8567
+Gen  9 (Temp 2.15e+02): Improvement = 362.8567
+Gen 10 (Temp 1.94e+02): Improvement = 362.8567
+Gen 11 (Temp 1.74e+02): Improvement = 362.8567
+Gen 12 (Temp 1.57e+02): Improvement = 362.8567
+Gen 13 (Temp 1.41e+02): Improvement = 362.8567
+Gen 14 (Temp 1.27e+02): Improvement = 362.8567
+Gen 15 (Temp 1.14e+02): Improvement = 362.8567
+Gen 16 (Temp 1.03e+02): Improvement = 362.8567
+Gen 17 (Temp 9.27e+01): Improvement = 362.8567
+Gen 18 (Temp 8.34e+01): Improvement = 362.8567
+Gen 19 (Temp 7.50e+01): Improvement = 362.8567
+Gen 20 (Temp 6.75e+01): Improvement = 362.8567
+Gen 21 (Temp 6.08e+01): Improvement = 362.8567
+Gen 22 (Temp 5.47e+01): Improvement = 443.4470
+Gen 23 (Temp 4.92e+01): Improvement = 443.4470
+Gen 24 (Temp 4.43e+01): Improvement = 443.4470
+Gen 25 (Temp 3.99e+01): Improvement = 443.4470
+Gen 26 (Temp 3.59e+01): Improvement = 443.4470
+Gen 27 (Temp 3.23e+01): Improvement = 443.4470
+Gen 28 (Temp 2.91e+01): Improvement = 443.4470
+Gen 29 (Temp 2.62e+01): Improvement = 443.4470
+Gen 30 (Temp 2.36e+01): Improvement = 443.4470
+Gen 31 (Temp 2.12e+01): Improvement = 443.4470
+Gen 32 (Temp 1.91e+01): Improvement = 443.4470
+Gen 33 (Temp 1.72e+01): Improvement = 443.4470
+Gen 34 (Temp 1.55e+01): Improvement = 443.4470
+Gen 35 (Temp 1.39e+01): Improvement = 443.4470
+Gen 36 (Temp 1.25e+01): Improvement = 443.4470
+Gen 37 (Temp 1.13e+01): Improvement = 443.4470
+Gen 38 (Temp 1.01e+01): Improvement = 443.4470
+Gen 39 (Temp 9.12e+00): Improvement = 443.4470
+Gen 40 (Temp 8.21e+00): Improvement = 443.4470
+Gen 41 (Temp 7.39e+00): Improvement = 443.4470
+Gen 42 (Temp 6.65e+00): Improvement = 443.4470
+Gen 43 (Temp 5.99e+00): Improvement = 443.4470
+Gen 44 (Temp 5.39e+00): Improvement = 443.4470
+Gen 45 (Temp 4.85e+00): Improvement = 443.4470
+Gen 46 (Temp 4.36e+00): Improvement = 443.4470
+Gen 47 (Temp 3.93e+00): Improvement = 487.3492
+Gen 48 (Temp 3.53e+00): Improvement = 487.3492
+Gen 49 (Temp 3.18e+00): Improvement = 487.3492
+Gen 50 (Temp 2.86e+00): Improvement = 487.3492
+Gen 51 (Temp 2.58e+00): Improvement = 487.3492
+Gen 52 (Temp 2.32e+00): Improvement = 487.3492
+Gen 53 (Temp 2.09e+00): Improvement = 487.3492
+Gen 54 (Temp 1.88e+00): Improvement = 487.3492
+Gen 55 (Temp 1.69e+00): Improvement = 487.3492
+Gen 56 (Temp 1.52e+00): Improvement = 487.3492
+Gen 57 (Temp 1.37e+00): Improvement = 487.3492
+Gen 58 (Temp 1.23e+00): Improvement = 487.3492
+Gen 59 (Temp 1.11e+00): Improvement = 487.3492
+Gen 60 (Temp 9.98e-01): Improvement = 487.3492
+Gen 61 (Temp 8.99e-01): Improvement = 487.3492
+Gen 62 (Temp 8.09e-01): Improvement = 487.3492
+Gen 63 (Temp 7.28e-01): Improvement = 487.3492
+Gen 64 (Temp 6.55e-01): Improvement = 487.3492
+Gen 65 (Temp 5.90e-01): Improvement = 487.3492
+Gen 66 (Temp 5.31e-01): Improvement = 487.3492
+Gen 67 (Temp 4.78e-01): Improvement = 487.3492
+Gen 68 (Temp 4.30e-01): Improvement = 487.3492
+Gen 69 (Temp 3.87e-01): Improvement = 487.3492
+Gen 70 (Temp 3.48e-01): Improvement = 487.3492
+Gen 71 (Temp 3.13e-01): Improvement = 487.3492
+Gen 72 (Temp 2.82e-01): Improvement = 487.3492
+--- Stagnation detected. Triggering GA Rescue #1 ---
+Gen 73 (Temp 4.23e-01): Improvement = 487.3492
+Gen 74 (Temp 3.81e-01): Improvement = 487.3492
+Gen 75 (Temp 3.43e-01): Improvement = 487.3492
+Gen 76 (Temp 3.08e-01): Improvement = 487.3492
+Gen 77 (Temp 2.77e-01): Improvement = 487.3492
+Gen 78 (Temp 2.50e-01): Improvement = 487.3492
+Gen 79 (Temp 2.25e-01): Improvement = 487.3492
+Gen 80 (Temp 2.02e-01): Improvement = 487.3492
+Gen 81 (Temp 1.82e-01): Improvement = 487.3492
+Gen 82 (Temp 1.64e-01): Improvement = 487.3492
+Gen 83 (Temp 1.47e-01): Improvement = 487.3492
+Gen 84 (Temp 1.33e-01): Improvement = 487.3492
+Gen 85 (Temp 1.19e-01): Improvement = 487.3492
+Gen 86 (Temp 1.08e-01): Improvement = 487.3492
+Gen 87 (Temp 9.68e-02): Improvement = 487.3492
+Gen 88 (Temp 8.71e-02): Improvement = 487.3492
+Gen 89 (Temp 7.84e-02): Improvement = 487.3492
+Gen 90 (Temp 7.05e-02): Improvement = 487.3492
+Gen 91 (Temp 6.35e-02): Improvement = 487.3492
+Gen 92 (Temp 5.71e-02): Improvement = 487.3492
+Gen 93 (Temp 5.14e-02): Improvement = 487.3492
+Gen 94 (Temp 4.63e-02): Improvement = 487.3492
+Gen 95 (Temp 4.16e-02): Improvement = 487.3492
+Gen 96 (Temp 3.75e-02): Improvement = 487.3492
+Gen 97 (Temp 3.37e-02): Improvement = 487.3492
+--- Stagnation detected. Triggering GA Rescue #2 ---
+Gen 98 (Temp 5.06e-02): Improvement = 487.3492
+Gen 99 (Temp 4.55e-02): Improvement = 487.3492
+Gen 100 (Temp 4.10e-02): Improvement = 487.3492
+Gen 101 (Temp 3.69e-02): Improvement = 487.3492
+Gen 102 (Temp 3.32e-02): Improvement = 487.3492
+Gen 103 (Temp 2.99e-02): Improvement = 487.3492
+Gen 104 (Temp 2.69e-02): Improvement = 487.3492
+Gen 105 (Temp 2.42e-02): Improvement = 487.3492
+Gen 106 (Temp 2.18e-02): Improvement = 487.3492
+Gen 107 (Temp 1.96e-02): Improvement = 487.3492
+Gen 108 (Temp 1.76e-02): Improvement = 487.3492
+Gen 109 (Temp 1.59e-02): Improvement = 487.3492
+Gen 110 (Temp 1.43e-02): Improvement = 487.3492
+Gen 111 (Temp 1.29e-02): Improvement = 487.3492
+Gen 112 (Temp 1.16e-02): Improvement = 487.3492
+Gen 113 (Temp 1.04e-02): Improvement = 487.3492
+Gen 114 (Temp 9.38e-03): Improvement = 487.3492
+Gen 115 (Temp 8.44e-03): Improvement = 487.3492
+Gen 116 (Temp 7.60e-03): Improvement = 487.3492
+Gen 117 (Temp 6.84e-03): Improvement = 487.3492
+Gen 118 (Temp 6.15e-03): Improvement = 487.3492
+Gen 119 (Temp 5.54e-03): Improvement = 487.3492
+Gen 120 (Temp 4.98e-03): Improvement = 487.3492
+Gen 121 (Temp 4.49e-03): Improvement = 487.3492
+Gen 122 (Temp 4.04e-03): Improvement = 487.3492
+--- Stagnation detected. Triggering GA Rescue #3 ---
+Gen 123 (Temp 6.05e-03): Improvement = 487.3492
+Gen 124 (Temp 5.45e-03): Improvement = 487.3492
+Gen 125 (Temp 4.90e-03): Improvement = 525.7993
+Gen 126 (Temp 4.41e-03): Improvement = 525.7993
+Gen 127 (Temp 3.97e-03): Improvement = 525.7993
+Gen 128 (Temp 3.58e-03): Improvement = 525.7993
+Gen 129 (Temp 3.22e-03): Improvement = 525.7993
+Gen 130 (Temp 2.90e-03): Improvement = 525.7993
+Gen 131 (Temp 2.61e-03): Improvement = 525.7993
+Gen 132 (Temp 2.35e-03): Improvement = 525.7993
+Gen 133 (Temp 2.11e-03): Improvement = 525.7993
+Gen 134 (Temp 1.90e-03): Improvement = 1214.6561
+Gen 135 (Temp 1.71e-03): Improvement = 1214.6561
+Gen 136 (Temp 1.54e-03): Improvement = 1214.6561
+Gen 137 (Temp 1.39e-03): Improvement = 1214.6561
+Gen 138 (Temp 1.25e-03): Improvement = 1214.6561
+Gen 139 (Temp 1.12e-03): Improvement = 1214.6561
+Gen 140 (Temp 1.01e-03): Improvement = 1214.6561
+
+=== SA with GA-Rescue Finished ===
+Final Best Weights (Normalized) = [0.730472282921731, 0.09196208219297247, 0.6766220090410457, 0.0, 0.011656594833231337]
+---- 与最高分对应的系统性能统计 ----
+总处理任务数: 15000
+任务完成率: 0.975 (14620 / 15000)
+全局本地缓存命中率: 0.472
+全局边缘云命中率: 0.455
+全局远端访问率: 0.072
+平均任务延迟: 182.850 ms
+
+==========================================================
+=== Final Score Summary for: [合成数据-指数分布 (1.5万行, 1000 ID)] ===
+==========================================================
+Algorithm                      | Best Score      | Improvement vs Baseline
+----------------------------------------------------------------------
+Random Search (Baseline)       | 6948.6147       | N/A                 
+Simulated Annealing (SA)       | 7302.5590       | 353.9443            
+Particle Swarm (PSO)           | 7062.5390       | 113.9244            
+Genetic Algorithm (GA)         | 7261.7845       | 313.1698            
+Ant Colony (ACO)               | 7392.4187       | 443.8040            
+Advanced SA (UpdateSA)         | 8163.2708       | 1214.6561           
+==========================================================
+
+
+=== Run #2 Finished. ===
+实验 #2 结束时间: Mon Nov 17 22:12:27 CST 2025
