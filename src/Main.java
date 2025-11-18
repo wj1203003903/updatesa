@@ -109,18 +109,17 @@ public class Main {
             out.println("实验 #" + runNumber + " 开始时间: " + new Date());
             long randomseed = (long)runNumber * runNumber * runNumber * 1000;
             out.printf("\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d (Seed: %d) >>>>>>>>>>\n", runNumber, randomseed);
-            long localCapacity = 500L * 1024L;
+            long localCapacity = 600L * 1024L;
             long edgeCapacity = 2000L * 1024L;
             DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
             int syntheticRequests = 15000;
-            int syntheticUniqueIds = 800;
+            int syntheticUniqueIds = 300;
 
             // 使用新参数创建 DataGenerator
             DataGenerator generator = new DataGenerator(syntheticRequests, syntheticUniqueIds, randomseed);
 
             // 运行测试
-            runExperimentOnDataset("合成数据-正态分布 (1.5万行, 1000 ID)", generator.generateNormalDistribution(), dataManager, randomseed, out);
-            runExperimentOnDataset("合成数据-指数分布 (1.5万行, 1000 ID)", generator.generateExponentialDistribution(), dataManager, randomseed, out);
+            runExperimentOnDataset("合成数据-zip分布 (1.5万行, 1000 ID)", generator.generateData(), dataManager, randomseed, out);
 
             out.println("\n\n=== Run #" + runNumber + " Finished. ===");
             out.println("实验 #" + runNumber + " 结束时间: " + new Date());
