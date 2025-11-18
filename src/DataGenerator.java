@@ -9,28 +9,46 @@ public class DataGenerator {
     private final int numRequests;
     private final int numUniqueIds;
     private final Random random;
-
-    // --- 【核心修改】新增一个Map来存储每个ID唯一的尺寸 ---
     private final Map<Integer, Integer> idToSizeMap;
 
     public DataGenerator(int numRequests, int numUniqueIds, long seed) {
         this.numRequests = numRequests;
         this.numUniqueIds = numUniqueIds;
         this.random = new Random(seed);
-
-        // --- 【核心修改】在构造函数中，预先为所有唯一ID生成并存储它们的固定尺寸 ---
         this.idToSizeMap = new HashMap<>();
-        System.out.println("预生成 " + numUniqueIds + " 个唯一ID的固定尺寸...");
+
+        System.out.println("预生成 " + numUniqueIds + " 个唯一ID的固定尺寸 (模拟真实数据分布，上限200KB)...");
+
+        // 底层正态分布的参数 (保持不变)
+        double mu = 9.0;
+        double sigma = 2.2;
+
         for (int id = 1; id <= numUniqueIds; id++) {
-            // 为每个ID生成一个随机但固定的尺寸，并存入Map
-            // 生成 Size 的逻辑与之前相同 (均值4000, 标准差2000, 最小500)
-            int size = (int) Math.max(500, random.nextGaussian() * 2000 + 4000);
+            double gaussian = random.nextGaussian();
+            double logSize = mu + sigma * gaussian;
+            int size = (int) Math.exp(logSize);
+
+            // 首先，确保一个最小尺寸
+            size = Math.max(100, size);
+
+            // --- 【核心修改】在这里增加一个最大尺寸的硬上限 ---
+            size = Math.min(size, 200000); // 确保最大尺寸不超过 200,000 字节
+
             this.idToSizeMap.put(id, size);
+        }
+
+        // (可选但推荐) 打印一些样本大小以供验证
+        System.out.println("生成 Size 样本 (前20个):");
+        for (int id = 1; id <= Math.min(20, numUniqueIds); id++) {
+            System.out.println("ID " + id + ": " + this.idToSizeMap.get(id) + " bytes");
         }
     }
 
+    // ... 下面的 generateNormalDistribution, generateExponentialDistribution,
+    // และ createHeavyTaskItem 方法保持不变...
+
     public DataItem[] generateNormalDistribution() {
-        System.out.println("生成正态分布数据 (ID与Size固定)...");
+        System.out.println("生成正态分布的'重任务'数据 (ID与Size固定, Deadline窗口现实)...");
         List<DataItem> dataList = new ArrayList<>();
         long currentTime = 804556800000L;
 
@@ -39,21 +57,19 @@ public class DataGenerator {
                 currentTime += random.nextInt(4000);
             }
 
-            // 生成ID (逻辑不变)
             double meanId = numUniqueIds / 2.0;
             double stdDevId = numUniqueIds / 6.0;
             double gaussianId = random.nextGaussian() * stdDevId + meanId;
             int id = (int) Math.round(Math.max(1, Math.min(gaussianId, numUniqueIds)));
 
-            // 创建DataItem，此时会使用预先生成的固定size
-            DataItem item = createItemWithFixedAttributes(id, currentTime);
+            DataItem item = createHeavyTaskItem(id, currentTime);
             dataList.add(item);
         }
         return dataList.toArray(new DataItem[0]);
     }
 
     public DataItem[] generateExponentialDistribution() {
-        System.out.println("生成指数分布数据 (ID与Size固定)...");
+        System.out.println("生成指数分布的'重任务'数据 (ID与Size固定, Deadline窗口现实)...");
         List<DataItem> dataList = new ArrayList<>();
         long currentTime = 804556800000L;
 
@@ -62,32 +78,22 @@ public class DataGenerator {
                 currentTime += random.nextInt(4000);
             }
 
-            // 生成ID (逻辑不变)
             double lambda = 5.0;
             double exponentialValue = -Math.log(1 - random.nextDouble()) / lambda;
             double mappedValue = 1 - Math.exp(-exponentialValue);
             int id = (int) (mappedValue * numUniqueIds) + 1;
 
-            // 创建DataItem，此时会使用预先生成的固定size
-            DataItem item = createItemWithFixedAttributes(id, currentTime);
+            DataItem item = createHeavyTaskItem(id, currentTime);
             dataList.add(item);
         }
         return dataList.toArray(new DataItem[0]);
     }
 
-    /**
-     * --- 【核心修改】辅助方法已重命名并修改逻辑 ---
-     * 它不再随机生成size，而是从Map中查询。
-     */
-    private DataItem createItemWithFixedAttributes(int id, long arrivalTime) {
-        final long BASE_TIME_WINDOW_MS = 400;
-        final double EXTRA_TIME_PER_BYTE = 0.05;
-
-        // --- 从Map中获取这个ID对应的、预先生成的固定尺寸 ---
+    private DataItem createHeavyTaskItem(int id, long arrivalTime) {
+        final long USER_TOLERANCE_WINDOW_MS = 2000;
+        long randomJitter = random.nextInt(1001) - 500;
+        long deadline = arrivalTime + USER_TOLERANCE_WINDOW_MS + randomJitter;
         int size = this.idToSizeMap.get(id);
-
-        // 根据固定的size和当前的arrivalTime生成Deadline
-        long deadline = arrivalTime + BASE_TIME_WINDOW_MS + (long)(size * EXTRA_TIME_PER_BYTE);
 
         return new DataItem(id, size, "synthetic_request", arrivalTime, deadline);
     }

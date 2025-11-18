@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class LogProcessor {
 
     // --- 配置 ---
-    private static final String LOG_FILE_PATH_TEMPLATE = "/Users/a1203003903/IdeaProjects/updatesa/experiment_run-%d_2025-11-17_18-17-44.txt";
+    private static final String LOG_FILE_PATH_TEMPLATE = "/Users/a1203003903/IdeaProjects/updatesa/experiment_run-%d_2025-11-17_21-07-57.txt";
     private static final String[] ALGORITHMS = {
             "Simulated Annealing (SA)",
             "Particle Swarm (PSO)",
