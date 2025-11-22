@@ -46,7 +46,7 @@ public class DataManager {
 
         double completionRate = (double) completedTasks / totalTasks;
         double averageDelay = totalDelaySeconds / totalTasks;
-        double w1 = 10.0, w2 = 1.0, w3 = 10.0;
+        double w1 = 20.0, w2 = 1.0, w3 = 10.0;
         if (averageDelay == 0) return Double.POSITIVE_INFINITY;
         return 100 * (w1 * localHitRate + w2 * cloudHitRate + w3 * completionRate) / (averageDelay);
     }

@@ -1,190 +1,250 @@
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
-    /**
-     * 从CSV文件加载数据项。
-     * @param filePath CSV文件路径。
-     * @param maxLines 要读取的最大行数（0或负数表示读取全部）。
-     * @return DataItem数组。
-     */
+    // ==========================================
+    // 1. 仿真上下文 (State Machine)
+    // ==========================================
+    static class SimContext {
+        String name;
+        DataManager dm;
+        double[] weights;
+
+        // DataTest 逻辑变量
+        List<DataItem> futureTasks;
+        List<DataItem> readyQueue;
+        int completedCount;
+        int futurePtr;
+        long currentTime;
+
+        public SimContext(String name, DataManager dm, DataItem[] dataset) {
+            this.name = name;
+            this.dm = dm;
+            this.weights = null;
+
+            this.futureTasks = new ArrayList<>();
+            for (DataItem item : dataset) this.futureTasks.add(cloneItem(item));
+            this.futureTasks.sort(Comparator.comparingLong(item -> item.arrivalTime));
+
+            this.readyQueue = new ArrayList<>();
+            this.completedCount = 0;
+            this.futurePtr = 0;
+            if (!futureTasks.isEmpty()) this.currentTime = futureTasks.get(0).arrivalTime;
+
+            for (DataItem item : this.futureTasks) {
+                dm.registerDataItem(item);
+                dm.addDataToRemote(item, item.arrivalTime);
+            }
+        }
+
+        public void runToTarget(int targetCount) {
+            if (this.weights != null) DataItem.setWeights(this.weights);
+
+            while (this.completedCount < targetCount && this.completedCount < futureTasks.size()) {
+                while (futurePtr < futureTasks.size() && futureTasks.get(futurePtr).arrivalTime <= currentTime) {
+                    readyQueue.add(futureTasks.get(futurePtr));
+                    futurePtr++;
+                }
+
+                if (!readyQueue.isEmpty()) {
+                    final long decisionTime = currentTime;
+                    DataItem bestTask = readyQueue.stream()
+                            .max(Comparator.comparingDouble(item -> item.getSchedulingScore(decisionTime)))
+                            .orElse(null);
+
+                    readyQueue.remove(bestTask);
+                    long duration = dm.processAndGetDuration(bestTask, currentTime, readyQueue.size());
+                    currentTime += duration;
+                    completedCount++;
+                } else {
+                    if (futurePtr < futureTasks.size()) {
+                        currentTime = futureTasks.get(futurePtr).arrivalTime;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // 2. 数据加载与辅助
+    // ==========================================
     private static DataItem[] loadDataFromFile(String filePath, int maxLines) {
         List<DataItem> dataList = new ArrayList<>();
-        String line;
-        // 使用try-with-resources确保BufferedReader被正确关闭
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine(); // 跳过表头
-            int lineCount = 0;
-            while ((line = br.readLine()) != null && (maxLines <= 0 || lineCount < maxLines)) {
-                String[] values = line.split(",");
-                int id = Integer.parseInt(values[0].replace("\"", ""));
-                int size = Integer.parseInt(values[1].replace("\"", ""));
-                long arrivalTime = (long) Double.parseDouble(values[2].replace("\"", ""));
-                long deadline = (long) Double.parseDouble(values[3].replace("\"", ""));
-                String type = "nasa_request";
-                dataList.add(new DataItem(id, size, type, arrivalTime, deadline));
-                lineCount++;
+            br.readLine();
+            String line;
+            int count = 0;
+            while ((line = br.readLine()) != null && (maxLines <= 0 || count < maxLines)) {
+                String[] v = line.split(",");
+                int id = Integer.parseInt(v[0].replace("\"", "").trim());
+                int size = Integer.parseInt(v[1].replace("\"", "").trim());
+                long arr = (long) Double.parseDouble(v[2].replace("\"", "").trim());
+                long ddl = (long) Double.parseDouble(v[3].replace("\"", "").trim());
+                dataList.add(new DataItem(id, size, "nasa", arr, ddl));
+                count++;
             }
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("错误：读取或解析 " + filePath + " 失败！");
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return dataList.toArray(new DataItem[0]);
     }
 
-    /**
-     * 线程安全版本：在单个数据集上运行所有算法，并将结果打印到指定的PrintStream。
-     */
-    public static void runExperimentOnDataset(String datasetName, DataItem[] dataSet, DataManager dm, long seed, PrintStream out) {
-        out.printf("\n\n=============== 正在对 [%s] 数据集运行完整测试 ===============\n", datasetName);
-        if (dataSet == null || dataSet.length == 0) {
-            out.println("错误：数据集为空，跳过测试。");
-            return;
-        }
-
-        // 重置数据管理器并加载新数据
-        dm.reset();
-        for (DataItem item : dataSet) {
-            dm.registerDataItem(item);
-            dm.addDataToRemote(item, item.arrivalTime);
-        }
-
-        Map<String, Double> results = new LinkedHashMap<>();
-        double baselineScore;
-
-        out.println("\n--- 1. Running Random Search (to set Baseline) ---");
-        RandomSearch rs = new RandomSearch(dataSet, dm, seed);
-        baselineScore = rs.run(out);
-        results.put("Random Search (Baseline)", baselineScore);
-
-        out.println("\n--- 2. Running Basic Simulated Annealing (SA) ---");
-        SA sa = new SA(dataSet, dm, seed);
-        results.put("Simulated Annealing (SA)", sa.run(out, baselineScore));
-
-        out.println("\n--- 3. Running Particle Swarm Optimization (PSO) ---");
-        PSO pso = new PSO(dataSet, dm, seed);
-        results.put("Particle Swarm (PSO)", pso.run(out, baselineScore));
-
-        out.println("\n--- 4. Running Genetic Algorithm (GA) ---");
-        GA ga = new GA(dataSet, dm, seed);
-        results.put("Genetic Algorithm (GA)", ga.run(out, baselineScore));
-
-        out.println("\n--- 5. Running Ant Colony Optimization (ACO) ---");
-        ACO aco = new ACO(dataSet, dm, seed);
-        results.put("Ant Colony (ACO)", aco.run(out, baselineScore));
-
-        out.println("\n--- 6. Running Advanced Simulated Annealing (UpdateSA) ---");
-        UpdateSA updateSA = new UpdateSA(dataSet, dm, seed);
-        results.put("Advanced SA (UpdateSA)", updateSA.run(out, baselineScore));
-
-        // 打印总结报告
-        out.println("\n==========================================================");
-        out.printf("=== Final Score Summary for: [%-20s] ===\n", datasetName);
-        out.println("==========================================================");
-        out.printf("%-30s | %-15s | %-20s\n", "Algorithm", "Best Score", "Improvement vs Baseline");
-        out.println("----------------------------------------------------------------------");
-
-        for (Map.Entry<String, Double> entry : results.entrySet()) {
-            String name = entry.getKey();
-            double score = entry.getValue();
-            if (name.contains("Baseline")) {
-                out.printf("%-30s | %-15.4f | %-20s\n", name, score, "N/A");
-            } else {
-                double improvement = score - baselineScore;
-                out.printf("%-30s | %-15.4f | %-20.4f\n", name, score, improvement);
-            }
-        }
-        out.println("==========================================================");
+    private static DataItem cloneItem(DataItem o) {
+        return new DataItem(o.id, o.size, o.type, o.arrivalTime, o.deadline);
     }
 
-    /**
-     * 执行一次完整的实验运行，包括所有需要测试的数据集。
-     * @param runNumber 当前的运行编号。
-     */
-    public static void runSingleFullExperiment(int runNumber) {
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        String logFileName = String.format("experiment_run-%d_%s.txt", runNumber, timestamp);
+    // ==========================================
+    // 3. 动态实验主入口
+    // ==========================================
+    public static void runDynamicComparison(int runNumber) {
+        String filename = "dynamic_cumulative_run_" + runNumber + ".csv";
 
-        try (FileOutputStream fos = new FileOutputStream(logFileName);
+        try (FileOutputStream fos = new FileOutputStream(filename);
              PrintStream out = new PrintStream(fos, true, "UTF-8")) {
 
-            out.println("实验 #" + runNumber + " 开始时间: " + new Date());
-            long randomseed = (long)runNumber * 1000;
-            out.printf("\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d (Seed: %d) >>>>>>>>>>\n", runNumber, randomseed);
+            System.out.printf("\n=== 启动动态实验 (Run #%d) [Cumulative Metrics] ===\n", runNumber);
 
-            // --- 定义仿真环境参数 ---
-            long localCapacity = 3000L * 1024L;  // 3 MB
-            long edgeCapacity = 5000L * 1024L;   // 5 MB
-            DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
+            DataItem[] rawDataset = loadDataFromFile("dataset/processed_nasa_log.csv", 50000);
+            if (rawDataset.length == 0) return;
 
-            // --- 运行真实数据实验 ---
-            String nasaDataPath = "dataset/processed_nasa_log.csv";
-            runExperimentOnDataset("10k Tasks", loadDataFromFile(nasaDataPath, 10000), dataManager, randomseed, out);
-            runExperimentOnDataset("15k Tasks", loadDataFromFile(nasaDataPath, 15000), dataManager, randomseed, out);
-            runExperimentOnDataset("20k Tasks", loadDataFromFile(nasaDataPath, 20000), dataManager, randomseed, out);
+            // 建议：3MB L1, 5MB L2 (配合静态实验的规模)
+            long localCap = 3000 * 1024L;
+            long edgeCap = 5000 * 1024L;
 
-            // --- 运行合成数据实验 ---
-            int syntheticRequests = 15000;
-            // 【关键可调参数】这个值与仿真器的缓存容量共同决定了最终的“缓存命中率”
-            int syntheticUniqueIds = 1000;
+            SimContext ctxStatic = new SimContext("Static", new DataManager(localCap, edgeCap), rawDataset);
+            SimContext ctxSA     = new SimContext("SA",     new DataManager(localCap, edgeCap), rawDataset);
+            SimContext ctxPSO    = new SimContext("PSO",    new DataManager(localCap, edgeCap), rawDataset);
+            SimContext ctxGA     = new SimContext("GA",     new DataManager(localCap, edgeCap), rawDataset);
+            SimContext ctxACO    = new SimContext("ACO",    new DataManager(localCap, edgeCap), rawDataset);
+            SimContext ctxSAGA   = new SimContext("SAGA",   new DataManager(localCap, edgeCap), rawDataset);
 
-            DataGenerator generator = new DataGenerator(syntheticRequests, syntheticUniqueIds, randomseed);
+            int TOTAL_TASKS = rawDataset.length;
+            int RETRAIN_WINDOW = 5000;
+            int TRAINING_SIZE = 5000;
+            int LOG_INTERVAL = 500;
+            long seed = runNumber * 999L;
+            Random rng = new Random();
 
-            // 【核心】调用唯一的方法，并使用统一的名称
-            runExperimentOnDataset("Zipf Tasks", generator.generateData(), dataManager, randomseed, out);
+            // CSV Header
+            out.println("LogIndex," +
+                    "Static_Hit,SA_Hit,PSO_Hit,GA_Hit,ACO_Hit,SAGA_Hit," +
+                    "Static_Lat,SA_Lat,PSO_Lat,GA_Lat,ACO_Lat,SAGA_Lat," +
+                    "Static_Comp,SA_Comp,PSO_Comp,GA_Comp,ACO_Comp,SAGA_Comp");
 
-            out.println("\n\n=== Run #" + runNumber + " Finished. ===");
-            out.println("实验 #" + runNumber + " 结束时间: " + new Date());
+            // ==========================================
+            // 4. 步进循环
+            // ==========================================
+            for (int target = LOG_INTERVAL; target <= TOTAL_TASKS; target += LOG_INTERVAL) {
 
-        } catch (IOException e) {
-            System.err.println("运行实验 #" + runNumber + " 时发生严重IO错误:");
-            e.printStackTrace();
-        }
-    }
+                int currentProgress = target - LOG_INTERVAL;
 
-    public static void main(String[] args) {
-        System.out.println("主程序启动，开始并行执行所有实验...");
+                // --- A. 训练阶段 (All Cold Start) ---
+                if (currentProgress % RETRAIN_WINDOW == 0) {
+                    System.out.printf(">>> Progress %d: Retraining (Cold Start)...\n", currentProgress);
 
-        final int TOTAL_EXPERIMENT_RUNS = 10;
-        final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+                    if (currentProgress == 0) ctxStatic.weights = randomWeights(rng);
 
-        System.out.println("将使用 " + NUM_THREADS + " 个线程并行运行 " + TOTAL_EXPERIMENT_RUNS + " 次实验。");
+                    DataItem[] trainData = getTrainData(rawDataset, currentProgress, TRAINING_SIZE);
+                    DataManager trainDM = new DataManager(localCap, edgeCap);
 
-        ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+                    SA optSA = new SA(trainData, trainDM, seed + currentProgress);
+                    ctxSA.weights = optSA.optimize(null);
 
-        for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
-            final int runNumber = i;
-            executor.submit(() -> {
-                System.out.println("任务 #" + runNumber + " 已提交，准备在线程 " + Thread.currentThread().getName() + " 上运行。");
-                runSingleFullExperiment(runNumber);
-                System.out.println("任务 #" + runNumber + " 已完成。");
-            });
-        }
+                    PSO optPSO = new PSO(trainData, trainDM, seed + currentProgress);
+                    ctxPSO.weights = optPSO.optimize(null);
 
-        executor.shutdown();
-        try {
-            // 设置一个超长的超时时间，确保实验能跑完
-            if (!executor.awaitTermination(24, TimeUnit.HOURS)) {
-                System.err.println("错误：并非所有任务都在24小时内完成！正在强制关闭...");
-                executor.shutdownNow();
+                    GA optGA = new GA(trainData, trainDM, seed + currentProgress);
+                    ctxGA.weights = optGA.optimize(null);
+
+                    ACO optACO = new ACO(trainData, trainDM, seed + currentProgress);
+                    ctxACO.weights = optACO.optimize(null);
+
+                    UpdateSA optSAGA = new UpdateSA(trainData, trainDM, seed + currentProgress);
+                    ctxSAGA.weights = optSAGA.optimize(null);
+                }
+
+                // --- B. 执行阶段 ---
+                ctxStatic.runToTarget(target);
+                ctxSA.runToTarget(target);
+                ctxPSO.runToTarget(target);
+                ctxGA.runToTarget(target);
+                ctxACO.runToTarget(target);
+                ctxSAGA.runToTarget(target);
+
+                // --- C. 打点 (累计指标) ---
+                int logIdx = target / LOG_INTERVAL;
+                StringBuilder sb = new StringBuilder();
+                sb.append(logIdx).append(",");
+
+                // Hit Rate (Cumulative)
+                sb.append(fmt(getCumulativeMetric(ctxStatic.dm, 0))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSA.dm, 0))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxPSO.dm, 0))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxGA.dm, 0))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxACO.dm, 0))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSAGA.dm, 0))).append(",");
+
+                // Latency (Cumulative)
+                sb.append(fmt(getCumulativeMetric(ctxStatic.dm, 1))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSA.dm, 1))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxPSO.dm, 1))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxGA.dm, 1))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxACO.dm, 1))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSAGA.dm, 1))).append(",");
+
+                // Comp Rate (Cumulative)
+                sb.append(fmt(getCumulativeMetric(ctxStatic.dm, 2))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSA.dm, 2))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxPSO.dm, 2))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxGA.dm, 2))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxACO.dm, 2))).append(",");
+                sb.append(fmt(getCumulativeMetric(ctxSAGA.dm, 2)));
+
+                out.println(sb.toString());
             }
-        } catch (InterruptedException e) {
-            System.err.println("等待线程池关闭时被中断！");
-            executor.shutdownNow();
-            Thread.currentThread().interrupt(); // 重新设置中断状态
-        }
-
-        System.out.println("\n所有实验均已执行完毕！程序退出。");
-        System.out.println("请检查项目根目录下生成的 experiment_run-X_...txt 文件获取详细结果。");
+            System.out.println("Done. File: " + filename);
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
+    // --- Helpers ---
+
+    private static DataItem[] getTrainData(DataItem[] all, int currentIdx, int size) {
+        if (currentIdx == 0) return copy(all, 0, Math.min(size, all.length));
+        int start = Math.max(0, currentIdx - size);
+        return copy(all, start, currentIdx);
+    }
+    private static DataItem[] copy(DataItem[] src, int s, int e) {
+        int len = e - s; DataItem[] d = new DataItem[len];
+        for(int k=0;k<len;k++) d[k] = cloneItem(src[s+k]); return d;
+    }
+    private static double[] randomWeights(Random r) {
+        double[] w = new double[5]; double s=0; for(int i=0;i<5;i++){w[i]=r.nextDouble();s+=w[i];} for(int i=0;i<5;i++)w[i]/=s; return w;
+    }
+    private static String fmt(double v) { return String.format("%.4f", v); }
+
+    /**
+     * 获取【累计】指标
+     * 直接使用 dm 的 total 变量，不使用快照做减法
+     */
+    private static double getCumulativeMetric(DataManager dm, int type) {
+        // 0: Cumulative Hit Rate
+        if (type == 0) {
+            return (dm.totalAccessed > 0) ?
+                    (double)(dm.localHits + dm.cloudHits) / dm.totalAccessed : 0;
+        }
+        // 1: Cumulative Avg Latency (ms)
+        if (type == 1) {
+            return (dm.totalTasks > 0) ?
+                    (dm.totalDelaySeconds / dm.totalTasks) * 1000 : 0;
+        }
+        // 2: Cumulative Completion Rate
+        if (type == 2) {
+            return (dm.totalTasks > 0) ?
+                    (double)dm.completedTasks / dm.totalTasks : 0;
+        }
+        return 0;
+    }
+
+    public static void main(String[] args) { runDynamicComparison(1); }
 }

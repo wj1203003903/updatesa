@@ -8,14 +8,10 @@ public class UpdateSA {
     private static class EliteSolution implements Comparable<EliteSolution> {
         final double[] solution;
         final double score;
-
         EliteSolution(double[] solution, double score) {
-            this.solution = solution;
-            this.score = score;
+            this.solution = solution; this.score = score;
         }
-
-        @Override
-        public int compareTo(EliteSolution other) {
+        @Override public int compareTo(EliteSolution other) {
             return Double.compare(other.score, this.score);
         }
     }
@@ -39,8 +35,9 @@ public class UpdateSA {
     private final Random random;
     private final List<EliteSolution> eliteArchive;
     private int restartCount;
-    private double[] bestSolution;
-    private double bestScore;
+
+    public double[] bestSolution;
+    public double bestScore;
 
     public UpdateSA(DataItem[] testData, DataManager baseDM, long seed) {
         this.testData = testData;
@@ -64,30 +61,39 @@ public class UpdateSA {
         return score;
     }
 
-    public double run(PrintStream out, double baselineScore) {
-        out.println("--- Pre-seeding Elite Archive to ensure GA-Rescue readiness... ---");
-        while (eliteArchive.size() <= ARCHIVE_SIZE / 3) {
-            evaluate(randomWeights());
-        }
-        out.println("--- Pre-seeding finished. Elite archive size: " + eliteArchive.size() + " ---");
-
+    /**
+     * SAGA 完整版热启动优化接口
+     */
+    public double[] optimize(double[] initialWeights) {
         double[] currentSolution;
         double currentScore;
-        if (!eliteArchive.isEmpty()) {
-            eliteArchive.sort(null);
-            currentSolution = eliteArchive.get(0).solution.clone();
-            currentScore = eliteArchive.get(0).score;
+
+        // 1. 确定初始解 (Warm Start)
+        if (initialWeights != null) {
+            currentSolution = initialWeights.clone();
+            // 可以在这里加极小的变异防止完全重合，也可以直接用
         } else {
             currentSolution = randomWeights();
-            currentScore = evaluate(currentSolution);
         }
 
+        // 评估初始解并放入精英库
+        currentScore = evaluate(currentSolution);
+        updateArchive(new EliteSolution(currentSolution.clone(), currentScore));
+
+        // 如果热启动的解比当前默认的好，更新全局
+        if (currentScore > this.bestScore) {
+            this.bestScore = currentScore;
+            this.bestSolution = currentSolution.clone();
+        }
+
+        // 2. 执行完整的 SA-GA 流程
         double temperature = INIT_TEMP;
         int stagnationCount = 0;
-        int generation = 0;
+
+        // 重置重启次数，保证每个窗口都有完整的探索机会
+        this.restartCount = 0;
 
         while (temperature > MIN_TEMP) {
-            generation++;
             double bestScoreAtTempStart = this.bestScore;
 
             for (int it = 0; it < ITERATIONS_PER_TEMP; it++) {
@@ -106,48 +112,45 @@ public class UpdateSA {
                 stagnationCount++;
             }
 
-            double improvement = this.bestScore - baselineScore;
-            out.printf("Gen %2d (Temp %.2e): Improvement = %.4f\n",
-                    generation, temperature, Math.max(0, improvement));
+            // GA Rescue 逻辑
+            if (eliteArchive.size() >= ARCHIVE_SIZE / 3 &&
+                    stagnationCount >= RESTART_STAGNATION_THRESHOLD &&
+                    restartCount < MAX_RESTART_COUNT) {
 
-            if (eliteArchive.size() >= ARCHIVE_SIZE / 3 && stagnationCount >= RESTART_STAGNATION_THRESHOLD && restartCount < MAX_RESTART_COUNT) {
-                out.printf("--- Stagnation detected. Triggering GA Rescue #%d ---\n", restartCount + 1);
                 restartCount++;
                 runGARescue();
                 int newStartIndex = random.nextInt(Math.min(5, eliteArchive.size()));
                 currentSolution = eliteArchive.get(newStartIndex).solution.clone();
                 currentScore = eliteArchive.get(newStartIndex).score;
                 temperature *= RESTART_TEMP_INCREASE_FACTOR;
-                if (temperature > INIT_TEMP) {
-                    temperature = INIT_TEMP;
-                }
+                if (temperature > INIT_TEMP) temperature = INIT_TEMP;
                 stagnationCount = 0;
                 continue;
             }
             temperature *= COOLING_RATE;
         }
 
-        out.println("\n=== SA with GA-Rescue Finished ===");
-        double[] finalNormalizedBest = this.bestSolution.clone();
-        baseDM.normalizeL2(finalNormalizedBest);
-        out.printf("Final Best Weights (Normalized) = %s\n", Arrays.toString(finalNormalizedBest));
-        baseDM.printStats(out);
-        return this.bestScore;
+        return this.bestSolution;
     }
+
+    // 兼容旧代码
+    public double run(PrintStream out, double baselineScore) {
+        optimize(null);
+        if (baselineScore != -9999) out.println("SAGA Finished.");
+        return bestScore;
+    }
+
+    // --- 下面是内部辅助方法 (保持不变) ---
 
     private double[] randomWeights() {
         double[] w = new double[DIMENSIONS];
-        for (int i = 0; i < DIMENSIONS; i++) {
-            w[i] = random.nextDouble();
-        }
+        for (int i = 0; i < DIMENSIONS; i++) w[i] = random.nextDouble();
         return w;
     }
 
-    private double acceptanceProbability(double currentScore, double neighborScore, double temperature) {
-        if (neighborScore > currentScore) {
-            return 1.0;
-        }
-        return Math.exp((neighborScore - currentScore) / temperature);
+    private double acceptanceProbability(double c, double n, double t) {
+        if (n > c) return 1.0;
+        return Math.exp((n - c) / t);
     }
 
     private void runGARescue() {
@@ -171,35 +174,29 @@ public class UpdateSA {
         while (eliteArchive.size() > ARCHIVE_SIZE / 3) {
             eliteArchive.remove(eliteArchive.size() - 1);
         }
-        for (EliteSolution solution : currentPopulation) {
-            updateArchive(solution);
-        }
+        for (EliteSolution solution : currentPopulation) updateArchive(solution);
     }
 
-    private EliteSolution tournamentSelection(List<EliteSolution> population) {
+    private EliteSolution tournamentSelection(List<EliteSolution> pop) {
         EliteSolution best = null;
-        for (int i = 0; i < GA_RESCUE_TOURNAMENT_SIZE; i++) {
-            EliteSolution ind = population.get(random.nextInt(population.size()));
-            if (best == null || ind.score > best.score) {
-                best = ind;
-            }
+        for(int i=0; i<GA_RESCUE_TOURNAMENT_SIZE; i++) {
+            EliteSolution ind = pop.get(random.nextInt(pop.size()));
+            if(best==null || ind.score > best.score) best = ind;
         }
         return best;
     }
 
     private double[] crossover(double[] p1, double[] p2) {
-        double[] child = new double[DIMENSIONS];
-        for (int i = 0; i < DIMENSIONS; i++) {
-            child[i] = random.nextBoolean() ? p1[i] : p2[i];
-        }
-        return child;
+        double[] c = new double[DIMENSIONS];
+        for(int i=0;i<DIMENSIONS;i++) c[i] = random.nextBoolean() ? p1[i] : p2[i];
+        return c;
     }
 
-    private void mutate(double[] individual) {
+    private void mutate(double[] ind) {
         for (int i = 0; i < DIMENSIONS; i++) {
             if (random.nextDouble() < GA_RESCUE_MUTATION_RATE) {
-                individual[i] += random.nextGaussian() * 0.1;
-                individual[i] = Math.max(0, Math.min(1, individual[i]));
+                ind[i] += random.nextGaussian() * 0.1;
+                ind[i] = Math.max(0, Math.min(1, ind[i]));
             }
         }
     }
@@ -225,9 +222,7 @@ public class UpdateSA {
 
     private double distance(double[] s1, double[] s2) {
         double sum = 0;
-        for (int i = 0; i < DIMENSIONS; i++) {
-            sum += (s1[i] - s2[i]) * (s1[i] - s2[i]);
-        }
+        for(int i=0;i<DIMENSIONS;i++) sum+=(s1[i]-s2[i])*(s1[i]-s2[i]);
         return Math.sqrt(sum);
     }
 
@@ -245,14 +240,10 @@ public class UpdateSA {
 
     private int[] randomSampleIndices(int k) {
         int[] all = new int[DIMENSIONS];
-        for (int i = 0; i < DIMENSIONS; i++) {
-            all[i] = i;
-        }
+        for (int i = 0; i < DIMENSIONS; i++) all[i] = i;
         for (int i = 0; i < k; i++) {
             int j = i + random.nextInt(DIMENSIONS - i);
-            int tmp = all[i];
-            all[i] = all[j];
-            all[j] = tmp;
+            int tmp = all[i]; all[i] = all[j]; all[j] = tmp;
         }
         return Arrays.copyOf(all, k);
     }
