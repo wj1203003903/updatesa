@@ -120,7 +120,7 @@ public class DataGenerator {
 
         // --- 2. 定义一个与对数尺寸相关的附加时间系数 ---
         // 这个系数决定了文件大小对deadline的影响程度。
-        final double SIZE_FACTOR_MS = 100.0;
+        final double SIZE_FACTOR_MS = 300.0;
 
         int size = this.idToSizeMap.get(id);
 

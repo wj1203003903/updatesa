@@ -11,12 +11,18 @@ import java.util.List;
 
 public class Main {
 
-    // loadDataFromFile 方法保持不变...
+    /**
+     * 从CSV文件加载数据项。
+     * @param filePath CSV文件路径。
+     * @param maxLines 要读取的最大行数（0或负数表示读取全部）。
+     * @return DataItem数组。
+     */
     private static DataItem[] loadDataFromFile(String filePath, int maxLines) {
         List<DataItem> dataList = new ArrayList<>();
         String line;
+        // 使用try-with-resources确保BufferedReader被正确关闭
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            br.readLine();
+            br.readLine(); // 跳过表头
             int lineCount = 0;
             while ((line = br.readLine()) != null && (maxLines <= 0 || lineCount < maxLines)) {
                 String[] values = line.split(",");
@@ -36,7 +42,7 @@ public class Main {
     }
 
     /**
-     * 线程安全版本：在单个数据集上运行所有算法。
+     * 线程安全版本：在单个数据集上运行所有算法，并将结果打印到指定的PrintStream。
      */
     public static void runExperimentOnDataset(String datasetName, DataItem[] dataSet, DataManager dm, long seed, PrintStream out) {
         out.printf("\n\n=============== 正在对 [%s] 数据集运行完整测试 ===============\n", datasetName);
@@ -45,6 +51,7 @@ public class Main {
             return;
         }
 
+        // 重置数据管理器并加载新数据
         dm.reset();
         for (DataItem item : dataSet) {
             dm.registerDataItem(item);
@@ -56,10 +63,9 @@ public class Main {
 
         out.println("\n--- 1. Running Random Search (to set Baseline) ---");
         RandomSearch rs = new RandomSearch(dataSet, dm, seed);
-        baselineScore = rs.run(out); // RandomSearch.run 不需要 baselineScore
+        baselineScore = rs.run(out);
         results.put("Random Search (Baseline)", baselineScore);
 
-        // --- 核心修改：将 baselineScore 传递给每个算法的 run 方法 ---
         out.println("\n--- 2. Running Basic Simulated Annealing (SA) ---");
         SA sa = new SA(dataSet, dm, seed);
         results.put("Simulated Annealing (SA)", sa.run(out, baselineScore));
@@ -80,7 +86,7 @@ public class Main {
         UpdateSA updateSA = new UpdateSA(dataSet, dm, seed);
         results.put("Advanced SA (UpdateSA)", updateSA.run(out, baselineScore));
 
-        // 打印总结报告 (这部分逻辑不变，因为它本来就能访问 baselineScore)
+        // 打印总结报告
         out.println("\n==========================================================");
         out.printf("=== Final Score Summary for: [%-20s] ===\n", datasetName);
         out.println("==========================================================");
@@ -100,29 +106,45 @@ public class Main {
         out.println("==========================================================");
     }
 
-    // runSingleFullExperiment 和 main 方法保持不变...
+    /**
+     * 执行一次完整的实验运行，包括所有需要测试的数据集。
+     * @param runNumber 当前的运行编号。
+     */
     public static void runSingleFullExperiment(int runNumber) {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
         String logFileName = String.format("experiment_run-%d_%s.txt", runNumber, timestamp);
+
         try (FileOutputStream fos = new FileOutputStream(logFileName);
              PrintStream out = new PrintStream(fos, true, "UTF-8")) {
-            out.println("实验 #" + runNumber + " 开始时间: " + new Date());
-            long randomseed = (long)runNumber * runNumber * runNumber * 1000;
-            out.printf("\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d (Seed: %d) >>>>>>>>>>\n", runNumber, randomseed);
-            long localCapacity = 600L * 1024L;
-            long edgeCapacity = 2000L * 1024L;
-            DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
-            int syntheticRequests = 15000;
-            int syntheticUniqueIds = 300;
 
-            // 使用新参数创建 DataGenerator
+            out.println("实验 #" + runNumber + " 开始时间: " + new Date());
+            long randomseed = (long)runNumber * 1000;
+            out.printf("\n<<<<<<<<<< STARTING EXPERIMENT RUN #%d (Seed: %d) >>>>>>>>>>\n", runNumber, randomseed);
+
+            // --- 定义仿真环境参数 ---
+            long localCapacity = 3000L * 1024L;  // 3 MB
+            long edgeCapacity = 5000L * 1024L;   // 5 MB
+            DataManager dataManager = new DataManager(localCapacity, edgeCapacity);
+
+            // --- 运行真实数据实验 ---
+            String nasaDataPath = "dataset/processed_nasa_log.csv";
+            runExperimentOnDataset("10k Tasks", loadDataFromFile(nasaDataPath, 10000), dataManager, randomseed, out);
+            runExperimentOnDataset("15k Tasks", loadDataFromFile(nasaDataPath, 15000), dataManager, randomseed, out);
+            runExperimentOnDataset("20k Tasks", loadDataFromFile(nasaDataPath, 20000), dataManager, randomseed, out);
+
+            // --- 运行合成数据实验 ---
+            int syntheticRequests = 15000;
+            // 【关键可调参数】这个值与仿真器的缓存容量共同决定了最终的“缓存命中率”
+            int syntheticUniqueIds = 1000;
+
             DataGenerator generator = new DataGenerator(syntheticRequests, syntheticUniqueIds, randomseed);
 
-            // 运行测试
-            runExperimentOnDataset("合成数据-zip分布 (1.5万行, 1000 ID)", generator.generateData(), dataManager, randomseed, out);
+            // 【核心】调用唯一的方法，并使用统一的名称
+            runExperimentOnDataset("Zipf Tasks", generator.generateData(), dataManager, randomseed, out);
 
             out.println("\n\n=== Run #" + runNumber + " Finished. ===");
             out.println("实验 #" + runNumber + " 结束时间: " + new Date());
+
         } catch (IOException e) {
             System.err.println("运行实验 #" + runNumber + " 时发生严重IO错误:");
             e.printStackTrace();
@@ -131,10 +153,14 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("主程序启动，开始并行执行所有实验...");
+
         final int TOTAL_EXPERIMENT_RUNS = 10;
         final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+
         System.out.println("将使用 " + NUM_THREADS + " 个线程并行运行 " + TOTAL_EXPERIMENT_RUNS + " 次实验。");
+
         ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+
         for (int i = 1; i <= TOTAL_EXPERIMENT_RUNS; i++) {
             final int runNumber = i;
             executor.submit(() -> {
@@ -143,17 +169,22 @@ public class Main {
                 System.out.println("任务 #" + runNumber + " 已完成。");
             });
         }
+
         executor.shutdown();
         try {
+            // 设置一个超长的超时时间，确保实验能跑完
             if (!executor.awaitTermination(24, TimeUnit.HOURS)) {
-                System.err.println("错误：并非所有任务都在24小时内完成！");
+                System.err.println("错误：并非所有任务都在24小时内完成！正在强制关闭...");
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
             System.err.println("等待线程池关闭时被中断！");
             executor.shutdownNow();
+            Thread.currentThread().interrupt(); // 重新设置中断状态
         }
+
         System.out.println("\n所有实验均已执行完毕！程序退出。");
         System.out.println("请检查项目根目录下生成的 experiment_run-X_...txt 文件获取详细结果。");
     }
+
 }

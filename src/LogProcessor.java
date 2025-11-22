@@ -1,13 +1,19 @@
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class LogProcessor {
 
-    // --- 配置 ---
-    private static final String LOG_FILE_PATH_TEMPLATE = "/Users/a1203003903/IdeaProjects/updatesa/experiment_run-%d_2025-11-17_21-07-57.txt";
+    // --- 【核心配置】---
+    // 请将此路径设置为您的日志文件所在的目录。
+    // 如果您的日志文件在根目录下的 "dataset" 文件夹里, 就改为 "dataset/"
+    private static final String LOG_DIRECTORY_PATH = ".";
+
     private static final String[] ALGORITHMS = {
             "Simulated Annealing (SA)",
             "Particle Swarm (PSO)",
@@ -15,17 +21,17 @@ public class LogProcessor {
             "Ant Colony (ACO)",
             "Advanced SA (UpdateSA)"
     };
-    private static final int NUM_RUNS = 10;
+
     private static final int MAX_GENERATIONS = 150;
 
-    // --- 实验分组键名 ---
+    // --- 实验分组键名 (确保与 Main.java 日志输出一致) ---
     private static final Map<String, String> EXPERIMENT_KEYS = new LinkedHashMap<>();
     static {
         EXPERIMENT_KEYS.put("真实数据 (1万行)", "10k_Tasks_Data");
         EXPERIMENT_KEYS.put("真实数据 (1.5万行)", "15k_Tasks_Data");
         EXPERIMENT_KEYS.put("真实数据 (2万行)", "20k_Tasks_Data");
-        EXPERIMENT_KEYS.put("合成数据-正态分布", "Normal_Distribution_Data");
-        EXPERIMENT_KEYS.put("合成数据-指数分布", "Exponential_Distribution_Data");
+        // 【重要】确保这个名字和您 Main.java 中打印的标题完全一致
+        EXPERIMENT_KEYS.put("合成数据-zip分布", "Synthetic_Zipf_Data");
     }
 
     // --- 数据结构 ---
@@ -36,32 +42,54 @@ public class LogProcessor {
         double completionRate = 0.0, localCacheHitRate = 0.0, edgeCloudHitRate = 0.0, remoteAccessRate = 0.0, avgLatency = 0.0;
     }
 
+    /**
+     * 【已重构】主方法，用于动态查找并处理日志文件。
+     */
     public static void main(String[] args) {
-        initializeDataStructures();
+        File logDir = new File(LOG_DIRECTORY_PATH);
+
+        // 创建一个文件名过滤器，只匹配 "experiment_run-X_....txt" 格式的文件
+        FilenameFilter logFileFilter = (dir, name) -> name.startsWith("experiment_run-") && name.endsWith(".txt");
+        File[] logFiles = logDir.listFiles(logFileFilter);
+
+        if (logFiles == null || logFiles.length == 0) {
+            System.err.println("错误：在目录 '" + logDir.getAbsolutePath() + "' 中未找到任何日志文件！");
+            System.err.println("请确认：");
+            System.err.println("1. LOG_DIRECTORY_PATH 常量设置是否正确。");
+            System.err.println("2. 您的 Main 程序是否已成功在指定目录下生成了 .txt 日志文件。");
+            return;
+        }
+
+        // 按文件名排序，确保处理顺序是从 run-1, run-2, ...
+        Arrays.sort(logFiles, Comparator.comparing(File::getName));
+        initializeDataStructures(logFiles.length);
+
         try {
-            for (int runNumber = 1; runNumber <= NUM_RUNS; runNumber++) {
-                String currentLogFile = String.format(LOG_FILE_PATH_TEMPLATE, runNumber);
-                System.out.println("--- Processing file for run #" + runNumber + ": " + currentLogFile + " ---");
-                parseLogFile(currentLogFile, runNumber - 1);
+            for (int i = 0; i < logFiles.length; i++) {
+                File logFile = logFiles[i];
+                System.out.println("--- Processing file #" + (i + 1) + ": " + logFile.getPath() + " ---");
+                parseLogFile(logFile.getPath(), i);
             }
             System.out.println("\n\n<<<<<<<<<< ALL LOG FILES PROCESSED. GENERATING FINAL RESULTS... >>>>>>>>>>");
             generateGroupedCsvOutputs();
         } catch (IOException e) {
-            System.err.println("Error processing log files: " + e.getMessage());
+            System.err.println("处理日志文件时发生错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // ... 其他方法无需改动, 只修改 parseLogFile ...
-
-    private static void initializeDataStructures() {
+    /**
+     * 根据动态发现的日志文件总数来初始化数据结构。
+     * @param numRuns 找到的日志文件总数。
+     */
+    private static void initializeDataStructures(int numRuns) {
         for (String groupKey : EXPERIMENT_KEYS.values()) {
             Map<String, List<Map<Integer, Double>>> groupData = new LinkedHashMap<>();
             Map<String, List<FinalMetrics>> groupMetrics = new LinkedHashMap<>();
 
             for (String algo : ALGORITHMS) {
                 List<Map<Integer, Double>> runsList = new ArrayList<>();
-                for (int i = 0; i < NUM_RUNS; i++) {
+                for (int i = 0; i < numRuns; i++) {
                     runsList.add(new HashMap<>());
                 }
                 groupData.put(algo, runsList);
@@ -79,7 +107,8 @@ public class LogProcessor {
 
     private static void parseLogFile(String logFilePath, int runIndex) throws IOException {
         List<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(logFilePath))) {
+        // 明确使用UTF-8编码读取，避免因系统默认编码不同导致的乱码问题
+        try (BufferedReader reader = new BufferedReader(new FileReader(logFilePath, StandardCharsets.UTF_8))) {
             reader.lines().forEach(lines::add);
         }
 
@@ -89,6 +118,7 @@ public class LogProcessor {
         for (int lineNum = 0; lineNum < lines.size(); lineNum++) {
             String line = lines.get(lineNum);
 
+            // 更新当前实验组的键
             for(Map.Entry<String, String> entry : EXPERIMENT_KEYS.entrySet()){
                 if(line.contains(entry.getKey())){
                     currentExperimentKey = entry.getValue();
@@ -98,6 +128,7 @@ public class LogProcessor {
 
             if (currentExperimentKey == null) continue;
 
+            // 更新当前算法
             if (line.contains("--- ") && (line.contains("Running") || line.contains("Finished"))) {
                 if (line.contains("Simulated Annealing (SA)")) currentAlgorithm = "Simulated Annealing (SA)";
                 else if (line.contains("Particle Swarm Optimization (PSO)")) currentAlgorithm = "Particle Swarm (PSO)";
@@ -108,23 +139,25 @@ public class LogProcessor {
             }
 
             if (currentAlgorithm != null) {
+                // 解析逐代数据
                 if (line.trim().startsWith("Gen ") && line.contains("Improvement =")) {
-                    if (groupedRunsData.get(currentExperimentKey).containsKey(currentAlgorithm)) {
+                    Map<String, List<Map<Integer, Double>>> currentGroupData = groupedRunsData.get(currentExperimentKey);
+                    if (currentGroupData != null && currentGroupData.containsKey(currentAlgorithm)) {
                         try {
                             String valueStr = line.split("Improvement =")[1].trim();
                             double improvement = Double.parseDouble(valueStr);
-                            Map<Integer, Double> runData = groupedRunsData.get(currentExperimentKey).get(currentAlgorithm).get(runIndex);
+                            Map<Integer, Double> runData = currentGroupData.get(currentAlgorithm).get(runIndex);
                             runData.put(runData.size() + 1, improvement);
                         } catch (Exception e) { /* Ignore parse error */ }
                     }
                 }
 
+                // 解析性能指标
                 if (line.contains("---- 与最高分对应的系统性能统计 ----")) {
                     FinalMetrics metrics = new FinalMetrics();
                     String owner = findBlockOwner(lines, lineNum);
-                    if (owner != null && groupedRunsMetrics.get(currentExperimentKey).containsKey(owner)) {
-                        // --- 最终修正: 循环范围从5扩大到6 ---
-                        // The metrics block contains 6 lines of data, not 5.
+                    Map<String, List<FinalMetrics>> currentGroupMetrics = groupedRunsMetrics.get(currentExperimentKey);
+                    if (owner != null && currentGroupMetrics != null && currentGroupMetrics.containsKey(owner)) {
                         for (int i = 1; i <= 6; i++) {
                             if (lineNum + i < lines.size()) {
                                 String metricLine = lines.get(lineNum + i);
@@ -142,7 +175,7 @@ public class LogProcessor {
                                 } catch (Exception e) { /* ignore parse error */ }
                             }
                         }
-                        groupedRunsMetrics.get(currentExperimentKey).get(owner).add(metrics);
+                        currentGroupMetrics.get(owner).add(metrics);
                     }
                 }
             }
